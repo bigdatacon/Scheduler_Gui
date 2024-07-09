@@ -9,7 +9,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    // Sample data
     ms_operations = {
         {new MSOperation{0, 1, 71, 102}, new MSOperation{0, 1, 169, 204}},
         {new MSOperation{0, 2, 102, 129}, new MSOperation{0, 2, 129, 169}},
@@ -30,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     plotMSOperations();
     plotJSOperations();
 
-    connect(msPlot, SIGNAL(plottableClick(QCPAbstractPlottable*,QMouseEvent*)), this, SLOT(handleBarDrag(QCPAbstractPlottable*,QMouseEvent*)));
+    connect(msPlot, &QCustomPlot::plottableClick, this, &MainWindow::handleBarDrag);
 }
 
 MainWindow::~MainWindow()
@@ -43,21 +42,19 @@ void MainWindow::setupPlots()
     auto layout = new QVBoxLayout;
     layout->addWidget(msPlot);
     layout->addWidget(jsPlot);
-    ui->centralwidget->setLayout(layout);
+    ui->centralwidget->setLayout(layout);  // убедитесь, что имя центрального виджета `centralwidget`
 }
 
 void MainWindow::plotMSOperations()
 {
     for (const auto& ops : ms_operations) {
         QCPBars *bar = new QCPBars(msPlot->xAxis, msPlot->yAxis);
-        QVector<double> ticks, start, duration;
+        QVector<double> ticks, duration;
         for (const auto& op : ops) {
-            ticks << op->machineId;
-            start << op->startTime;
+            ticks << op->startTime;
             duration << (op->endTime - op->startTime);
         }
         bar->setData(ticks, duration);
-        msPlot->addPlottable(bar);
     }
     msPlot->rescaleAxes();
     msPlot->replot();
@@ -67,14 +64,12 @@ void MainWindow::plotJSOperations()
 {
     for (const auto& ops : js_operations) {
         QCPBars *bar = new QCPBars(jsPlot->xAxis, jsPlot->yAxis);
-        QVector<double> ticks, start, duration;
+        QVector<double> ticks, duration;
         for (const auto& op : ops) {
-            ticks << op->jobId;
-            start << op->startTime;
+            ticks << op->startTime;
             duration << (op->endTime - op->startTime);
         }
         bar->setData(ticks, duration);
-        jsPlot->addPlottable(bar);
     }
     jsPlot->rescaleAxes();
     jsPlot->replot();
@@ -82,8 +77,14 @@ void MainWindow::plotJSOperations()
 
 void MainWindow::syncPlots(QCPBars *source, QCPBars *target)
 {
-    // Implement logic to sync target plot based on source plot's new data
-    target->setData(source->data()->keys(), source->data()->values());
+    QCPBarsDataContainer::const_iterator it;
+    QVector<double> keys, values;
+    for (it = source->data()->constBegin(); it != source->data()->constEnd(); ++it)
+    {
+        keys << it->key;
+        values << it->value;
+    }
+    target->setData(keys, values);
     target->parentPlot()->replot();
 }
 
@@ -99,6 +100,6 @@ void MainWindow::handleBarDrag(QCPAbstractPlottable *plottable, QMouseEvent *eve
         bar->parentPlot()->replot();
 
         // Sync with corresponding bar in jsPlot
-        syncPlots(bar, qobject_cast<QCPBars*>(jsPlot->plottable()));
+        syncPlots(bar, qobject_cast<QCPBars*>(jsPlot->plottable(0)));
     }
 }
