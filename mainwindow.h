@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include "qcustomplot.h"
-#include <vector>
 
 class MSOperation {
 public:
@@ -39,6 +38,9 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void handleBarDrag(QCPAbstractPlottable* plottable, int dataIndex, QMouseEvent* event);
+
 private:
     Ui::MainWindow *ui;
     QCustomPlot *msPlot;
@@ -51,7 +53,6 @@ private:
     void plotMSOperations();
     void plotJSOperations();
     void syncPlots(QCPBars *source, QCPBars *target);
-    void handleBarDrag(QCPAbstractPlottable*, QMouseEvent*);
 };
 
 #endif // MAINWINDOW_H
