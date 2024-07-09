@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     plotMSOperations();
     plotJSOperations();
 
-    connect(msPlot, &QCustomPlot::plottableClick, this, &MainWindow::handleBarDrag);
+    connect(msPlot, SIGNAL(plottableClick(QCPAbstractPlottable*,QMouseEvent*)), this, SLOT(handleBarDrag(QCPAbstractPlottable*,QMouseEvent*)));
 }
 
 MainWindow::~MainWindow()
