@@ -13,16 +13,17 @@ int main(int argc, char *argv[])
     BarChartView view;
     view.setRenderHint(QPainter::Antialiasing);
 
-    QFile file("data.json");
+    QString filePath = QCoreApplication::applicationDirPath() + "/data.json";
+    QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Could not open data.json";
+        qWarning() << "Could not open" << filePath;
         return -1;
     }
 
     QByteArray jsonData = file.readAll();
     QJsonDocument document = QJsonDocument::fromJson(jsonData);
     if (document.isNull() || !document.isObject()) {
-        qWarning() << "Invalid JSON data in data.json";
+        qWarning() << "Invalid JSON data in" << filePath;
         return -1;
     }
 
@@ -32,7 +33,7 @@ int main(int argc, char *argv[])
         qDebug() << "Loaded js_operations with" << operations.size() << "entries";
         view.loadData(operations);
     } else {
-        qWarning() << "No js_operations array found in data.json";
+        qWarning() << "No js_operations array found in" << filePath;
     }
 
     view.resize(800, 600);
