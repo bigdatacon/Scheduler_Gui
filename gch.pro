@@ -14,14 +14,14 @@ SOURCES += \
     barchartview.cpp \
     main.cpp \
     mainwindow.cpp \
-    qcustomplot.cpp \
-    draggablebarchart.cpp  # Добавьте этот файл
+    qcustomplot.cpp
+     # draggablebarchart.cpp # Добавьте этот файл
 
 HEADERS += \
     barchartview.h \
     mainwindow.h \
-    qcustomplot.h \
-    draggablebarchart.h  # Добавьте этот файл
+    qcustomplot.h
+     # draggablebarchart.h # Добавьте этот файл
 
 FORMS += \
     mainwindow.ui
