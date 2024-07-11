@@ -1,0 +1,36 @@
+{
+    "js_operations": [
+        {"Finish": 71, "Job": 1, "Machine": 3, "Start": 38},
+        {"Finish": 102, "Job": 1, "Machine": 0, "Start": 71},
+        {"Finish": 129, "Job": 1, "Machine": 1, "Start": 102},
+        {"Finish": 169, "Job": 1, "Machine": 1, "Start": 129},
+        {"Finish": 204, "Job": 1, "Machine": 0, "Start": 169},
+        {"Finish": 14, "Job": 2, "Machine": 6, "Start": 0},
+        {"Finish": 35, "Job": 2, "Machine": 5, "Start": 14},
+        {"Finish": 109, "Job": 2, "Machine": 3, "Start": 71},
+        {"Finish": 150, "Job": 2, "Machine": 7, "Start": 109},
+        {"Finish": 38, "Job": 3, "Machine": 3, "Start": 0},
+        {"Finish": 65, "Job": 3, "Machine": 5, "Start": 38},
+        {"Finish": 107, "Job": 3, "Machine": 4, "Start": 65},
+        {"Finish": 173, "Job": 3, "Machine": 3, "Start": 109},
+        {"Finish": 227, "Job": 3, "Machine": 7, "Start": 173},
+        {"Finish": 254, "Job": 3, "Machine": 5, "Start": 227}
+    ],
+    "ms_operations": [
+        {"Finish": 102, "Job": 0, "Machine": 1, "Start": 71},
+        {"Finish": 204, "Job": 0, "Machine": 1, "Start": 169},
+        {"Finish": 129, "Job": 0, "Machine": 2, "Start": 102},
+        {"Finish": 169, "Job": 0, "Machine": 2, "Start": 129},
+        {"Finish": 38, "Job": 2, "Machine": 3, "Start": 0},
+        {"Finish": 71, "Job": 0, "Machine": 3, "Start": 38},
+        {"Finish": 109, "Job": 1, "Machine": 3, "Start": 71},
+        {"Finish": 173, "Job": 2, "Machine": 3, "Start": 109},
+        {"Finish": 107, "Job": 2, "Machine": 4, "Start": 65},
+        {"Finish": 35, "Job": 1, "Machine": 5, "Start": 14},
+        {"Finish": 65, "Job": 2, "Machine": 5, "Start": 38},
+        {"Finish": 254, "Job": 2, "Machine": 5, "Start": 227},
+        {"Finish": 14, "Job": 1, "Machine": 6, "Start": 0},
+        {"Finish": 150, "Job": 1, "Machine": 7, "Start": 109},
+        {"Finish": 227, "Job": 2, "Machine": 7, "Start": 173}
+    ]
+}
