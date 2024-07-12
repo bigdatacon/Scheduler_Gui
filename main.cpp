@@ -2,52 +2,98 @@
 #include <QMainWindow>
 #include "qcustomplot.h"
 #include <QVBoxLayout>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 struct MSOperation {
-    int jobIndex;
-    int operationIndex;
+    int job;
+    int machine;
     int startTime;
     int finishTime;
 };
 
 struct JSOperation {
-    int operationIndex;
-    int machineIndex;
+    int job;
+    int machine;
     int startTime;
     int finishTime;
 };
 
+bool loadJsonData(const QString &fileName, QVector<JSOperation> &js_operations, QVector<MSOperation> &ms_operations) {
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return false;
+    }
+
+    QByteArray data = file.readAll();
+    file.close();
+
+    QJsonDocument document = QJsonDocument::fromJson(data);
+    if (document.isNull() || !document.isObject()) {
+        return false;
+    }
+
+    QJsonObject jsonObject = document.object();
+    QJsonArray jsArray = jsonObject["js_operations"].toArray();
+    QJsonArray msArray = jsonObject["ms_operations"].toArray();
+
+    for (const QJsonValue &value : jsArray) {
+        QJsonObject obj = value.toObject();
+        JSOperation operation;
+        operation.job = obj["Job"].toInt();
+        operation.machine = obj["Machine"].toInt();
+        operation.startTime = obj["Start"].toInt();
+        operation.finishTime = obj["Finish"].toInt();
+        js_operations.append(operation);
+    }
+
+    for (const QJsonValue &value : msArray) {
+        QJsonObject obj = value.toObject();
+        MSOperation operation;
+        operation.job = obj["Job"].toInt();
+        operation.machine = obj["Machine"].toInt();
+        operation.startTime = obj["Start"].toInt();
+        operation.finishTime = obj["Finish"].toInt();
+        ms_operations.append(operation);
+    }
+
+    return true;
+}
+
 void createGanttChart(QCustomPlot *customPlot, const QVector<JSOperation> &js_operations, const QVector<MSOperation> &ms_operations, bool groupByJob) {
-    QVector<double> startTimes, durations;
+    QVector<double> startTimes, durations, yPositions;
     QVector<QString> labels;
     QMap<int, int> uniqueLabels; // To map job/machine to axis index
     int index = 0;
 
     if (groupByJob) {
         for (const auto &op : js_operations) {
-            int label = op.operationIndex;
+            int label = op.job;
             if (!uniqueLabels.contains(label)) {
                 uniqueLabels[label] = index++;
             }
-            startTimes.append(uniqueLabels[label]);
+            startTimes.append(op.startTime);
             durations.append(op.finishTime - op.startTime);
-            labels.append(QString("M%1").arg(op.machineIndex));
+            yPositions.append(uniqueLabels[label]);
+            labels.append(QString("J%1").arg(op.job));
         }
     } else {
         for (const auto &op : ms_operations) {
-            int label = op.jobIndex;
+            int label = op.machine;
             if (!uniqueLabels.contains(label)) {
                 uniqueLabels[label] = index++;
             }
-            startTimes.append(uniqueLabels[label]);
+            startTimes.append(op.startTime);
             durations.append(op.finishTime - op.startTime);
-            labels.append(QString("J%1").arg(op.jobIndex));
+            yPositions.append(uniqueLabels[label]);
+            labels.append(QString("M%1").arg(op.machine));
         }
     }
 
     QCPBars *bars = new QCPBars(customPlot->yAxis, customPlot->xAxis);
-    QVector<double> barWidths(startTimes.size(), 1); // Width of each bar
-    bars->setData(startTimes, durations);
+    bars->setData(yPositions, durations);
 
     QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
     for (auto it = uniqueLabels.begin(); it != uniqueLabels.end(); ++it) {
@@ -56,7 +102,7 @@ void createGanttChart(QCustomPlot *customPlot, const QVector<JSOperation> &js_op
 
     customPlot->yAxis->setTicker(textTicker);
     customPlot->xAxis->setLabel("Time");
-    customPlot->yAxis->setLabel(groupByJob ? "Operations" : "Jobs");
+    customPlot->yAxis->setLabel(groupByJob ? "Jobs" : "Machines");
     customPlot->xAxis->setRange(0, 260);
     customPlot->yAxis->setRange(-1, index);
 
@@ -68,18 +114,12 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     QMainWindow window;
 
-    // Sample data from the provided JSON
-    QVector<JSOperation> js_operations = {
-        {1, 3, 38, 71}, {1, 0, 71, 102}, {1, 1, 102, 129}, {1, 1, 129, 169}, {1, 0, 169, 204},
-        {2, 6, 0, 14}, {2, 5, 14, 35}, {2, 3, 71, 109}, {2, 7, 109, 150},
-        {3, 3, 0, 38}, {3, 5, 38, 65}, {3, 4, 65, 107}, {3, 3, 109, 173}, {3, 7, 173, 227}, {3, 5, 227, 254}
-    };
-
-    QVector<MSOperation> ms_operations = {
-        {1, 1, 71, 102}, {1, 1, 169, 204}, {1, 2, 102, 129}, {1, 2, 129, 169}, {3, 3, 0, 38},
-        {1, 3, 38, 71}, {2, 3, 71, 109}, {3, 3, 109, 173}, {3, 4, 65, 107}, {2, 5, 14, 35},
-        {3, 5, 38, 65}, {3, 5, 227, 254}, {2, 6, 0, 14}, {2, 7, 109, 150}, {3, 7, 173, 227}
-    };
+    QVector<JSOperation> js_operations;
+    QVector<MSOperation> ms_operations;
+    if (!loadJsonData("data.json", js_operations, ms_operations)) {
+        qDebug() << "Failed to load data from JSON file.";
+        return -1;
+    }
 
     QWidget *centralWidget = new QWidget(&window);
     QVBoxLayout *layout = new QVBoxLayout(centralWidget);
