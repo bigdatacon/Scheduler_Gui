@@ -3,30 +3,50 @@
 #include "qcustomplot.h"
 #include <QVBoxLayout>
 
-struct Operation {
-    int Start;
-    int Finish;
-    int Job;
-    int Machine;
+struct MSOperation {
+    int jobIndex;
+    int operationIndex;
+    int startTime;
+    int finishTime;
 };
 
-void createGanttChart(QCustomPlot *customPlot, const QVector<Operation> &operations, bool groupByJob) {
+struct JSOperation {
+    int operationIndex;
+    int machineIndex;
+    int startTime;
+    int finishTime;
+};
+
+void createGanttChart(QCustomPlot *customPlot, const QVector<JSOperation> &js_operations, const QVector<MSOperation> &ms_operations, bool groupByJob) {
     QVector<double> startTimes, durations;
     QVector<QString> labels;
     QMap<int, int> uniqueLabels; // To map job/machine to axis index
     int index = 0;
 
-    for (const auto &op : operations) {
-        int label = groupByJob ? op.Job : op.Machine;
-        if (!uniqueLabels.contains(label)) {
-            uniqueLabels[label] = index++;
+    if (groupByJob) {
+        for (const auto &op : js_operations) {
+            int label = op.operationIndex;
+            if (!uniqueLabels.contains(label)) {
+                uniqueLabels[label] = index++;
+            }
+            startTimes.append(uniqueLabels[label]);
+            durations.append(op.finishTime - op.startTime);
+            labels.append(QString("M%1").arg(op.machineIndex));
         }
-        startTimes.append(op.Start);
-        durations.append(op.Finish - op.Start);
-        labels.append(groupByJob ? QString("Job %1").arg(op.Job) : QString("Machine %1").arg(op.Machine));
+    } else {
+        for (const auto &op : ms_operations) {
+            int label = op.jobIndex;
+            if (!uniqueLabels.contains(label)) {
+                uniqueLabels[label] = index++;
+            }
+            startTimes.append(uniqueLabels[label]);
+            durations.append(op.finishTime - op.startTime);
+            labels.append(QString("J%1").arg(op.jobIndex));
+        }
     }
 
     QCPBars *bars = new QCPBars(customPlot->yAxis, customPlot->xAxis);
+    QVector<double> barWidths(startTimes.size(), 1); // Width of each bar
     bars->setData(startTimes, durations);
 
     QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
@@ -36,7 +56,7 @@ void createGanttChart(QCustomPlot *customPlot, const QVector<Operation> &operati
 
     customPlot->yAxis->setTicker(textTicker);
     customPlot->xAxis->setLabel("Time");
-    customPlot->yAxis->setLabel(groupByJob ? "Jobs" : "Machines");
+    customPlot->yAxis->setLabel(groupByJob ? "Operations" : "Jobs");
     customPlot->xAxis->setRange(0, 260);
     customPlot->yAxis->setRange(-1, index);
 
@@ -49,16 +69,16 @@ int main(int argc, char *argv[])
     QMainWindow window;
 
     // Sample data from the provided JSON
-    QVector<Operation> js_operations = {
-        {38, 71, 1, 3}, {71, 102, 1, 0}, {102, 129, 1, 1}, {129, 169, 1, 1}, {169, 204, 1, 0},
-        {0, 14, 2, 6}, {14, 35, 2, 5}, {71, 109, 2, 3}, {109, 150, 2, 7},
-        {0, 38, 3, 3}, {38, 65, 3, 5}, {65, 107, 3, 4}, {109, 173, 3, 3}, {173, 227, 3, 7}, {227, 254, 3, 5}
+    QVector<JSOperation> js_operations = {
+        {1, 3, 38, 71}, {1, 0, 71, 102}, {1, 1, 102, 129}, {1, 1, 129, 169}, {1, 0, 169, 204},
+        {2, 6, 0, 14}, {2, 5, 14, 35}, {2, 3, 71, 109}, {2, 7, 109, 150},
+        {3, 3, 0, 38}, {3, 5, 38, 65}, {3, 4, 65, 107}, {3, 3, 109, 173}, {3, 7, 173, 227}, {3, 5, 227, 254}
     };
 
-    QVector<Operation> ms_operations = {
-        {71, 102, 0, 1}, {169, 204, 0, 1}, {102, 129, 0, 2}, {129, 169, 0, 2}, {0, 38, 2, 3},
-        {38, 71, 0, 3}, {71, 109, 1, 3}, {109, 173, 2, 3}, {65, 107, 2, 4}, {14, 35, 1, 5},
-        {38, 65, 2, 5}, {227, 254, 2, 5}, {0, 14, 1, 6}, {109, 150, 1, 7}, {173, 227, 2, 7}
+    QVector<MSOperation> ms_operations = {
+        {0, 1, 71, 102}, {0, 1, 169, 204}, {0, 2, 102, 129}, {0, 2, 129, 169}, {2, 3, 0, 38},
+        {0, 3, 38, 71}, {1, 3, 71, 109}, {2, 3, 109, 173}, {2, 4, 65, 107}, {1, 5, 14, 35},
+        {2, 5, 38, 65}, {2, 5, 227, 254}, {1, 6, 0, 14}, {1, 7, 109, 150}, {2, 7, 173, 227}
     };
 
     QWidget *centralWidget = new QWidget(&window);
@@ -71,8 +91,8 @@ int main(int argc, char *argv[])
     layout->addWidget(customPlot1);
     layout->addWidget(customPlot2);
 
-    createGanttChart(customPlot1, js_operations, true);
-    createGanttChart(customPlot2, ms_operations, false);
+    createGanttChart(customPlot1, js_operations, ms_operations, true);
+    createGanttChart(customPlot2, js_operations, ms_operations, false);
 
     window.resize(800, 600);
     window.show();
