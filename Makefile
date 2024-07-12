@@ -55,20 +55,14 @@ OBJECTS_DIR   = ./
 SOURCES       = barchartview.cpp \
 		main.cpp \
 		mainwindow.cpp \
-		qcustomplot.cpp \
-		draggablebarchart.cpp moc_barchartview.cpp \
-		moc_mainwindow.cpp \
-		moc_qcustomplot.cpp \
-		moc_draggablebarchart.cpp
+		qcustomplot.cpp moc_mainwindow.cpp \
+		moc_qcustomplot.cpp
 OBJECTS       = barchartview.o \
 		main.o \
 		mainwindow.o \
 		qcustomplot.o \
-		draggablebarchart.o \
-		moc_barchartview.o \
 		moc_mainwindow.o \
-		moc_qcustomplot.o \
-		moc_draggablebarchart.o
+		moc_qcustomplot.o
 DIST          = data.json \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -156,12 +150,10 @@ DIST          = data.json \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		gch.pro barchartview.h \
 		mainwindow.h \
-		qcustomplot.h \
-		draggablebarchart.h barchartview.cpp \
+		qcustomplot.h barchartview.cpp \
 		main.cpp \
 		mainwindow.cpp \
-		qcustomplot.cpp \
-		draggablebarchart.cpp
+		qcustomplot.cpp
 QMAKE_TARGET  = gch
 DESTDIR       = 
 TARGET        = gch
@@ -359,8 +351,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents barchartview.h mainwindow.h qcustomplot.h draggablebarchart.h $(DISTDIR)/
-	$(COPY_FILE) --parents barchartview.cpp main.cpp mainwindow.cpp qcustomplot.cpp draggablebarchart.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents barchartview.h mainwindow.h qcustomplot.h $(DISTDIR)/
+	$(COPY_FILE) --parents barchartview.cpp main.cpp mainwindow.cpp qcustomplot.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents mainwindow.ui $(DISTDIR)/
 
 
@@ -391,14 +383,9 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -w -O2 -std=gnu++1z -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_barchartview.cpp moc_mainwindow.cpp moc_qcustomplot.cpp moc_draggablebarchart.cpp
+compiler_moc_header_make_all: moc_mainwindow.cpp moc_qcustomplot.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_barchartview.cpp moc_mainwindow.cpp moc_qcustomplot.cpp moc_draggablebarchart.cpp
-moc_barchartview.cpp: barchartview.h \
-		moc_predefs.h \
-		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/user1/gch/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/user1/gch -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include barchartview.h -o moc_barchartview.cpp
-
+	-$(DEL_FILE) moc_mainwindow.cpp moc_qcustomplot.cpp
 moc_mainwindow.cpp: mainwindow.h \
 		qcustomplot.h \
 		moc_predefs.h \
@@ -409,11 +396,6 @@ moc_qcustomplot.cpp: qcustomplot.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/user1/gch/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/user1/gch -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include qcustomplot.h -o moc_qcustomplot.cpp
-
-moc_draggablebarchart.cpp: draggablebarchart.h \
-		moc_predefs.h \
-		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/user1/gch/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/user1/gch -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include draggablebarchart.h -o moc_draggablebarchart.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -438,10 +420,10 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_ui
 
 ####### Compile
 
-barchartview.o: barchartview.cpp barchartview.h
+barchartview.o: barchartview.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o barchartview.o barchartview.cpp
 
-main.o: main.cpp barchartview.h
+main.o: main.cpp qcustomplot.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 mainwindow.o: mainwindow.cpp mainwindow.h \
@@ -452,20 +434,11 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 qcustomplot.o: qcustomplot.cpp qcustomplot.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qcustomplot.o qcustomplot.cpp
 
-draggablebarchart.o: draggablebarchart.cpp draggablebarchart.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o draggablebarchart.o draggablebarchart.cpp
-
-moc_barchartview.o: moc_barchartview.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_barchartview.o moc_barchartview.cpp
-
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp
 
 moc_qcustomplot.o: moc_qcustomplot.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_qcustomplot.o moc_qcustomplot.cpp
-
-moc_draggablebarchart.o: moc_draggablebarchart.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_draggablebarchart.o moc_draggablebarchart.cpp
 
 ####### Install
 

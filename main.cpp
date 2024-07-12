@@ -12,24 +12,31 @@ int main(int argc, char *argv[])
     window.resize(800, 600);
 
     // generate some data:
-    QVector<double> x(101), y(101); // initialize with entries 0..100
-    for (int i=0; i<101; ++i)
+    QVector<double> ticks(5), barData(5);
+    for (int i = 0; i < 5; ++i)
     {
-      x[i] = i/50.0 - 1; // x goes from -1 to 1
-      y[i] = x[i]*x[i]; // let's plot a quadratic function
+        ticks[i] = i + 1; // category values
+        barData[i] = (i + 1) * 2; // bar lengths
     }
 
-    // create graph and assign data to it:
-    customPlot->addGraph();
-    customPlot->graph(0)->setData(x, y);
+    // create and set up bars:
+    QCPBars *bars = new QCPBars(customPlot->yAxis, customPlot->xAxis);
+    bars->setData(ticks, barData);
 
     // give the axes some labels:
-    customPlot->xAxis->setLabel("x");
-    customPlot->yAxis->setLabel("y");
+    customPlot->xAxis->setLabel("Value");
+    customPlot->yAxis->setLabel("Category");
+
+    // prepare y axis with category labels:
+    QVector<QString> labels;
+    labels << "A" << "B" << "C" << "D" << "E";
+    QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
+    textTicker->addTicks(ticks, labels);
+    customPlot->yAxis->setTicker(textTicker);
 
     // set axes ranges, so we see all data:
-    customPlot->xAxis->setRange(-1, 1);
-    customPlot->yAxis->setRange(0, 1);
+    customPlot->xAxis->setRange(0, 10);
+    customPlot->yAxis->setRange(0, 6);
 
     customPlot->replot();
 
