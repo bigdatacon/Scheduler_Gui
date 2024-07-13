@@ -1,95 +1,88 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-      ui(new Ui::MainWindow)
+      customPlot(new QCustomPlot(this)),
+      startTimeEdit(new QLineEdit(this)),
+      finishTimeEdit(new QLineEdit(this)),
+      jobEdit(new QLineEdit(this)),
+      machineEdit(new QLineEdit(this)),
+      applyButton(new QPushButton("Apply", this)),
+      resetButton(new QPushButton("Reset", this)),
+      layout(new QVBoxLayout)
 {
-    ui->setupUi(this);
-    msPlot = new QCustomPlot(this);
-    jsPlot = new QCustomPlot(this);
+    QWidget *centralWidget = new QWidget(this);
+    setCentralWidget(centralWidget);
 
-    ui->verticalLayout->addWidget(msPlot);
-    ui->verticalLayout->addWidget(jsPlot);
+    setupPlot();
 
-    setupPlots();
+    layout->addWidget(customPlot);
+    layout->addWidget(new QLabel("Start Time:", this));
+    layout->addWidget(startTimeEdit);
+    layout->addWidget(new QLabel("Finish Time:", this));
+    layout->addWidget(finishTimeEdit);
+    layout->addWidget(new QLabel("Job:", this));
+    layout->addWidget(jobEdit);
+    layout->addWidget(new QLabel("Machine:", this));
+    layout->addWidget(machineEdit);
+    layout->addWidget(applyButton);
+    layout->addWidget(resetButton);
+
+    centralWidget->setLayout(layout);
+
+    connect(applyButton, &QPushButton::clicked, this, &MainWindow::onApplyButtonClicked);
+    connect(resetButton, &QPushButton::clicked, this, &MainWindow::onResetButtonClicked);
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
+MainWindow::~MainWindow() {}
 
-void MainWindow::setupPlots()
-{
-    plotMSOperations();
-    plotJSOperations();
+void MainWindow::setupPlot() {
+    customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+    customPlot->xAxis->setRange(0, 10);
+    customPlot->yAxis->setRange(0, 10);
 
-    connect(msPlot, &QCustomPlot::plottableClick, this, &MainWindow::handleBarDrag);
-}
+    // Create QCPBars for machines and jobs
+    machinesBars = new QCPBars(customPlot->yAxis, customPlot->xAxis);
+    jobsBars = new QCPBars(customPlot->yAxis, customPlot->xAxis);
 
-void MainWindow::plotMSOperations()
-{
-    for (const auto &ops : ms_operations)
-    {
-        QCPBars *bar = new QCPBars(msPlot->xAxis, msPlot->yAxis);
-        QVector<double> ticks, duration;
-        for (const auto &op : ops)
-        {
-            ticks << op->startTime;
-            duration << (op->endTime - op->startTime);
-        }
-        bar->setData(ticks, duration);
+    // Set bars width
+    machinesBars->setWidth(0.5);
+    jobsBars->setWidth(0.5);
+
+    // Initialize data for the bars
+    QVector<double> machinesData, jobsData, ticks;
+    machinesData << 1 << 2 << 3 << 4 << 5;
+    jobsData << 1 << 2 << 3 << 4 << 5;
+    ticks << 1 << 2 << 3 << 4 << 5;
+
+    // Set data for the bars
+    machinesBars->setData(ticks, machinesData);
+    jobsBars->setData(ticks, jobsData);
+
+    // Configure y-axis text labels
+    QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
+    for (int i = 0; i < ticks.size(); ++i) {
+        textTicker->addTick(ticks[i], QString("Label %1").arg(i+1));
     }
-    msPlot->rescaleAxes();
-    msPlot->replot();
+    customPlot->yAxis->setTicker(textTicker);
+    customPlot->xAxis->setLabel("Time");
+    customPlot->yAxis->setLabel("Machines/Jobs");
+
+    customPlot->replot();
 }
 
-void MainWindow::plotJSOperations()
-{
-    for (const auto &ops : js_operations)
-    {
-        QCPBars *bar = new QCPBars(jsPlot->xAxis, jsPlot->yAxis);
-        QVector<double> ticks, duration;
-        for (const auto &op : ops)
-        {
-            ticks << op->startTime;
-            duration << (op->endTime - op->startTime);
-        }
-        bar->setData(ticks, duration);
-    }
-    jsPlot->rescaleAxes();
-    jsPlot->replot();
+void MainWindow::updateBars() {
+    // This function should include the logic to update the bars and related bars on the other graph according to the input values
 }
 
-void MainWindow::syncPlots(QCPBars *source, QCPBars *target)
-{
-    QVector<double> keys;
-    QVector<double> values;
-    for (auto it = source->data()->constBegin(); it != source->data()->constEnd(); ++it)
-    {
-        keys.append(it->key);
-        values.append(it->value);
-    }
-    target->setData(keys, values);
+void MainWindow::onApplyButtonClicked() {
+    // Apply changes
+    updateBars();
 }
 
-void MainWindow::handleBarDrag(QCPAbstractPlottable* plottable, int dataIndex, QMouseEvent* event)
-{
-    QCPBars* bar = qobject_cast<QCPBars*>(plottable);
-    if (bar)
-    {
-        double delta = msPlot->xAxis->pixelToCoord(event->pos().x()) - msPlot->xAxis->pixelToCoord(event->pos().x());
-        QVector<double> keys;
-        QVector<double> values;
-        for (auto it = bar->data()->constBegin(); it != bar->data()->constEnd(); ++it)
-        {
-            keys.append(it->key + delta);
-            values.append(it->value);
-        }
-        bar->setData(keys, values);
-        msPlot->replot();
-        syncPlots(bar, qobject_cast<QCPBars *>(jsPlot->plottable(0)));
-        jsPlot->replot();
-    }
+void MainWindow::onResetButtonClicked() {
+    // Reset to the original view
+    customPlot->xAxis->setRange(0, 10);
+    customPlot->yAxis->setRange(0, 10);
+    updateBars();
 }
