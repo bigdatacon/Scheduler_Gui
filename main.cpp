@@ -9,6 +9,7 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <iostream>
+#include <map>
 
 using json = nlohmann::json;
 
@@ -21,6 +22,8 @@ struct Operation {
 
 QVector<Operation> jsOperations;
 QVector<Operation> msOperations;
+QVector<Operation> originalJsOperations;
+QVector<Operation> originalMsOperations;
 
 QLineEdit *startTimeEdit;
 QLineEdit *finishTimeEdit;
@@ -38,22 +41,42 @@ Operation *selectedOperation = nullptr;
 void setupPlot(QCustomPlot *customPlot, const QVector<Operation> &operations, bool groupByJob) {
     QMap<int, int> uniqueLabels;
     QVector<double> yPositions;
+    QVector<double> startTimes;
     QVector<double> durations;
     QVector<QString> labels;
     int index = 0;
 
+    std::map<int, QColor> colorMap;
+
     for (const auto &op : operations) {
         int label = groupByJob ? op.job : op.machine;
+        int otherLabel = groupByJob ? op.machine : op.job;
         if (!uniqueLabels.contains(label)) {
             uniqueLabels[label] = index++;
         }
         yPositions.append(uniqueLabels[label]);
+        startTimes.append(op.start);
         durations.append(op.finish - op.start);
-        labels.append(QString("%1").arg(groupByJob ? op.machine : op.job));
+        labels.append(QString("%1").arg(otherLabel));
+
+        if (colorMap.find(otherLabel) == colorMap.end()) {
+            QColor color = QColor::fromHsv((colorMap.size() * 30) % 360, 255, 255);
+            colorMap[otherLabel] = color;
+        }
     }
 
     QCPBars *bars = new QCPBars(customPlot->yAxis, customPlot->xAxis);
-    bars->setData(yPositions, durations);
+    QVector<double> barValues = QVector<double>(durations.size(), 1.0); // This line adds dummy values for bar height.
+    bars->setData(startTimes, barValues); // Setting the dummy data.
+
+    for (int i = 0; i < yPositions.size(); ++i) {
+        QCPBarsData barData;
+        barData.key = yPositions[i];
+        barData.value = durations[i];
+        bars->data()->add(barData);
+        bars->setPen(QPen(colorMap[labels[i].toInt()]));
+        bars->setBrush(QBrush(colorMap[labels[i].toInt()]));
+    }
 
     QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
     for (auto it = uniqueLabels.begin(); it != uniqueLabels.end(); ++it) {
@@ -65,6 +88,16 @@ void setupPlot(QCustomPlot *customPlot, const QVector<Operation> &operations, bo
     customPlot->yAxis->setLabel(groupByJob ? "Jobs" : "Machines");
     customPlot->xAxis->setRange(0, 300);
     customPlot->yAxis->setRange(-1, index);
+
+    for (int i = 0; i < yPositions.size(); ++i) {
+        QCPItemText *text = new QCPItemText(customPlot);
+        text->position->setCoords((startTimes[i] + durations[i] / 2), yPositions[i]);
+        text->setPositionAlignment(Qt::AlignCenter);
+        text->setText(labels[i]);
+        text->setFont(QFont("Helvetica", 10));
+        text->setPen(QPen(Qt::black));
+    }
+
     customPlot->replot();
 
     if (groupByJob) {
@@ -76,7 +109,9 @@ void setupPlot(QCustomPlot *customPlot, const QVector<Operation> &operations, bo
 
 void plotGraphs() {
     plot1->clearPlottables();
+    plot1->clearItems();
     plot2->clearPlottables();
+    plot2->clearItems();
 
     setupPlot(plot1, jsOperations, false);
     setupPlot(plot2, jsOperations, true);
@@ -117,6 +152,12 @@ void updateBar() {
     }
 }
 
+void resetGraphs() {
+    jsOperations = originalJsOperations;
+    msOperations = originalMsOperations;
+    plotGraphs();
+}
+
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     QMainWindow window;
@@ -145,6 +186,9 @@ int main(int argc, char *argv[]) {
         for (const auto &op : data["ms_operations"]) {
             msOperations.append({op["Job"], op["Machine"], op["Start"], op["Finish"]});
         }
+
+        originalJsOperations = jsOperations;
+        originalMsOperations = msOperations;
     } catch (json::type_error &e) {
         std::cerr << "JSON type error: " << e.what() << std::endl;
         return 1;
@@ -201,7 +245,7 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(applyButton, &QPushButton::clicked, updateBar);
     QObject::connect(resetButton, &QPushButton::clicked, []() {
-        plotGraphs();
+        resetGraphs();
         startTimeEdit->clear();
         finishTimeEdit->clear();
         jobEdit->clear();
