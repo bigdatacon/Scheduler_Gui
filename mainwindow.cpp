@@ -1,105 +1,400 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include <QPainter>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QWebChannel>
+#include <QDesktopServices>
+#include <QUrl>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h> // для close
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    msPlot(new QCustomPlot(this)),
-    jsPlot(new QCustomPlot(this))
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent),
+      webView(new QWebEngineView(this)),
+      chartPixmap(800, 600),
+      chartLabel(new QLabel(this)),
+      selectedBar(nullptr),
+      httpServer(new QTcpServer(this))
 {
-    ui->setupUi(this);
+    mainLayout = new QVBoxLayout;
+    chartLabel->setPixmap(chartPixmap);
+    mainLayout->addWidget(chartLabel);
+    QWidget *centralWidget = new QWidget(this);
+    centralWidget->setLayout(mainLayout);
+    setCentralWidget(centralWidget);
 
-    ms_operations = {
-        {new MSOperation{0, 1, 71, 102}, new MSOperation{0, 1, 169, 204}},
-        {new MSOperation{0, 2, 102, 129}, new MSOperation{0, 2, 129, 169}},
-        {new MSOperation{2, 4, 0, 38}, new MSOperation{0, 4, 38, 71}, new MSOperation{1, 4, 71, 109}, new MSOperation{2, 4, 109, 173}},
-        {new MSOperation{2, 5, 65, 107}},
-        {new MSOperation{1, 6, 14, 35}, new MSOperation{2, 6, 38, 65}, new MSOperation{2, 6, 227, 254}},
-        {new MSOperation{1, 7, 0, 14}},
-        {new MSOperation{1, 8, 109, 150}, new MSOperation{2, 8, 173, 227}}
-    };
+    drawBarChart(chartPixmap);
+    chartLabel->setPixmap(chartPixmap);
 
-    js_operations = {
-        {new JSOperation{1, 3, 38, 71}, new JSOperation{1, 0, 71, 102}, new JSOperation{1, 1, 102, 129}, new JSOperation{1, 1, 129, 169}, new JSOperation{1, 0, 169, 204}},
-        {new JSOperation{2, 6, 0, 14}, new JSOperation{2, 5, 14, 35}, new JSOperation{2, 3, 71, 109}, new JSOperation{2, 7, 109, 150}},
-        {new JSOperation{3, 3, 0, 38}, new JSOperation{3, 5, 38, 65}, new JSOperation{3, 4, 65, 107}, new JSOperation{3, 3, 109, 173}, new JSOperation{3, 7, 173, 227}, new JSOperation{3, 5, 227, 254}}
-    };
-
-    setupPlots();
-    plotMSOperations();
-    plotJSOperations();
-
-    connect(msPlot, SIGNAL(plottableClick(QCPAbstractPlottable*,QMouseEvent*)), this, SLOT(handleBarDrag(QCPAbstractPlottable*,QMouseEvent*)));
+    startHttpServer(); // Запуск веб-сервера
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    httpServer->close();
 }
 
-void MainWindow::setupPlots()
+void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-    auto layout = new QVBoxLayout;
-    layout->addWidget(msPlot);
-    layout->addWidget(jsPlot);
-    ui->centralwidget->setLayout(layout);  // убедитесь, что имя центрального виджета `centralwidget`
-}
-
-void MainWindow::plotMSOperations()
-{
-    for (const auto& ops : ms_operations) {
-        QCPBars *bar = new QCPBars(msPlot->xAxis, msPlot->yAxis);
-        QVector<double> ticks, duration;
-        for (const auto& op : ops) {
-            ticks << op->startTime;
-            duration << (op->endTime - op->startTime);
+    lastMousePos = event->pos();
+    for (Bar &bar : bars) {
+        if (bar.rect.contains(lastMousePos)) {
+            selectedBar = &bar;
+            break;
         }
-        bar->setData(ticks, duration);
     }
-    msPlot->rescaleAxes();
-    msPlot->replot();
 }
 
-void MainWindow::plotJSOperations()
+void MainWindow::mouseMoveEvent(QMouseEvent *event)
 {
-    for (const auto& ops : js_operations) {
-        QCPBars *bar = new QCPBars(jsPlot->xAxis, jsPlot->yAxis);
-        QVector<double> ticks, duration;
-        for (const auto& op : ops) {
-            ticks << op->startTime;
-            duration << (op->endTime - op->startTime);
+    if (selectedBar) {
+        int dx = event->pos().x() - lastMousePos.x();
+        int dy = event->pos().y() - lastMousePos.y();
+        selectedBar->rect.moveLeft(selectedBar->rect.left() + dx);
+        selectedBar->rect.moveTop(selectedBar->rect.top() + dy);
+        lastMousePos = event->pos();
+        updateBarPosition();
+    }
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+    selectedBar = nullptr;
+}
+
+void MainWindow::drawBarChart(QPixmap &pixmap)
+{
+    pixmap.fill(Qt::white);
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    // Draw X and Y axes
+    painter.setPen(QPen(Qt::black, 2));
+    painter.drawLine(50, 50, 50, pixmap.height() - 50); // Y axis
+    painter.drawLine(50, pixmap.height() - 50, pixmap.width() - 50, pixmap.height() - 50); // X axis
+
+    // Draw X axis labels
+    int xLabelInterval = 50;
+    for (int i = 50; i < pixmap.width() - 50; i += xLabelInterval) {
+        painter.drawLine(i, pixmap.height() - 55, i, pixmap.height() - 45);
+        painter.drawText(i - 10, pixmap.height() - 30, QString::number((i - 50) / 10));
+    }
+
+    // Draw Y axis labels
+    int yLabelInterval = 50;
+    for (int i = pixmap.height() - 50; i > 50; i -= yLabelInterval) {
+        painter.drawLine(45, i, 55, i);
+        painter.drawText(20, i + 5, QString::number((pixmap.height() - 50 - i) / 10));
+    }
+
+    int barWidth = 50;
+    int spacing = 20;
+    int y = 100;
+
+    for (int i = 0; i < 5; ++i) {
+        QRect rect(100, y, 200, barWidth);
+        bars.append({rect, QString("Bar %1").arg(i + 1)});
+        y += barWidth + spacing;
+    }
+
+    for (const Bar &bar : bars) {
+        painter.setBrush(Qt::blue);
+        painter.drawRect(bar.rect);
+        painter.drawText(bar.rect, Qt::AlignCenter, bar.label);
+    }
+}
+
+void MainWindow::updateBarChart()
+{
+    QPixmap newPixmap = chartPixmap; // Копируем текущий график
+    newPixmap.fill(Qt::white);
+    QPainter painter(&newPixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    // Draw X and Y axes
+    painter.setPen(QPen(Qt::black, 2));
+    painter.drawLine(50, 50, 50, newPixmap.height() - 50); // Y axis
+    painter.drawLine(50, newPixmap.height() - 50, newPixmap.width() - 50, newPixmap.height() - 50); // X axis
+
+    // Draw X axis labels
+    int xLabelInterval = 50;
+    for (int i = 50; i < newPixmap.width() - 50; i += xLabelInterval) {
+        painter.drawLine(i, newPixmap.height() - 55, i, newPixmap.height() - 45);
+        painter.drawText(i - 10, newPixmap.height() - 30, QString::number((i - 50) / 10));
+    }
+
+    // Draw Y axis labels
+    int yLabelInterval = 50;
+    for (int i = newPixmap.height() - 50; i > 50; i -= yLabelInterval) {
+        painter.drawLine(45, i, 55, i);
+        painter.drawText(20, i + 5, QString::number((newPixmap.height() - 50 - i) / 10));
+    }
+
+    for (const Bar &bar : bars) {
+        bool overlap = false;
+        for (const Bar &otherBar : bars) {
+            if (&bar != &otherBar && barsOverlap(bar.rect, otherBar.rect)) {
+                overlap = true;
+                break;
+            }
         }
-        bar->setData(ticks, duration);
+        if (overlap) {
+            painter.setBrush(Qt::red);
+        } else {
+            painter.setBrush(Qt::blue);
+        }
+        painter.drawRect(bar.rect);
+        painter.drawText(bar.rect, Qt::AlignCenter, bar.label);
     }
-    jsPlot->rescaleAxes();
-    jsPlot->replot();
+
+    chartLabel->setPixmap(newPixmap);
 }
 
-void MainWindow::syncPlots(QCPBars *source, QCPBars *target)
+void MainWindow::updateBarPosition()
 {
-    QCPBarsDataContainer::const_iterator it;
-    QVector<double> keys, values;
-    for (it = source->data()->constBegin(); it != source->data()->constEnd(); ++it)
-    {
-        keys << it->key;
-        values << it->value;
+    if (selectedBar) {
+        bool overlap = false;
+        for (const Bar &otherBar : bars) {
+            if (selectedBar != &otherBar && barsOverlap(selectedBar->rect, otherBar.rect)) {
+                overlap = true;
+                break;
+            }
+        }
+        QString color = overlap ? "red" : "blue";
+        QString script = generateUpdateScript(selectedBar->rect, color);
+        webView->page()->runJavaScript(script);
+        updateBarChart();
     }
-    target->setData(keys, values);
-    target->parentPlot()->replot();
 }
 
-void MainWindow::handleBarDrag(QCPAbstractPlottable *plottable, QMouseEvent *event)
+bool MainWindow::barsOverlap(const QRect &rect1, const QRect &rect2)
 {
-    if (QCPBars *bar = qobject_cast<QCPBars*>(plottable)) {
-        double key = bar->parentPlot()->xAxis->pixelToCoord(event->pos().x());
-        double value = bar->parentPlot()->yAxis->pixelToCoord(event->pos().y());
+    return rect1.intersects(rect2);
+}
 
-        // Adjust bar's data based on mouse drag
-        bar->data()->clear();
-        bar->addData(key, value);
-        bar->parentPlot()->replot();
+QString MainWindow::generateHtmlChart()
+{
+    QJsonArray jsonBars;
+    for (const Bar &bar : bars) {
+        QJsonObject jsonBar;
+        jsonBar["x"] = bar.rect.left();
+        jsonBar["y"] = bar.rect.top();
+        jsonBar["width"] = bar.rect.width();
+        jsonBar["height"] = bar.rect.height();
+        jsonBar["label"] = bar.label;
+        jsonBar["color"] = "blue";
+        jsonBars.append(jsonBar);
+    }
 
-        // Sync with corresponding bar in jsPlot
-        syncPlots(bar, qobject_cast<QCPBars*>(jsPlot->plottable(0)));
+    QJsonObject json;
+    json["bars"] = jsonBars;
+
+    QJsonDocument doc(json);
+    QString jsonString = doc.toJson(QJsonDocument::Compact);
+
+    QString html = R"(
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Bar Chart</title>
+        <style>
+            body { font-family: Arial, sans-serif; }
+            .bar { position: absolute; cursor: pointer; }
+        </style>
+    </head>
+    <body>
+        <script>
+            function drawChart(bars) {
+                document.body.innerHTML = '';
+                bars.forEach(bar => {
+                    let div = document.createElement('div');
+                    div.className = 'bar';
+                    div.style.left = bar.x + 'px';
+                    div.style.top = bar.y + 'px';
+                    div.style.width = bar.width + 'px';
+                    div.style.height = bar.height + 'px';
+                    div.style.backgroundColor = bar.color;
+                    div.innerText = bar.label;
+                    div.style.color = 'white';
+                    div.style.textAlign = 'center';
+                    div.style.lineHeight = bar.height + 'px';
+                    div.setAttribute('data-label', bar.label);
+                    document.body.appendChild(div);
+
+                    div.onmousedown = (e) => {
+                        let shiftX = e.clientX - div.getBoundingClientRect().left;
+                        let shiftY = e.clientY - div.getBoundingClientRect().top;
+
+                        const moveAt = (pageX, pageY) => {
+                            div.style.left = pageX - shiftX + 'px';
+                            div.style.top = pageY - shiftY + 'px';
+                            updateOverlap();
+                        };
+
+                        const onMouseMove = (e) => {
+                            moveAt(e.pageX, e.pageY);
+                        };
+
+                        document.addEventListener('mousemove', onMouseMove);
+
+                        div.onmouseup = () => {
+                            document.removeEventListener('mousemove', onMouseMove);
+                            div.onmouseup = null;
+                            // Send updated position to the server
+                            let bar = {
+                                x: parseInt(div.style.left),
+                                y: parseInt(div.style.top),
+                                width: parseInt(div.style.width),
+                                height: parseInt(div.style.height),
+                                label: div.getAttribute('data-label'),
+                                color: div.style.backgroundColor
+                            };
+                            fetch('/update', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(bar)
+                            });
+                        };
+                    };
+
+                    div.ondragstart = () => {
+                        return false;
+                    };
+                });
+            }
+
+            let bars = )" + jsonString + R"(;
+            drawChart(bars.bars);
+
+            function updateBar(bar) {
+                let div = document.querySelector('.bar[data-label="' + bar.label + '"]');
+                if (div) {
+                    div.style.left = bar.x + 'px';
+                    div.style.top = bar.y + 'px';
+                    div.style.backgroundColor = bar.color;
+                }
+            }
+
+            function updateOverlap() {
+                let barDivs = document.querySelectorAll('.bar');
+                barDivs.forEach(div1 => {
+                    let rect1 = div1.getBoundingClientRect();
+                    let overlap = false;
+                    barDivs.forEach(div2 => {
+                        if (div1 !== div2) {
+                            let rect2 = div2.getBoundingClientRect();
+                            if (rect1.left < rect2.right &&
+                                rect1.right > rect2.left &&
+                                rect1.top < rect2.bottom &&
+                                rect1.bottom > rect2.top) {
+                                overlap = true;
+                            }
+                        }
+                    });
+                    div1.style.backgroundColor = overlap ? 'red' : 'blue';
+                });
+            }
+        </script>
+    </body>
+    </html>
+    )";
+
+    return html;
+}
+
+QString MainWindow::generateUpdateScript(const QRect &rect, const QString &color)
+{
+    QJsonObject jsonBar;
+    jsonBar["x"] = rect.left();
+    jsonBar["y"] = rect.top();
+    jsonBar["width"] = rect.width();
+    jsonBar["height"] = rect.height();
+    jsonBar["color"] = color;
+
+    QJsonDocument doc(jsonBar);
+    QString jsonString = doc.toJson(QJsonDocument::Compact);
+
+    QString script = R"(
+        let bar = )" + jsonString + R"(;
+        updateBar(bar);
+    )";
+
+    return script;
+}
+
+void MainWindow::startHttpServer()
+{
+    int port = 8000; // Или другой порт, который вы хотите использовать
+    if (isPortInUse(port)) {
+        qDebug() << "Port" << port << "is in use. Server could not start!";
+        return;
+    }
+
+    connect(httpServer, &QTcpServer::newConnection, this, &MainWindow::handleNewConnection);
+
+    if (!httpServer->listen(QHostAddress::Any, port)) {
+        qDebug() << "Server could not start!";
+    } else {
+        qDebug() << "Server started on port" << port << "!";
+        QDesktopServices::openUrl(QUrl("http://127.0.0.1:" + QString::number(port)));
+    }
+}
+
+bool MainWindow::isPortInUse(int port)
+{
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) {
+        return true; // Если не удалось создать сокет, считаем, что порт занят
+    }
+
+    sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr.sin_port = htons(port);
+
+    int result = ::bind(sock, (struct sockaddr*)&addr, sizeof(addr));
+    ::close(sock);
+
+    return result < 0; // Если bind не удался, значит порт занят
+}
+
+void MainWindow::handleNewConnection()
+{
+    QTcpSocket *clientSocket = httpServer->nextPendingConnection();
+    connect(clientSocket, &QTcpSocket::readyRead, this, &MainWindow::readClient);
+    connect(clientSocket, &QTcpSocket::disconnected, clientSocket, &QTcpSocket::deleteLater);
+}
+
+void MainWindow::readClient()
+{
+    QTcpSocket *clientSocket = qobject_cast<QTcpSocket *>(sender());
+    if (!clientSocket)
+        return;
+
+    while (clientSocket->canReadLine()) {
+        QString line = clientSocket->readLine();
+        if (line.startsWith("GET")) {
+            QString html = generateHtmlChart();
+            QByteArray response = "HTTP/1.1 200 OK\r\n";
+            response += "Content-Type: text/html; charset=\"utf-8\"\r\n";
+            response += "Content-Length: " + QByteArray::number(html.size()) + "\r\n";
+            response += "\r\n";
+            response += html.toUtf8();
+            clientSocket->write(response);
+            clientSocket->disconnectFromHost();
+            break;
+        } else if (line.startsWith("POST /update")) {
+            while (clientSocket->canReadLine()) {
+                QString body = clientSocket->readLine();
+                QJsonDocument doc = QJsonDocument::fromJson(body.toUtf8());
+                QJsonObject obj = doc.object();
+                // Обновите данные бара в приложении на основе obj
+                // Здесь вы можете обновить позиции баров и другие параметры
+            }
+        }
     }
 }

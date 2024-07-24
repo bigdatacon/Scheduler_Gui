@@ -2,56 +2,56 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "qcustomplot.h"
-#include <vector>
-
-class MSOperation {
-public:
-    int machineId;
-    int operationId;
-    int startTime;
-    int endTime;
-
-    MSOperation(int mId, int oId, int sTime, int eTime)
-        : machineId(mId), operationId(oId), startTime(sTime), endTime(eTime) {}
-};
-
-class JSOperation {
-public:
-    int jobId;
-    int machineId;
-    int startTime;
-    int endTime;
-
-    JSOperation(int jId, int mId, int sTime, int eTime)
-        : jobId(jId), machineId(mId), startTime(sTime), endTime(eTime) {}
-};
-
-namespace Ui {
-class MainWindow;
-}
+#include <QWebEngineView>
+#include <QVBoxLayout>
+#include <QMouseEvent>
+#include <QTcpServer>
+#include <QTcpSocket>
+#include <QLabel>
+#include <QPixmap>
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+
 private:
-    Ui::MainWindow *ui;
-    QCustomPlot *msPlot;
-    QCustomPlot *jsPlot;
+    void drawBarChart(QPixmap &pixmap);
+    void updateBarChart();
+    void updateBarPosition();
+    bool barsOverlap(const QRect &rect1, const QRect &rect2);
+    QString generateHtmlChart();
+    QString generateUpdateScript(const QRect &rect, const QString &color);
+    void startHttpServer();
+    bool isPortInUse(int port);
 
-    std::vector<std::vector<MSOperation*>> ms_operations;
-    std::vector<std::vector<JSOperation*>> js_operations;
+    QWebEngineView *webView;
+    QVBoxLayout *mainLayout;
+    QTcpServer *httpServer;
 
-    void setupPlots();
-    void plotMSOperations();
-    void plotJSOperations();
-    void syncPlots(QCPBars *source, QCPBars *target);
-    void handleBarDrag(QCPAbstractPlottable*, QMouseEvent*);
+    QPixmap chartPixmap;
+    QLabel *chartLabel;
+
+    struct Bar {
+        QRect rect;
+        QString label;
+    };
+
+    QVector<Bar> bars;
+    Bar *selectedBar;
+    QPoint lastMousePos;
+
+private slots:
+    void handleNewConnection();
+    void readClient();
 };
 
 #endif // MAINWINDOW_H
