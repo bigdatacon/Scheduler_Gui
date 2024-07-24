@@ -18,10 +18,12 @@ public:
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
     void drawBarChart(QPixmap &pixmap);
     void updateBarChart();
+    bool barsOverlap(const QRect &rect1, const QRect &rect2);
 
     QPixmap chartPixmap;
     QLabel *chartLabel;

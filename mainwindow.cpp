@@ -44,15 +44,25 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
+void MainWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+    selectedBar = nullptr;
+}
+
 void MainWindow::drawBarChart(QPixmap &pixmap)
 {
     pixmap.fill(Qt::white);
     QPainter painter(&pixmap);
     painter.setRenderHint(QPainter::Antialiasing);
 
+    // Draw X and Y axes
+    painter.setPen(QPen(Qt::black, 2));
+    painter.drawLine(50, 50, 50, pixmap.height() - 50); // Y axis
+    painter.drawLine(50, pixmap.height() - 50, pixmap.width() - 50, pixmap.height() - 50); // X axis
+
     int barWidth = 50;
     int spacing = 20;
-    int y = 50;
+    int y = 100;
 
     for (int i = 0; i < 5; ++i) {
         QRect rect(100, y, 200, barWidth);
@@ -69,6 +79,37 @@ void MainWindow::drawBarChart(QPixmap &pixmap)
 
 void MainWindow::updateBarChart()
 {
-    drawBarChart(chartPixmap);
-    chartLabel->setPixmap(chartPixmap);
+    QPixmap newPixmap = chartPixmap; // Копируем текущий график
+    newPixmap.fill(Qt::white);
+    QPainter painter(&newPixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    // Draw X and Y axes
+    painter.setPen(QPen(Qt::black, 2));
+    painter.drawLine(50, 50, 50, newPixmap.height() - 50); // Y axis
+    painter.drawLine(50, newPixmap.height() - 50, newPixmap.width() - 50, newPixmap.height() - 50); // X axis
+
+    for (const Bar &bar : bars) {
+        bool overlap = false;
+        for (const Bar &otherBar : bars) {
+            if (&bar != &otherBar && barsOverlap(bar.rect, otherBar.rect)) {
+                overlap = true;
+                break;
+            }
+        }
+        if (overlap) {
+            painter.setBrush(Qt::red);
+        } else {
+            painter.setBrush(Qt::blue);
+        }
+        painter.drawRect(bar.rect);
+        painter.drawText(bar.rect, Qt::AlignCenter, bar.label);
+    }
+
+    chartLabel->setPixmap(newPixmap);
+}
+
+bool MainWindow::barsOverlap(const QRect &rect1, const QRect &rect2)
+{
+    return rect1.intersects(rect2);
 }
