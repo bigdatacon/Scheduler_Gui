@@ -25,8 +25,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_QCP_t {
-    QByteArrayData data[62];
-    char stringdata0[713];
+    QByteArrayData data[64];
+    char stringdata0[751];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -77,26 +77,28 @@ QT_MOC_LITERAL(38, 407, 18), // "phImmediateRefresh"
 QT_MOC_LITERAL(39, 426, 13), // "phCacheLabels"
 QT_MOC_LITERAL(40, 440, 13), // "PlottingHints"
 QT_MOC_LITERAL(41, 454, 11), // "Interaction"
-QT_MOC_LITERAL(42, 466, 10), // "iRangeDrag"
-QT_MOC_LITERAL(43, 477, 10), // "iRangeZoom"
-QT_MOC_LITERAL(44, 488, 12), // "iMultiSelect"
-QT_MOC_LITERAL(45, 501, 17), // "iSelectPlottables"
-QT_MOC_LITERAL(46, 519, 11), // "iSelectAxes"
-QT_MOC_LITERAL(47, 531, 13), // "iSelectLegend"
-QT_MOC_LITERAL(48, 545, 12), // "iSelectItems"
-QT_MOC_LITERAL(49, 558, 12), // "iSelectOther"
-QT_MOC_LITERAL(50, 571, 12), // "Interactions"
-QT_MOC_LITERAL(51, 584, 17), // "SelectionRectMode"
-QT_MOC_LITERAL(52, 602, 7), // "srmNone"
-QT_MOC_LITERAL(53, 610, 7), // "srmZoom"
-QT_MOC_LITERAL(54, 618, 9), // "srmSelect"
-QT_MOC_LITERAL(55, 628, 9), // "srmCustom"
-QT_MOC_LITERAL(56, 638, 13), // "SelectionType"
-QT_MOC_LITERAL(57, 652, 6), // "stNone"
-QT_MOC_LITERAL(58, 659, 7), // "stWhole"
-QT_MOC_LITERAL(59, 667, 12), // "stSingleData"
-QT_MOC_LITERAL(60, 680, 11), // "stDataRange"
-QT_MOC_LITERAL(61, 692, 20) // "stMultipleDataRanges"
+QT_MOC_LITERAL(42, 466, 5), // "iNone"
+QT_MOC_LITERAL(43, 472, 10), // "iRangeDrag"
+QT_MOC_LITERAL(44, 483, 10), // "iRangeZoom"
+QT_MOC_LITERAL(45, 494, 12), // "iMultiSelect"
+QT_MOC_LITERAL(46, 507, 17), // "iSelectPlottables"
+QT_MOC_LITERAL(47, 525, 11), // "iSelectAxes"
+QT_MOC_LITERAL(48, 537, 13), // "iSelectLegend"
+QT_MOC_LITERAL(49, 551, 12), // "iSelectItems"
+QT_MOC_LITERAL(50, 564, 12), // "iSelectOther"
+QT_MOC_LITERAL(51, 577, 31), // "iSelectPlottablesBeyondAxisRect"
+QT_MOC_LITERAL(52, 609, 12), // "Interactions"
+QT_MOC_LITERAL(53, 622, 17), // "SelectionRectMode"
+QT_MOC_LITERAL(54, 640, 7), // "srmNone"
+QT_MOC_LITERAL(55, 648, 7), // "srmZoom"
+QT_MOC_LITERAL(56, 656, 9), // "srmSelect"
+QT_MOC_LITERAL(57, 666, 9), // "srmCustom"
+QT_MOC_LITERAL(58, 676, 13), // "SelectionType"
+QT_MOC_LITERAL(59, 690, 6), // "stNone"
+QT_MOC_LITERAL(60, 697, 7), // "stWhole"
+QT_MOC_LITERAL(61, 705, 12), // "stSingleData"
+QT_MOC_LITERAL(62, 718, 11), // "stDataRange"
+QT_MOC_LITERAL(63, 730, 20) // "stMultipleDataRanges"
 
     },
     "QCP\0ResolutionUnit\0ruDotsPerMeter\0"
@@ -112,9 +114,10 @@ QT_MOC_LITERAL(61, 692, 20) // "stMultipleDataRanges"
     "AntialiasedElements\0PlottingHint\0"
     "phNone\0phFastPolylines\0phImmediateRefresh\0"
     "phCacheLabels\0PlottingHints\0Interaction\0"
-    "iRangeDrag\0iRangeZoom\0iMultiSelect\0"
+    "iNone\0iRangeDrag\0iRangeZoom\0iMultiSelect\0"
     "iSelectPlottables\0iSelectAxes\0"
     "iSelectLegend\0iSelectItems\0iSelectOther\0"
+    "iSelectPlottablesBeyondAxisRect\0"
     "Interactions\0SelectionRectMode\0srmNone\0"
     "srmZoom\0srmSelect\0srmCustom\0SelectionType\0"
     "stNone\0stWhole\0stSingleData\0stDataRange\0"
@@ -145,10 +148,10 @@ static const uint qt_meta_data_QCP[] = {
       34,   20, 0x1,   13,  145,
       35,   35, 0x0,    4,  171,
       40,   35, 0x1,    4,  179,
-      41,   41, 0x0,    8,  187,
-      50,   41, 0x1,    8,  203,
-      51,   51, 0x0,    4,  219,
-      56,   56, 0x0,    5,  227,
+      41,   41, 0x0,   10,  187,
+      52,   41, 0x1,   10,  207,
+      53,   53, 0x0,    4,  227,
+      58,   58, 0x0,    5,  235,
 
  // enum data: key, value
        2, uint(QCP::ruDotsPerMeter),
@@ -205,31 +208,35 @@ static const uint qt_meta_data_QCP[] = {
       37, uint(QCP::phFastPolylines),
       38, uint(QCP::phImmediateRefresh),
       39, uint(QCP::phCacheLabels),
-      42, uint(QCP::iRangeDrag),
-      43, uint(QCP::iRangeZoom),
-      44, uint(QCP::iMultiSelect),
-      45, uint(QCP::iSelectPlottables),
-      46, uint(QCP::iSelectAxes),
-      47, uint(QCP::iSelectLegend),
-      48, uint(QCP::iSelectItems),
-      49, uint(QCP::iSelectOther),
-      42, uint(QCP::iRangeDrag),
-      43, uint(QCP::iRangeZoom),
-      44, uint(QCP::iMultiSelect),
-      45, uint(QCP::iSelectPlottables),
-      46, uint(QCP::iSelectAxes),
-      47, uint(QCP::iSelectLegend),
-      48, uint(QCP::iSelectItems),
-      49, uint(QCP::iSelectOther),
-      52, uint(QCP::srmNone),
-      53, uint(QCP::srmZoom),
-      54, uint(QCP::srmSelect),
-      55, uint(QCP::srmCustom),
-      57, uint(QCP::stNone),
-      58, uint(QCP::stWhole),
-      59, uint(QCP::stSingleData),
-      60, uint(QCP::stDataRange),
-      61, uint(QCP::stMultipleDataRanges),
+      42, uint(QCP::iNone),
+      43, uint(QCP::iRangeDrag),
+      44, uint(QCP::iRangeZoom),
+      45, uint(QCP::iMultiSelect),
+      46, uint(QCP::iSelectPlottables),
+      47, uint(QCP::iSelectAxes),
+      48, uint(QCP::iSelectLegend),
+      49, uint(QCP::iSelectItems),
+      50, uint(QCP::iSelectOther),
+      51, uint(QCP::iSelectPlottablesBeyondAxisRect),
+      42, uint(QCP::iNone),
+      43, uint(QCP::iRangeDrag),
+      44, uint(QCP::iRangeZoom),
+      45, uint(QCP::iMultiSelect),
+      46, uint(QCP::iSelectPlottables),
+      47, uint(QCP::iSelectAxes),
+      48, uint(QCP::iSelectLegend),
+      49, uint(QCP::iSelectItems),
+      50, uint(QCP::iSelectOther),
+      51, uint(QCP::iSelectPlottablesBeyondAxisRect),
+      54, uint(QCP::srmNone),
+      55, uint(QCP::srmZoom),
+      56, uint(QCP::srmSelect),
+      57, uint(QCP::srmCustom),
+      59, uint(QCP::stNone),
+      60, uint(QCP::stWhole),
+      61, uint(QCP::stSingleData),
+      62, uint(QCP::stDataRange),
+      63, uint(QCP::stMultipleDataRanges),
 
        0        // eod
 };
@@ -1477,6 +1484,90 @@ QT_INIT_METAOBJECT const QMetaObject QCPLineEnding::staticMetaObject = { {
     nullptr
 } };
 
+struct qt_meta_stringdata_QCPLabelPainterPrivate_t {
+    QByteArrayData data[17];
+    char stringdata0[210];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_QCPLabelPainterPrivate_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_QCPLabelPainterPrivate_t qt_meta_stringdata_QCPLabelPainterPrivate = {
+    {
+QT_MOC_LITERAL(0, 0, 22), // "QCPLabelPainterPrivate"
+QT_MOC_LITERAL(1, 23, 10), // "AnchorMode"
+QT_MOC_LITERAL(2, 34, 13), // "amRectangular"
+QT_MOC_LITERAL(3, 48, 15), // "amSkewedUpright"
+QT_MOC_LITERAL(4, 64, 15), // "amSkewedRotated"
+QT_MOC_LITERAL(5, 80, 19), // "AnchorReferenceType"
+QT_MOC_LITERAL(6, 100, 9), // "artNormal"
+QT_MOC_LITERAL(7, 110, 10), // "artTangent"
+QT_MOC_LITERAL(8, 121, 10), // "AnchorSide"
+QT_MOC_LITERAL(9, 132, 6), // "asLeft"
+QT_MOC_LITERAL(10, 139, 7), // "asRight"
+QT_MOC_LITERAL(11, 147, 5), // "asTop"
+QT_MOC_LITERAL(12, 153, 8), // "asBottom"
+QT_MOC_LITERAL(13, 162, 9), // "asTopLeft"
+QT_MOC_LITERAL(14, 172, 10), // "asTopRight"
+QT_MOC_LITERAL(15, 183, 13), // "asBottomRight"
+QT_MOC_LITERAL(16, 197, 12) // "asBottomLeft"
+
+    },
+    "QCPLabelPainterPrivate\0AnchorMode\0"
+    "amRectangular\0amSkewedUpright\0"
+    "amSkewedRotated\0AnchorReferenceType\0"
+    "artNormal\0artTangent\0AnchorSide\0asLeft\0"
+    "asRight\0asTop\0asBottom\0asTopLeft\0"
+    "asTopRight\0asBottomRight\0asBottomLeft"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_QCPLabelPainterPrivate[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       0,    0, // methods
+       0,    0, // properties
+       3,   14, // enums/sets
+       0,    0, // constructors
+       4,       // flags
+       0,       // signalCount
+
+ // enums: name, alias, flags, count, data
+       1,    1, 0x0,    3,   29,
+       5,    5, 0x0,    2,   35,
+       8,    8, 0x0,    8,   39,
+
+ // enum data: key, value
+       2, uint(QCPLabelPainterPrivate::amRectangular),
+       3, uint(QCPLabelPainterPrivate::amSkewedUpright),
+       4, uint(QCPLabelPainterPrivate::amSkewedRotated),
+       6, uint(QCPLabelPainterPrivate::artNormal),
+       7, uint(QCPLabelPainterPrivate::artTangent),
+       9, uint(QCPLabelPainterPrivate::asLeft),
+      10, uint(QCPLabelPainterPrivate::asRight),
+      11, uint(QCPLabelPainterPrivate::asTop),
+      12, uint(QCPLabelPainterPrivate::asBottom),
+      13, uint(QCPLabelPainterPrivate::asTopLeft),
+      14, uint(QCPLabelPainterPrivate::asTopRight),
+      15, uint(QCPLabelPainterPrivate::asBottomRight),
+      16, uint(QCPLabelPainterPrivate::asBottomLeft),
+
+       0        // eod
+};
+
+QT_INIT_METAOBJECT const QMetaObject QCPLabelPainterPrivate::staticMetaObject = { {
+    nullptr,
+    qt_meta_stringdata_QCPLabelPainterPrivate.data,
+    qt_meta_data_QCPLabelPainterPrivate,
+    nullptr,
+    nullptr,
+    nullptr
+} };
+
 struct qt_meta_stringdata_QCPAxisTicker_t {
     QByteArrayData data[4];
     char stringdata0[63];
@@ -2694,20 +2785,6 @@ void QCPAbstractPlottable::qt_static_metacall(QObject *_o, QMetaObject::Call _c,
                 *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QCPDataSelection >(); break;
             }
             break;
-        case 2:
-            switch (*reinterpret_cast<int*>(_a[1])) {
-            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-            case 0:
-                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QCP::SelectionType >(); break;
-            }
-            break;
-        case 3:
-            switch (*reinterpret_cast<int*>(_a[1])) {
-            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-            case 0:
-                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QCP::SelectionType >(); break;
-            }
-            break;
         case 4:
             switch (*reinterpret_cast<int*>(_a[1])) {
             default: *reinterpret_cast<int*>(_a[0]) = -1; break;
@@ -2742,8 +2819,6 @@ void QCPAbstractPlottable::qt_static_metacall(QObject *_o, QMetaObject::Call _c,
     } else if (_c == QMetaObject::RegisterPropertyMetaType) {
         switch (_id) {
         default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-        case 7:
-            *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QCP::SelectionType >(); break;
         case 6:
         case 5:
             *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QCPAxis* >(); break;
@@ -3188,8 +3263,8 @@ void QCPAbstractItem::selectableChanged(bool _t1)
     QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 struct qt_meta_stringdata_QCustomPlot_t {
-    QByteArrayData data[64];
-    char stringdata0[914];
+    QByteArrayData data[65];
+    char stringdata0[926];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -3230,38 +3305,39 @@ QT_MOC_LITERAL(28, 332, 22), // "QCPAbstractLegendItem*"
 QT_MOC_LITERAL(29, 355, 17), // "legendDoubleClick"
 QT_MOC_LITERAL(30, 373, 22), // "selectionChangedByUser"
 QT_MOC_LITERAL(31, 396, 12), // "beforeReplot"
-QT_MOC_LITERAL(32, 409, 11), // "afterReplot"
-QT_MOC_LITERAL(33, 421, 11), // "rescaleAxes"
-QT_MOC_LITERAL(34, 433, 21), // "onlyVisiblePlottables"
-QT_MOC_LITERAL(35, 455, 11), // "deselectAll"
-QT_MOC_LITERAL(36, 467, 6), // "replot"
-QT_MOC_LITERAL(37, 474, 28), // "QCustomPlot::RefreshPriority"
-QT_MOC_LITERAL(38, 503, 15), // "refreshPriority"
-QT_MOC_LITERAL(39, 519, 20), // "processRectSelection"
-QT_MOC_LITERAL(40, 540, 4), // "rect"
-QT_MOC_LITERAL(41, 545, 15), // "processRectZoom"
-QT_MOC_LITERAL(42, 561, 21), // "processPointSelection"
-QT_MOC_LITERAL(43, 583, 8), // "viewport"
-QT_MOC_LITERAL(44, 592, 10), // "background"
-QT_MOC_LITERAL(45, 603, 16), // "backgroundScaled"
-QT_MOC_LITERAL(46, 620, 20), // "backgroundScaledMode"
-QT_MOC_LITERAL(47, 641, 19), // "Qt::AspectRatioMode"
-QT_MOC_LITERAL(48, 661, 10), // "plotLayout"
-QT_MOC_LITERAL(49, 672, 14), // "QCPLayoutGrid*"
-QT_MOC_LITERAL(50, 687, 24), // "autoAddPlottableToLegend"
-QT_MOC_LITERAL(51, 712, 18), // "selectionTolerance"
-QT_MOC_LITERAL(52, 731, 20), // "noAntialiasingOnDrag"
-QT_MOC_LITERAL(53, 752, 19), // "multiSelectModifier"
-QT_MOC_LITERAL(54, 772, 20), // "Qt::KeyboardModifier"
-QT_MOC_LITERAL(55, 793, 6), // "openGl"
-QT_MOC_LITERAL(56, 800, 15), // "LayerInsertMode"
-QT_MOC_LITERAL(57, 816, 8), // "limBelow"
-QT_MOC_LITERAL(58, 825, 8), // "limAbove"
-QT_MOC_LITERAL(59, 834, 15), // "RefreshPriority"
-QT_MOC_LITERAL(60, 850, 18), // "rpImmediateRefresh"
-QT_MOC_LITERAL(61, 869, 15), // "rpQueuedRefresh"
-QT_MOC_LITERAL(62, 885, 13), // "rpRefreshHint"
-QT_MOC_LITERAL(63, 899, 14) // "rpQueuedReplot"
+QT_MOC_LITERAL(32, 409, 11), // "afterLayout"
+QT_MOC_LITERAL(33, 421, 11), // "afterReplot"
+QT_MOC_LITERAL(34, 433, 11), // "rescaleAxes"
+QT_MOC_LITERAL(35, 445, 21), // "onlyVisiblePlottables"
+QT_MOC_LITERAL(36, 467, 11), // "deselectAll"
+QT_MOC_LITERAL(37, 479, 6), // "replot"
+QT_MOC_LITERAL(38, 486, 28), // "QCustomPlot::RefreshPriority"
+QT_MOC_LITERAL(39, 515, 15), // "refreshPriority"
+QT_MOC_LITERAL(40, 531, 20), // "processRectSelection"
+QT_MOC_LITERAL(41, 552, 4), // "rect"
+QT_MOC_LITERAL(42, 557, 15), // "processRectZoom"
+QT_MOC_LITERAL(43, 573, 21), // "processPointSelection"
+QT_MOC_LITERAL(44, 595, 8), // "viewport"
+QT_MOC_LITERAL(45, 604, 10), // "background"
+QT_MOC_LITERAL(46, 615, 16), // "backgroundScaled"
+QT_MOC_LITERAL(47, 632, 20), // "backgroundScaledMode"
+QT_MOC_LITERAL(48, 653, 19), // "Qt::AspectRatioMode"
+QT_MOC_LITERAL(49, 673, 10), // "plotLayout"
+QT_MOC_LITERAL(50, 684, 14), // "QCPLayoutGrid*"
+QT_MOC_LITERAL(51, 699, 24), // "autoAddPlottableToLegend"
+QT_MOC_LITERAL(52, 724, 18), // "selectionTolerance"
+QT_MOC_LITERAL(53, 743, 20), // "noAntialiasingOnDrag"
+QT_MOC_LITERAL(54, 764, 19), // "multiSelectModifier"
+QT_MOC_LITERAL(55, 784, 20), // "Qt::KeyboardModifier"
+QT_MOC_LITERAL(56, 805, 6), // "openGl"
+QT_MOC_LITERAL(57, 812, 15), // "LayerInsertMode"
+QT_MOC_LITERAL(58, 828, 8), // "limBelow"
+QT_MOC_LITERAL(59, 837, 8), // "limAbove"
+QT_MOC_LITERAL(60, 846, 15), // "RefreshPriority"
+QT_MOC_LITERAL(61, 862, 18), // "rpImmediateRefresh"
+QT_MOC_LITERAL(62, 881, 15), // "rpQueuedRefresh"
+QT_MOC_LITERAL(63, 897, 13), // "rpRefreshHint"
+QT_MOC_LITERAL(64, 911, 14) // "rpQueuedReplot"
 
     },
     "QCustomPlot\0mouseDoubleClick\0\0"
@@ -3275,9 +3351,9 @@ QT_MOC_LITERAL(63, 899, 14) // "rpQueuedReplot"
     "axisDoubleClick\0legendClick\0QCPLegend*\0"
     "legend\0QCPAbstractLegendItem*\0"
     "legendDoubleClick\0selectionChangedByUser\0"
-    "beforeReplot\0afterReplot\0rescaleAxes\0"
-    "onlyVisiblePlottables\0deselectAll\0"
-    "replot\0QCustomPlot::RefreshPriority\0"
+    "beforeReplot\0afterLayout\0afterReplot\0"
+    "rescaleAxes\0onlyVisiblePlottables\0"
+    "deselectAll\0replot\0QCustomPlot::RefreshPriority\0"
     "refreshPriority\0processRectSelection\0"
     "rect\0processRectZoom\0processPointSelection\0"
     "viewport\0background\0backgroundScaled\0"
@@ -3298,40 +3374,41 @@ static const uint qt_meta_data_QCustomPlot[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      24,   14, // methods
-      10,  226, // properties
-       2,  256, // enums/sets
+      25,   14, // methods
+      10,  232, // properties
+       2,  262, // enums/sets
        0,    0, // constructors
        0,       // flags
-      16,       // signalCount
+      17,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,  134,    2, 0x06 /* Public */,
-       5,    1,  137,    2, 0x06 /* Public */,
-       6,    1,  140,    2, 0x06 /* Public */,
-       7,    1,  143,    2, 0x06 /* Public */,
-       8,    1,  146,    2, 0x06 /* Public */,
-      10,    3,  149,    2, 0x06 /* Public */,
-      14,    3,  156,    2, 0x06 /* Public */,
-      15,    2,  163,    2, 0x06 /* Public */,
-      18,    2,  168,    2, 0x06 /* Public */,
-      19,    3,  173,    2, 0x06 /* Public */,
-      24,    3,  180,    2, 0x06 /* Public */,
-      25,    3,  187,    2, 0x06 /* Public */,
-      29,    3,  194,    2, 0x06 /* Public */,
-      30,    0,  201,    2, 0x06 /* Public */,
-      31,    0,  202,    2, 0x06 /* Public */,
-      32,    0,  203,    2, 0x06 /* Public */,
+       1,    1,  139,    2, 0x06 /* Public */,
+       5,    1,  142,    2, 0x06 /* Public */,
+       6,    1,  145,    2, 0x06 /* Public */,
+       7,    1,  148,    2, 0x06 /* Public */,
+       8,    1,  151,    2, 0x06 /* Public */,
+      10,    3,  154,    2, 0x06 /* Public */,
+      14,    3,  161,    2, 0x06 /* Public */,
+      15,    2,  168,    2, 0x06 /* Public */,
+      18,    2,  173,    2, 0x06 /* Public */,
+      19,    3,  178,    2, 0x06 /* Public */,
+      24,    3,  185,    2, 0x06 /* Public */,
+      25,    3,  192,    2, 0x06 /* Public */,
+      29,    3,  199,    2, 0x06 /* Public */,
+      30,    0,  206,    2, 0x06 /* Public */,
+      31,    0,  207,    2, 0x06 /* Public */,
+      32,    0,  208,    2, 0x06 /* Public */,
+      33,    0,  209,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-      33,    1,  204,    2, 0x0a /* Public */,
-      33,    0,  207,    2, 0x2a /* Public | MethodCloned */,
-      35,    0,  208,    2, 0x0a /* Public */,
-      36,    1,  209,    2, 0x0a /* Public */,
-      36,    0,  212,    2, 0x2a /* Public | MethodCloned */,
-      39,    2,  213,    2, 0x09 /* Protected */,
-      41,    2,  218,    2, 0x09 /* Protected */,
-      42,    1,  223,    2, 0x09 /* Protected */,
+      34,    1,  210,    2, 0x0a /* Public */,
+      34,    0,  213,    2, 0x2a /* Public | MethodCloned */,
+      36,    0,  214,    2, 0x0a /* Public */,
+      37,    1,  215,    2, 0x0a /* Public */,
+      37,    0,  218,    2, 0x2a /* Public | MethodCloned */,
+      40,    2,  219,    2, 0x09 /* Protected */,
+      42,    2,  224,    2, 0x09 /* Protected */,
+      43,    1,  229,    2, 0x09 /* Protected */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3,    4,
@@ -3350,40 +3427,41 @@ static const uint qt_meta_data_QCustomPlot[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void,
 
  // slots: parameters
-    QMetaType::Void, QMetaType::Bool,   34,
+    QMetaType::Void, QMetaType::Bool,   35,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 37,   38,
+    QMetaType::Void, 0x80000000 | 38,   39,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QRect, 0x80000000 | 3,   40,    4,
-    QMetaType::Void, QMetaType::QRect, 0x80000000 | 3,   40,    4,
+    QMetaType::Void, QMetaType::QRect, 0x80000000 | 3,   41,    4,
+    QMetaType::Void, QMetaType::QRect, 0x80000000 | 3,   41,    4,
     QMetaType::Void, 0x80000000 | 3,    4,
 
  // properties: name, type, flags
-      43, QMetaType::QRect, 0x00095103,
-      44, QMetaType::QPixmap, 0x00095103,
-      45, QMetaType::Bool, 0x00095103,
-      46, 0x80000000 | 47, 0x0009510b,
-      48, 0x80000000 | 49, 0x00095009,
-      50, QMetaType::Bool, 0x00095103,
-      51, QMetaType::Int, 0x00095103,
-      52, QMetaType::Bool, 0x00095103,
-      53, 0x80000000 | 54, 0x0009510b,
-      55, QMetaType::Bool, 0x00095103,
+      44, QMetaType::QRect, 0x00095103,
+      45, QMetaType::QPixmap, 0x00095103,
+      46, QMetaType::Bool, 0x00095103,
+      47, 0x80000000 | 48, 0x0009510b,
+      49, 0x80000000 | 50, 0x00095009,
+      51, QMetaType::Bool, 0x00095103,
+      52, QMetaType::Int, 0x00095103,
+      53, QMetaType::Bool, 0x00095103,
+      54, 0x80000000 | 55, 0x0009510b,
+      56, QMetaType::Bool, 0x00095103,
 
  // enums: name, alias, flags, count, data
-      56,   56, 0x0,    2,  266,
-      59,   59, 0x0,    4,  270,
+      57,   57, 0x0,    2,  272,
+      60,   60, 0x0,    4,  276,
 
  // enum data: key, value
-      57, uint(QCustomPlot::limBelow),
-      58, uint(QCustomPlot::limAbove),
-      60, uint(QCustomPlot::rpImmediateRefresh),
-      61, uint(QCustomPlot::rpQueuedRefresh),
-      62, uint(QCustomPlot::rpRefreshHint),
-      63, uint(QCustomPlot::rpQueuedReplot),
+      58, uint(QCustomPlot::limBelow),
+      59, uint(QCustomPlot::limAbove),
+      61, uint(QCustomPlot::rpImmediateRefresh),
+      62, uint(QCustomPlot::rpQueuedRefresh),
+      63, uint(QCustomPlot::rpRefreshHint),
+      64, uint(QCustomPlot::rpQueuedReplot),
 
        0        // eod
 };
@@ -3409,15 +3487,16 @@ void QCustomPlot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         case 12: _t->legendDoubleClick((*reinterpret_cast< QCPLegend*(*)>(_a[1])),(*reinterpret_cast< QCPAbstractLegendItem*(*)>(_a[2])),(*reinterpret_cast< QMouseEvent*(*)>(_a[3]))); break;
         case 13: _t->selectionChangedByUser(); break;
         case 14: _t->beforeReplot(); break;
-        case 15: _t->afterReplot(); break;
-        case 16: _t->rescaleAxes((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 17: _t->rescaleAxes(); break;
-        case 18: _t->deselectAll(); break;
-        case 19: _t->replot((*reinterpret_cast< QCustomPlot::RefreshPriority(*)>(_a[1]))); break;
-        case 20: _t->replot(); break;
-        case 21: _t->processRectSelection((*reinterpret_cast< QRect(*)>(_a[1])),(*reinterpret_cast< QMouseEvent*(*)>(_a[2]))); break;
-        case 22: _t->processRectZoom((*reinterpret_cast< QRect(*)>(_a[1])),(*reinterpret_cast< QMouseEvent*(*)>(_a[2]))); break;
-        case 23: _t->processPointSelection((*reinterpret_cast< QMouseEvent*(*)>(_a[1]))); break;
+        case 15: _t->afterLayout(); break;
+        case 16: _t->afterReplot(); break;
+        case 17: _t->rescaleAxes((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 18: _t->rescaleAxes(); break;
+        case 19: _t->deselectAll(); break;
+        case 20: _t->replot((*reinterpret_cast< QCustomPlot::RefreshPriority(*)>(_a[1]))); break;
+        case 21: _t->replot(); break;
+        case 22: _t->processRectSelection((*reinterpret_cast< QRect(*)>(_a[1])),(*reinterpret_cast< QMouseEvent*(*)>(_a[2]))); break;
+        case 23: _t->processRectZoom((*reinterpret_cast< QRect(*)>(_a[1])),(*reinterpret_cast< QMouseEvent*(*)>(_a[2]))); break;
+        case 24: _t->processPointSelection((*reinterpret_cast< QMouseEvent*(*)>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
@@ -3487,7 +3566,7 @@ void QCustomPlot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
                 *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QCPLegend* >(); break;
             }
             break;
-        case 19:
+        case 20:
             switch (*reinterpret_cast<int*>(_a[1])) {
             default: *reinterpret_cast<int*>(_a[0]) = -1; break;
             case 0:
@@ -3604,8 +3683,15 @@ void QCustomPlot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         }
         {
             using _t = void (QCustomPlot::*)();
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QCustomPlot::afterReplot)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QCustomPlot::afterLayout)) {
                 *result = 15;
+                return;
+            }
+        }
+        {
+            using _t = void (QCustomPlot::*)();
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QCustomPlot::afterReplot)) {
+                *result = 16;
                 return;
             }
         }
@@ -3685,13 +3771,13 @@ int QCustomPlot::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 24)
+        if (_id < 25)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 24;
+        _id -= 25;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 24)
+        if (_id < 25)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 24;
+        _id -= 25;
     }
 #ifndef QT_NO_PROPERTIES
     else if (_c == QMetaObject::ReadProperty || _c == QMetaObject::WriteProperty
@@ -3817,13 +3903,19 @@ void QCustomPlot::beforeReplot()
 }
 
 // SIGNAL 15
-void QCustomPlot::afterReplot()
+void QCustomPlot::afterLayout()
 {
     QMetaObject::activate(this, &staticMetaObject, 15, nullptr);
 }
+
+// SIGNAL 16
+void QCustomPlot::afterReplot()
+{
+    QMetaObject::activate(this, &staticMetaObject, 16, nullptr);
+}
 struct qt_meta_stringdata_QCPColorGradient_t {
-    QByteArrayData data[17];
-    char stringdata0[164];
+    QByteArrayData data[23];
+    char stringdata0[237];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -3836,23 +3928,31 @@ QT_MOC_LITERAL(0, 0, 16), // "QCPColorGradient"
 QT_MOC_LITERAL(1, 17, 18), // "ColorInterpolation"
 QT_MOC_LITERAL(2, 36, 5), // "ciRGB"
 QT_MOC_LITERAL(3, 42, 5), // "ciHSV"
-QT_MOC_LITERAL(4, 48, 14), // "GradientPreset"
-QT_MOC_LITERAL(5, 63, 11), // "gpGrayscale"
-QT_MOC_LITERAL(6, 75, 5), // "gpHot"
-QT_MOC_LITERAL(7, 81, 6), // "gpCold"
-QT_MOC_LITERAL(8, 88, 7), // "gpNight"
-QT_MOC_LITERAL(9, 96, 7), // "gpCandy"
-QT_MOC_LITERAL(10, 104, 11), // "gpGeography"
-QT_MOC_LITERAL(11, 116, 5), // "gpIon"
-QT_MOC_LITERAL(12, 122, 9), // "gpThermal"
-QT_MOC_LITERAL(13, 132, 7), // "gpPolar"
-QT_MOC_LITERAL(14, 140, 10), // "gpSpectrum"
-QT_MOC_LITERAL(15, 151, 5), // "gpJet"
-QT_MOC_LITERAL(16, 157, 6) // "gpHues"
+QT_MOC_LITERAL(4, 48, 11), // "NanHandling"
+QT_MOC_LITERAL(5, 60, 6), // "nhNone"
+QT_MOC_LITERAL(6, 67, 13), // "nhLowestColor"
+QT_MOC_LITERAL(7, 81, 14), // "nhHighestColor"
+QT_MOC_LITERAL(8, 96, 13), // "nhTransparent"
+QT_MOC_LITERAL(9, 110, 10), // "nhNanColor"
+QT_MOC_LITERAL(10, 121, 14), // "GradientPreset"
+QT_MOC_LITERAL(11, 136, 11), // "gpGrayscale"
+QT_MOC_LITERAL(12, 148, 5), // "gpHot"
+QT_MOC_LITERAL(13, 154, 6), // "gpCold"
+QT_MOC_LITERAL(14, 161, 7), // "gpNight"
+QT_MOC_LITERAL(15, 169, 7), // "gpCandy"
+QT_MOC_LITERAL(16, 177, 11), // "gpGeography"
+QT_MOC_LITERAL(17, 189, 5), // "gpIon"
+QT_MOC_LITERAL(18, 195, 9), // "gpThermal"
+QT_MOC_LITERAL(19, 205, 7), // "gpPolar"
+QT_MOC_LITERAL(20, 213, 10), // "gpSpectrum"
+QT_MOC_LITERAL(21, 224, 5), // "gpJet"
+QT_MOC_LITERAL(22, 230, 6) // "gpHues"
 
     },
     "QCPColorGradient\0ColorInterpolation\0"
-    "ciRGB\0ciHSV\0GradientPreset\0gpGrayscale\0"
+    "ciRGB\0ciHSV\0NanHandling\0nhNone\0"
+    "nhLowestColor\0nhHighestColor\0nhTransparent\0"
+    "nhNanColor\0GradientPreset\0gpGrayscale\0"
     "gpHot\0gpCold\0gpNight\0gpCandy\0gpGeography\0"
     "gpIon\0gpThermal\0gpPolar\0gpSpectrum\0"
     "gpJet\0gpHues"
@@ -3867,30 +3967,36 @@ static const uint qt_meta_data_QCPColorGradient[] = {
        0,    0, // classinfo
        0,    0, // methods
        0,    0, // properties
-       2,   14, // enums/sets
+       3,   14, // enums/sets
        0,    0, // constructors
        4,       // flags
        0,       // signalCount
 
  // enums: name, alias, flags, count, data
-       1,    1, 0x0,    2,   24,
-       4,    4, 0x0,   12,   28,
+       1,    1, 0x0,    2,   29,
+       4,    4, 0x0,    5,   33,
+      10,   10, 0x0,   12,   43,
 
  // enum data: key, value
        2, uint(QCPColorGradient::ciRGB),
        3, uint(QCPColorGradient::ciHSV),
-       5, uint(QCPColorGradient::gpGrayscale),
-       6, uint(QCPColorGradient::gpHot),
-       7, uint(QCPColorGradient::gpCold),
-       8, uint(QCPColorGradient::gpNight),
-       9, uint(QCPColorGradient::gpCandy),
-      10, uint(QCPColorGradient::gpGeography),
-      11, uint(QCPColorGradient::gpIon),
-      12, uint(QCPColorGradient::gpThermal),
-      13, uint(QCPColorGradient::gpPolar),
-      14, uint(QCPColorGradient::gpSpectrum),
-      15, uint(QCPColorGradient::gpJet),
-      16, uint(QCPColorGradient::gpHues),
+       5, uint(QCPColorGradient::nhNone),
+       6, uint(QCPColorGradient::nhLowestColor),
+       7, uint(QCPColorGradient::nhHighestColor),
+       8, uint(QCPColorGradient::nhTransparent),
+       9, uint(QCPColorGradient::nhNanColor),
+      11, uint(QCPColorGradient::gpGrayscale),
+      12, uint(QCPColorGradient::gpHot),
+      13, uint(QCPColorGradient::gpCold),
+      14, uint(QCPColorGradient::gpNight),
+      15, uint(QCPColorGradient::gpCandy),
+      16, uint(QCPColorGradient::gpGeography),
+      17, uint(QCPColorGradient::gpIon),
+      18, uint(QCPColorGradient::gpThermal),
+      19, uint(QCPColorGradient::gpPolar),
+      20, uint(QCPColorGradient::gpSpectrum),
+      21, uint(QCPColorGradient::gpJet),
+      22, uint(QCPColorGradient::gpHues),
 
        0        // eod
 };
@@ -7908,6 +8014,859 @@ int QCPItemBracket::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     }
 #endif // QT_NO_PROPERTIES
     return _id;
+}
+struct qt_meta_stringdata_QCPPolarAxisRadial_t {
+    QByteArrayData data[36];
+    char stringdata0[466];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_QCPPolarAxisRadial_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_QCPPolarAxisRadial_t qt_meta_stringdata_QCPPolarAxisRadial = {
+    {
+QT_MOC_LITERAL(0, 0, 18), // "QCPPolarAxisRadial"
+QT_MOC_LITERAL(1, 19, 12), // "rangeChanged"
+QT_MOC_LITERAL(2, 32, 0), // ""
+QT_MOC_LITERAL(3, 33, 8), // "QCPRange"
+QT_MOC_LITERAL(4, 42, 8), // "newRange"
+QT_MOC_LITERAL(5, 51, 8), // "oldRange"
+QT_MOC_LITERAL(6, 60, 16), // "scaleTypeChanged"
+QT_MOC_LITERAL(7, 77, 29), // "QCPPolarAxisRadial::ScaleType"
+QT_MOC_LITERAL(8, 107, 9), // "scaleType"
+QT_MOC_LITERAL(9, 117, 16), // "selectionChanged"
+QT_MOC_LITERAL(10, 134, 35), // "QCPPolarAxisRadial::Selectabl..."
+QT_MOC_LITERAL(11, 170, 5), // "parts"
+QT_MOC_LITERAL(12, 176, 17), // "selectableChanged"
+QT_MOC_LITERAL(13, 194, 12), // "setScaleType"
+QT_MOC_LITERAL(14, 207, 4), // "type"
+QT_MOC_LITERAL(15, 212, 8), // "setRange"
+QT_MOC_LITERAL(16, 221, 5), // "range"
+QT_MOC_LITERAL(17, 227, 18), // "setSelectableParts"
+QT_MOC_LITERAL(18, 246, 15), // "selectableParts"
+QT_MOC_LITERAL(19, 262, 16), // "setSelectedParts"
+QT_MOC_LITERAL(20, 279, 13), // "selectedParts"
+QT_MOC_LITERAL(21, 293, 14), // "AngleReference"
+QT_MOC_LITERAL(22, 308, 10), // "arAbsolute"
+QT_MOC_LITERAL(23, 319, 13), // "arAngularAxis"
+QT_MOC_LITERAL(24, 333, 9), // "ScaleType"
+QT_MOC_LITERAL(25, 343, 8), // "stLinear"
+QT_MOC_LITERAL(26, 352, 13), // "stLogarithmic"
+QT_MOC_LITERAL(27, 366, 14), // "SelectablePart"
+QT_MOC_LITERAL(28, 381, 6), // "spNone"
+QT_MOC_LITERAL(29, 388, 6), // "spAxis"
+QT_MOC_LITERAL(30, 395, 12), // "spTickLabels"
+QT_MOC_LITERAL(31, 408, 11), // "spAxisLabel"
+QT_MOC_LITERAL(32, 420, 15), // "SelectableParts"
+QT_MOC_LITERAL(33, 436, 9), // "LabelMode"
+QT_MOC_LITERAL(34, 446, 9), // "lmUpright"
+QT_MOC_LITERAL(35, 456, 9) // "lmRotated"
+
+    },
+    "QCPPolarAxisRadial\0rangeChanged\0\0"
+    "QCPRange\0newRange\0oldRange\0scaleTypeChanged\0"
+    "QCPPolarAxisRadial::ScaleType\0scaleType\0"
+    "selectionChanged\0QCPPolarAxisRadial::SelectableParts\0"
+    "parts\0selectableChanged\0setScaleType\0"
+    "type\0setRange\0range\0setSelectableParts\0"
+    "selectableParts\0setSelectedParts\0"
+    "selectedParts\0AngleReference\0arAbsolute\0"
+    "arAngularAxis\0ScaleType\0stLinear\0"
+    "stLogarithmic\0SelectablePart\0spNone\0"
+    "spAxis\0spTickLabels\0spAxisLabel\0"
+    "SelectableParts\0LabelMode\0lmUpright\0"
+    "lmRotated"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_QCPPolarAxisRadial[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       9,   14, // methods
+       0,    0, // properties
+       5,   88, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       5,       // signalCount
+
+ // signals: name, argc, parameters, tag, flags
+       1,    1,   59,    2, 0x06 /* Public */,
+       1,    2,   62,    2, 0x06 /* Public */,
+       6,    1,   67,    2, 0x06 /* Public */,
+       9,    1,   70,    2, 0x06 /* Public */,
+      12,    1,   73,    2, 0x06 /* Public */,
+
+ // slots: name, argc, parameters, tag, flags
+      13,    1,   76,    2, 0x0a /* Public */,
+      15,    1,   79,    2, 0x0a /* Public */,
+      17,    1,   82,    2, 0x0a /* Public */,
+      19,    1,   85,    2, 0x0a /* Public */,
+
+ // signals: parameters
+    QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void, 0x80000000 | 3, 0x80000000 | 3,    4,    5,
+    QMetaType::Void, 0x80000000 | 7,    8,
+    QMetaType::Void, 0x80000000 | 10,   11,
+    QMetaType::Void, 0x80000000 | 10,   11,
+
+ // slots: parameters
+    QMetaType::Void, 0x80000000 | 7,   14,
+    QMetaType::Void, 0x80000000 | 3,   16,
+    QMetaType::Void, 0x80000000 | 10,   18,
+    QMetaType::Void, 0x80000000 | 10,   20,
+
+ // enums: name, alias, flags, count, data
+      21,   21, 0x0,    2,  113,
+      24,   24, 0x0,    2,  117,
+      27,   27, 0x0,    4,  121,
+      32,   27, 0x1,    4,  129,
+      33,   33, 0x0,    2,  137,
+
+ // enum data: key, value
+      22, uint(QCPPolarAxisRadial::arAbsolute),
+      23, uint(QCPPolarAxisRadial::arAngularAxis),
+      25, uint(QCPPolarAxisRadial::stLinear),
+      26, uint(QCPPolarAxisRadial::stLogarithmic),
+      28, uint(QCPPolarAxisRadial::spNone),
+      29, uint(QCPPolarAxisRadial::spAxis),
+      30, uint(QCPPolarAxisRadial::spTickLabels),
+      31, uint(QCPPolarAxisRadial::spAxisLabel),
+      28, uint(QCPPolarAxisRadial::spNone),
+      29, uint(QCPPolarAxisRadial::spAxis),
+      30, uint(QCPPolarAxisRadial::spTickLabels),
+      31, uint(QCPPolarAxisRadial::spAxisLabel),
+      34, uint(QCPPolarAxisRadial::lmUpright),
+      35, uint(QCPPolarAxisRadial::lmRotated),
+
+       0        // eod
+};
+
+void QCPPolarAxisRadial::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        auto *_t = static_cast<QCPPolarAxisRadial *>(_o);
+        (void)_t;
+        switch (_id) {
+        case 0: _t->rangeChanged((*reinterpret_cast< const QCPRange(*)>(_a[1]))); break;
+        case 1: _t->rangeChanged((*reinterpret_cast< const QCPRange(*)>(_a[1])),(*reinterpret_cast< const QCPRange(*)>(_a[2]))); break;
+        case 2: _t->scaleTypeChanged((*reinterpret_cast< QCPPolarAxisRadial::ScaleType(*)>(_a[1]))); break;
+        case 3: _t->selectionChanged((*reinterpret_cast< const QCPPolarAxisRadial::SelectableParts(*)>(_a[1]))); break;
+        case 4: _t->selectableChanged((*reinterpret_cast< const QCPPolarAxisRadial::SelectableParts(*)>(_a[1]))); break;
+        case 5: _t->setScaleType((*reinterpret_cast< QCPPolarAxisRadial::ScaleType(*)>(_a[1]))); break;
+        case 6: _t->setRange((*reinterpret_cast< const QCPRange(*)>(_a[1]))); break;
+        case 7: _t->setSelectableParts((*reinterpret_cast< const QCPPolarAxisRadial::SelectableParts(*)>(_a[1]))); break;
+        case 8: _t->setSelectedParts((*reinterpret_cast< const QCPPolarAxisRadial::SelectableParts(*)>(_a[1]))); break;
+        default: ;
+        }
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        switch (_id) {
+        default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+        case 2:
+            switch (*reinterpret_cast<int*>(_a[1])) {
+            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+            case 0:
+                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QCPPolarAxisRadial::ScaleType >(); break;
+            }
+            break;
+        case 5:
+            switch (*reinterpret_cast<int*>(_a[1])) {
+            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+            case 0:
+                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QCPPolarAxisRadial::ScaleType >(); break;
+            }
+            break;
+        }
+    } else if (_c == QMetaObject::IndexOfMethod) {
+        int *result = reinterpret_cast<int *>(_a[0]);
+        {
+            using _t = void (QCPPolarAxisRadial::*)(const QCPRange & );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QCPPolarAxisRadial::rangeChanged)) {
+                *result = 0;
+                return;
+            }
+        }
+        {
+            using _t = void (QCPPolarAxisRadial::*)(const QCPRange & , const QCPRange & );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QCPPolarAxisRadial::rangeChanged)) {
+                *result = 1;
+                return;
+            }
+        }
+        {
+            using _t = void (QCPPolarAxisRadial::*)(QCPPolarAxisRadial::ScaleType );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QCPPolarAxisRadial::scaleTypeChanged)) {
+                *result = 2;
+                return;
+            }
+        }
+        {
+            using _t = void (QCPPolarAxisRadial::*)(const QCPPolarAxisRadial::SelectableParts & );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QCPPolarAxisRadial::selectionChanged)) {
+                *result = 3;
+                return;
+            }
+        }
+        {
+            using _t = void (QCPPolarAxisRadial::*)(const QCPPolarAxisRadial::SelectableParts & );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QCPPolarAxisRadial::selectableChanged)) {
+                *result = 4;
+                return;
+            }
+        }
+    }
+}
+
+QT_INIT_METAOBJECT const QMetaObject QCPPolarAxisRadial::staticMetaObject = { {
+    QMetaObject::SuperData::link<QCPLayerable::staticMetaObject>(),
+    qt_meta_stringdata_QCPPolarAxisRadial.data,
+    qt_meta_data_QCPPolarAxisRadial,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
+
+const QMetaObject *QCPPolarAxisRadial::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *QCPPolarAxisRadial::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_QCPPolarAxisRadial.stringdata0))
+        return static_cast<void*>(this);
+    return QCPLayerable::qt_metacast(_clname);
+}
+
+int QCPPolarAxisRadial::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QCPLayerable::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 9)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 9;
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 9)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 9;
+    }
+    return _id;
+}
+
+// SIGNAL 0
+void QCPPolarAxisRadial::rangeChanged(const QCPRange & _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
+}
+
+// SIGNAL 1
+void QCPPolarAxisRadial::rangeChanged(const QCPRange & _t1, const QCPRange & _t2)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
+    QMetaObject::activate(this, &staticMetaObject, 1, _a);
+}
+
+// SIGNAL 2
+void QCPPolarAxisRadial::scaleTypeChanged(QCPPolarAxisRadial::ScaleType _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 2, _a);
+}
+
+// SIGNAL 3
+void QCPPolarAxisRadial::selectionChanged(const QCPPolarAxisRadial::SelectableParts & _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 3, _a);
+}
+
+// SIGNAL 4
+void QCPPolarAxisRadial::selectableChanged(const QCPPolarAxisRadial::SelectableParts & _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 4, _a);
+}
+struct qt_meta_stringdata_QCPPolarAxisAngular_t {
+    QByteArrayData data[25];
+    char stringdata0[320];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_QCPPolarAxisAngular_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_QCPPolarAxisAngular_t qt_meta_stringdata_QCPPolarAxisAngular = {
+    {
+QT_MOC_LITERAL(0, 0, 19), // "QCPPolarAxisAngular"
+QT_MOC_LITERAL(1, 20, 12), // "rangeChanged"
+QT_MOC_LITERAL(2, 33, 0), // ""
+QT_MOC_LITERAL(3, 34, 8), // "QCPRange"
+QT_MOC_LITERAL(4, 43, 8), // "newRange"
+QT_MOC_LITERAL(5, 52, 8), // "oldRange"
+QT_MOC_LITERAL(6, 61, 16), // "selectionChanged"
+QT_MOC_LITERAL(7, 78, 36), // "QCPPolarAxisAngular::Selectab..."
+QT_MOC_LITERAL(8, 115, 5), // "parts"
+QT_MOC_LITERAL(9, 121, 17), // "selectableChanged"
+QT_MOC_LITERAL(10, 139, 8), // "setRange"
+QT_MOC_LITERAL(11, 148, 5), // "range"
+QT_MOC_LITERAL(12, 154, 18), // "setSelectableParts"
+QT_MOC_LITERAL(13, 173, 15), // "selectableParts"
+QT_MOC_LITERAL(14, 189, 16), // "setSelectedParts"
+QT_MOC_LITERAL(15, 206, 13), // "selectedParts"
+QT_MOC_LITERAL(16, 220, 14), // "SelectablePart"
+QT_MOC_LITERAL(17, 235, 6), // "spNone"
+QT_MOC_LITERAL(18, 242, 6), // "spAxis"
+QT_MOC_LITERAL(19, 249, 12), // "spTickLabels"
+QT_MOC_LITERAL(20, 262, 11), // "spAxisLabel"
+QT_MOC_LITERAL(21, 274, 15), // "SelectableParts"
+QT_MOC_LITERAL(22, 290, 9), // "LabelMode"
+QT_MOC_LITERAL(23, 300, 9), // "lmUpright"
+QT_MOC_LITERAL(24, 310, 9) // "lmRotated"
+
+    },
+    "QCPPolarAxisAngular\0rangeChanged\0\0"
+    "QCPRange\0newRange\0oldRange\0selectionChanged\0"
+    "QCPPolarAxisAngular::SelectableParts\0"
+    "parts\0selectableChanged\0setRange\0range\0"
+    "setSelectableParts\0selectableParts\0"
+    "setSelectedParts\0selectedParts\0"
+    "SelectablePart\0spNone\0spAxis\0spTickLabels\0"
+    "spAxisLabel\0SelectableParts\0LabelMode\0"
+    "lmUpright\0lmRotated"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_QCPPolarAxisAngular[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       7,   14, // methods
+       0,    0, // properties
+       3,   72, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       4,       // signalCount
+
+ // signals: name, argc, parameters, tag, flags
+       1,    1,   49,    2, 0x06 /* Public */,
+       1,    2,   52,    2, 0x06 /* Public */,
+       6,    1,   57,    2, 0x06 /* Public */,
+       9,    1,   60,    2, 0x06 /* Public */,
+
+ // slots: name, argc, parameters, tag, flags
+      10,    1,   63,    2, 0x0a /* Public */,
+      12,    1,   66,    2, 0x0a /* Public */,
+      14,    1,   69,    2, 0x0a /* Public */,
+
+ // signals: parameters
+    QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void, 0x80000000 | 3, 0x80000000 | 3,    4,    5,
+    QMetaType::Void, 0x80000000 | 7,    8,
+    QMetaType::Void, 0x80000000 | 7,    8,
+
+ // slots: parameters
+    QMetaType::Void, 0x80000000 | 3,   11,
+    QMetaType::Void, 0x80000000 | 7,   13,
+    QMetaType::Void, 0x80000000 | 7,   15,
+
+ // enums: name, alias, flags, count, data
+      16,   16, 0x0,    4,   87,
+      21,   16, 0x1,    4,   95,
+      22,   22, 0x0,    2,  103,
+
+ // enum data: key, value
+      17, uint(QCPPolarAxisAngular::spNone),
+      18, uint(QCPPolarAxisAngular::spAxis),
+      19, uint(QCPPolarAxisAngular::spTickLabels),
+      20, uint(QCPPolarAxisAngular::spAxisLabel),
+      17, uint(QCPPolarAxisAngular::spNone),
+      18, uint(QCPPolarAxisAngular::spAxis),
+      19, uint(QCPPolarAxisAngular::spTickLabels),
+      20, uint(QCPPolarAxisAngular::spAxisLabel),
+      23, uint(QCPPolarAxisAngular::lmUpright),
+      24, uint(QCPPolarAxisAngular::lmRotated),
+
+       0        // eod
+};
+
+void QCPPolarAxisAngular::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        auto *_t = static_cast<QCPPolarAxisAngular *>(_o);
+        (void)_t;
+        switch (_id) {
+        case 0: _t->rangeChanged((*reinterpret_cast< const QCPRange(*)>(_a[1]))); break;
+        case 1: _t->rangeChanged((*reinterpret_cast< const QCPRange(*)>(_a[1])),(*reinterpret_cast< const QCPRange(*)>(_a[2]))); break;
+        case 2: _t->selectionChanged((*reinterpret_cast< const QCPPolarAxisAngular::SelectableParts(*)>(_a[1]))); break;
+        case 3: _t->selectableChanged((*reinterpret_cast< const QCPPolarAxisAngular::SelectableParts(*)>(_a[1]))); break;
+        case 4: _t->setRange((*reinterpret_cast< const QCPRange(*)>(_a[1]))); break;
+        case 5: _t->setSelectableParts((*reinterpret_cast< const QCPPolarAxisAngular::SelectableParts(*)>(_a[1]))); break;
+        case 6: _t->setSelectedParts((*reinterpret_cast< const QCPPolarAxisAngular::SelectableParts(*)>(_a[1]))); break;
+        default: ;
+        }
+    } else if (_c == QMetaObject::IndexOfMethod) {
+        int *result = reinterpret_cast<int *>(_a[0]);
+        {
+            using _t = void (QCPPolarAxisAngular::*)(const QCPRange & );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QCPPolarAxisAngular::rangeChanged)) {
+                *result = 0;
+                return;
+            }
+        }
+        {
+            using _t = void (QCPPolarAxisAngular::*)(const QCPRange & , const QCPRange & );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QCPPolarAxisAngular::rangeChanged)) {
+                *result = 1;
+                return;
+            }
+        }
+        {
+            using _t = void (QCPPolarAxisAngular::*)(const QCPPolarAxisAngular::SelectableParts & );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QCPPolarAxisAngular::selectionChanged)) {
+                *result = 2;
+                return;
+            }
+        }
+        {
+            using _t = void (QCPPolarAxisAngular::*)(const QCPPolarAxisAngular::SelectableParts & );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QCPPolarAxisAngular::selectableChanged)) {
+                *result = 3;
+                return;
+            }
+        }
+    }
+}
+
+QT_INIT_METAOBJECT const QMetaObject QCPPolarAxisAngular::staticMetaObject = { {
+    QMetaObject::SuperData::link<QCPLayoutElement::staticMetaObject>(),
+    qt_meta_stringdata_QCPPolarAxisAngular.data,
+    qt_meta_data_QCPPolarAxisAngular,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
+
+const QMetaObject *QCPPolarAxisAngular::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *QCPPolarAxisAngular::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_QCPPolarAxisAngular.stringdata0))
+        return static_cast<void*>(this);
+    return QCPLayoutElement::qt_metacast(_clname);
+}
+
+int QCPPolarAxisAngular::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QCPLayoutElement::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 7)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 7;
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 7)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 7;
+    }
+    return _id;
+}
+
+// SIGNAL 0
+void QCPPolarAxisAngular::rangeChanged(const QCPRange & _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
+}
+
+// SIGNAL 1
+void QCPPolarAxisAngular::rangeChanged(const QCPRange & _t1, const QCPRange & _t2)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
+    QMetaObject::activate(this, &staticMetaObject, 1, _a);
+}
+
+// SIGNAL 2
+void QCPPolarAxisAngular::selectionChanged(const QCPPolarAxisAngular::SelectableParts & _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 2, _a);
+}
+
+// SIGNAL 3
+void QCPPolarAxisAngular::selectableChanged(const QCPPolarAxisAngular::SelectableParts & _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 3, _a);
+}
+struct qt_meta_stringdata_QCPPolarGrid_t {
+    QByteArrayData data[7];
+    char stringdata0[64];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_QCPPolarGrid_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_QCPPolarGrid_t qt_meta_stringdata_QCPPolarGrid = {
+    {
+QT_MOC_LITERAL(0, 0, 12), // "QCPPolarGrid"
+QT_MOC_LITERAL(1, 13, 8), // "GridType"
+QT_MOC_LITERAL(2, 22, 9), // "gtAngular"
+QT_MOC_LITERAL(3, 32, 8), // "gtRadial"
+QT_MOC_LITERAL(4, 41, 5), // "gtAll"
+QT_MOC_LITERAL(5, 47, 6), // "gtNone"
+QT_MOC_LITERAL(6, 54, 9) // "GridTypes"
+
+    },
+    "QCPPolarGrid\0GridType\0gtAngular\0"
+    "gtRadial\0gtAll\0gtNone\0GridTypes"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_QCPPolarGrid[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       0,    0, // methods
+       0,    0, // properties
+       2,   14, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       0,       // signalCount
+
+ // enums: name, alias, flags, count, data
+       1,    1, 0x0,    4,   24,
+       6,    1, 0x1,    4,   32,
+
+ // enum data: key, value
+       2, uint(QCPPolarGrid::gtAngular),
+       3, uint(QCPPolarGrid::gtRadial),
+       4, uint(QCPPolarGrid::gtAll),
+       5, uint(QCPPolarGrid::gtNone),
+       2, uint(QCPPolarGrid::gtAngular),
+       3, uint(QCPPolarGrid::gtRadial),
+       4, uint(QCPPolarGrid::gtAll),
+       5, uint(QCPPolarGrid::gtNone),
+
+       0        // eod
+};
+
+void QCPPolarGrid::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    (void)_o;
+    (void)_id;
+    (void)_c;
+    (void)_a;
+}
+
+QT_INIT_METAOBJECT const QMetaObject QCPPolarGrid::staticMetaObject = { {
+    QMetaObject::SuperData::link<QCPLayerable::staticMetaObject>(),
+    qt_meta_stringdata_QCPPolarGrid.data,
+    qt_meta_data_QCPPolarGrid,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
+
+const QMetaObject *QCPPolarGrid::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *QCPPolarGrid::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_QCPPolarGrid.stringdata0))
+        return static_cast<void*>(this);
+    return QCPLayerable::qt_metacast(_clname);
+}
+
+int QCPPolarGrid::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QCPLayerable::qt_metacall(_c, _id, _a);
+    return _id;
+}
+struct qt_meta_stringdata_QCPPolarLegendItem_t {
+    QByteArrayData data[1];
+    char stringdata0[19];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_QCPPolarLegendItem_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_QCPPolarLegendItem_t qt_meta_stringdata_QCPPolarLegendItem = {
+    {
+QT_MOC_LITERAL(0, 0, 18) // "QCPPolarLegendItem"
+
+    },
+    "QCPPolarLegendItem"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_QCPPolarLegendItem[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       0,    0, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       0,       // signalCount
+
+       0        // eod
+};
+
+void QCPPolarLegendItem::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    (void)_o;
+    (void)_id;
+    (void)_c;
+    (void)_a;
+}
+
+QT_INIT_METAOBJECT const QMetaObject QCPPolarLegendItem::staticMetaObject = { {
+    QMetaObject::SuperData::link<QCPAbstractLegendItem::staticMetaObject>(),
+    qt_meta_stringdata_QCPPolarLegendItem.data,
+    qt_meta_data_QCPPolarLegendItem,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
+
+const QMetaObject *QCPPolarLegendItem::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *QCPPolarLegendItem::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_QCPPolarLegendItem.stringdata0))
+        return static_cast<void*>(this);
+    return QCPAbstractLegendItem::qt_metacast(_clname);
+}
+
+int QCPPolarLegendItem::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QCPAbstractLegendItem::qt_metacall(_c, _id, _a);
+    return _id;
+}
+struct qt_meta_stringdata_QCPPolarGraph_t {
+    QByteArrayData data[14];
+    char stringdata0[167];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_QCPPolarGraph_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_QCPPolarGraph_t qt_meta_stringdata_QCPPolarGraph = {
+    {
+QT_MOC_LITERAL(0, 0, 13), // "QCPPolarGraph"
+QT_MOC_LITERAL(1, 14, 16), // "selectionChanged"
+QT_MOC_LITERAL(2, 31, 0), // ""
+QT_MOC_LITERAL(3, 32, 8), // "selected"
+QT_MOC_LITERAL(4, 41, 16), // "QCPDataSelection"
+QT_MOC_LITERAL(5, 58, 9), // "selection"
+QT_MOC_LITERAL(6, 68, 17), // "selectableChanged"
+QT_MOC_LITERAL(7, 86, 18), // "QCP::SelectionType"
+QT_MOC_LITERAL(8, 105, 10), // "selectable"
+QT_MOC_LITERAL(9, 116, 13), // "setSelectable"
+QT_MOC_LITERAL(10, 130, 12), // "setSelection"
+QT_MOC_LITERAL(11, 143, 9), // "LineStyle"
+QT_MOC_LITERAL(12, 153, 6), // "lsNone"
+QT_MOC_LITERAL(13, 160, 6) // "lsLine"
+
+    },
+    "QCPPolarGraph\0selectionChanged\0\0"
+    "selected\0QCPDataSelection\0selection\0"
+    "selectableChanged\0QCP::SelectionType\0"
+    "selectable\0setSelectable\0setSelection\0"
+    "LineStyle\0lsNone\0lsLine"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_QCPPolarGraph[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       5,   14, // methods
+       0,    0, // properties
+       1,   54, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       3,       // signalCount
+
+ // signals: name, argc, parameters, tag, flags
+       1,    1,   39,    2, 0x06 /* Public */,
+       1,    1,   42,    2, 0x06 /* Public */,
+       6,    1,   45,    2, 0x06 /* Public */,
+
+ // slots: name, argc, parameters, tag, flags
+       9,    1,   48,    2, 0x0a /* Public */,
+      10,    1,   51,    2, 0x0a /* Public */,
+
+ // signals: parameters
+    QMetaType::Void, QMetaType::Bool,    3,
+    QMetaType::Void, 0x80000000 | 4,    5,
+    QMetaType::Void, 0x80000000 | 7,    8,
+
+ // slots: parameters
+    QMetaType::Void, 0x80000000 | 7,    8,
+    QMetaType::Void, 0x80000000 | 4,    5,
+
+ // enums: name, alias, flags, count, data
+      11,   11, 0x0,    2,   59,
+
+ // enum data: key, value
+      12, uint(QCPPolarGraph::lsNone),
+      13, uint(QCPPolarGraph::lsLine),
+
+       0        // eod
+};
+
+void QCPPolarGraph::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        auto *_t = static_cast<QCPPolarGraph *>(_o);
+        (void)_t;
+        switch (_id) {
+        case 0: _t->selectionChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 1: _t->selectionChanged((*reinterpret_cast< const QCPDataSelection(*)>(_a[1]))); break;
+        case 2: _t->selectableChanged((*reinterpret_cast< QCP::SelectionType(*)>(_a[1]))); break;
+        case 3: _t->setSelectable((*reinterpret_cast< QCP::SelectionType(*)>(_a[1]))); break;
+        case 4: _t->setSelection((*reinterpret_cast< QCPDataSelection(*)>(_a[1]))); break;
+        default: ;
+        }
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        switch (_id) {
+        default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+        case 1:
+            switch (*reinterpret_cast<int*>(_a[1])) {
+            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+            case 0:
+                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QCPDataSelection >(); break;
+            }
+            break;
+        case 4:
+            switch (*reinterpret_cast<int*>(_a[1])) {
+            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+            case 0:
+                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QCPDataSelection >(); break;
+            }
+            break;
+        }
+    } else if (_c == QMetaObject::IndexOfMethod) {
+        int *result = reinterpret_cast<int *>(_a[0]);
+        {
+            using _t = void (QCPPolarGraph::*)(bool );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QCPPolarGraph::selectionChanged)) {
+                *result = 0;
+                return;
+            }
+        }
+        {
+            using _t = void (QCPPolarGraph::*)(const QCPDataSelection & );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QCPPolarGraph::selectionChanged)) {
+                *result = 1;
+                return;
+            }
+        }
+        {
+            using _t = void (QCPPolarGraph::*)(QCP::SelectionType );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QCPPolarGraph::selectableChanged)) {
+                *result = 2;
+                return;
+            }
+        }
+    }
+}
+
+QT_INIT_METAOBJECT const QMetaObject QCPPolarGraph::staticMetaObject = { {
+    QMetaObject::SuperData::link<QCPLayerable::staticMetaObject>(),
+    qt_meta_stringdata_QCPPolarGraph.data,
+    qt_meta_data_QCPPolarGraph,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
+
+const QMetaObject *QCPPolarGraph::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *QCPPolarGraph::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_QCPPolarGraph.stringdata0))
+        return static_cast<void*>(this);
+    return QCPLayerable::qt_metacast(_clname);
+}
+
+int QCPPolarGraph::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QCPLayerable::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 5)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 5;
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 5)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 5;
+    }
+    return _id;
+}
+
+// SIGNAL 0
+void QCPPolarGraph::selectionChanged(bool _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
+}
+
+// SIGNAL 1
+void QCPPolarGraph::selectionChanged(const QCPDataSelection & _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 1, _a);
+}
+
+// SIGNAL 2
+void QCPPolarGraph::selectableChanged(QCP::SelectionType _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 2, _a);
 }
 QT_WARNING_POP
 QT_END_MOC_NAMESPACE

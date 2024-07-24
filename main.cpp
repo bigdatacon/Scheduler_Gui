@@ -38,6 +38,7 @@ QCustomPlot *plot2;
 
 Operation *selectedOperation = nullptr;
 
+
 void setupPlot(QCustomPlot *customPlot, const QVector<Operation> &operations, bool groupByJob) {
     QMap<int, int> uniqueLabels;
     QVector<double> yPositions;
@@ -65,17 +66,28 @@ void setupPlot(QCustomPlot *customPlot, const QVector<Operation> &operations, bo
         }
     }
 
+    customPlot->clearPlottables(); // Очистить существующие бары перед добавлением новых.
+
     QCPBars *bars = new QCPBars(customPlot->yAxis, customPlot->xAxis);
-    QVector<double> barValues = QVector<double>(durations.size(), 1.0); // This line adds dummy values for bar height.
-    bars->setData(startTimes, barValues); // Setting the dummy data.
+    QVector<double> ticks;
+    QVector<double> barStarts;
+    QVector<double> barLengths;
 
     for (int i = 0; i < yPositions.size(); ++i) {
-        QCPBarsData barData;
-        barData.key = yPositions[i];
-        barData.value = durations[i];
-        bars->data()->add(barData);
-        bars->setPen(QPen(colorMap[labels[i].toInt()]));
-        bars->setBrush(QBrush(colorMap[labels[i].toInt()]));
+        ticks.append(yPositions[i]);
+        barStarts.append(startTimes[i]);
+        barLengths.append(durations[i]);
+    }
+
+    bars->setData(barStarts, barLengths);
+
+    QVector<QCPBars *> allBars;
+    for (int i = 0; i < yPositions.size(); ++i) {
+        QCPBars *bar = new QCPBars(customPlot->yAxis, customPlot->xAxis);
+        bar->setData(QVector<double>() << barStarts[i], QVector<double>() << barLengths[i]);
+        bar->setPen(QPen(colorMap[labels[i].toInt()]));
+        bar->setBrush(QBrush(colorMap[labels[i].toInt()]));
+        allBars.append(bar);
     }
 
     QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
@@ -107,6 +119,7 @@ void setupPlot(QCustomPlot *customPlot, const QVector<Operation> &operations, bo
     }
 }
 
+
 void plotGraphs() {
     plot1->clearPlottables();
     plot1->clearItems();
@@ -118,20 +131,14 @@ void plotGraphs() {
 }
 
 void onBarClicked(QMouseEvent *event, QCustomPlot *customPlot) {
-    int index = -1;
-    QCPBars *bars = nullptr;
+    if (event->button() != Qt::LeftButton) return;
 
-    if (customPlot == plot1) {
-        bars = barsMachines;
-    } else if (customPlot == plot2) {
-        bars = barsJobs;
-    }
+    QCPBars *bars = (customPlot == plot1) ? barsMachines : barsJobs;
+    double yCoord = customPlot->yAxis->pixelToCoord(event->pos().y());
 
-    if (bars) {
-        double y = customPlot->yAxis->pixelToCoord(event->pos().y());
-        double key = round(y);
-        index = bars->data()->findBegin(key)->key;
-
+    QCPBarsDataContainer::const_iterator it = bars->data()->findBegin(yCoord, false);
+    if (it != bars->data()->constEnd()) {
+        int index = std::distance(bars->data()->constBegin(), it);
         if (index >= 0 && index < jsOperations.size()) {
             selectedOperation = &jsOperations[index];
             startTimeEdit->setText(QString::number(selectedOperation->start));
@@ -254,7 +261,6 @@ int main(int argc, char *argv[]) {
 
     window.resize(800, 600);
     window.show();
-
     QObject::connect(plot1, &QCustomPlot::mousePress, [plot1](QMouseEvent *event) {
         onBarClicked(event, plot1);
     });
