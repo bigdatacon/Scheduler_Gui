@@ -201,7 +201,7 @@ QString MainWindow::generateHtmlChart()
         <title>Bar Chart</title>
         <style>
             body { font-family: Arial, sans-serif; }
-            .bar { position: absolute; }
+            .bar { position: absolute; cursor: pointer; }
         </style>
     </head>
     <body>
@@ -222,8 +222,50 @@ QString MainWindow::generateHtmlChart()
                     div.style.lineHeight = bar.height + 'px';
                     div.setAttribute('data-label', bar.label);
                     document.body.appendChild(div);
+
+                    div.onmousedown = (e) => {
+                        let shiftX = e.clientX - div.getBoundingClientRect().left;
+                        let shiftY = e.clientY - div.getBoundingClientRect().top;
+
+                        const moveAt = (pageX, pageY) => {
+                            div.style.left = pageX - shiftX + 'px';
+                            div.style.top = pageY - shiftY + 'px';
+                        };
+
+                        const onMouseMove = (e) => {
+                            moveAt(e.pageX, e.pageY);
+                        };
+
+                        document.addEventListener('mousemove', onMouseMove);
+
+                        div.onmouseup = () => {
+                            document.removeEventListener('mousemove', onMouseMove);
+                            div.onmouseup = null;
+                            // Send updated position to the server
+                            let bar = {
+                                x: parseInt(div.style.left),
+                                y: parseInt(div.style.top),
+                                width: bar.width,
+                                height: bar.height,
+                                label: bar.label,
+                                color: bar.color
+                            };
+                            fetch('/update', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(bar)
+                            });
+                        };
+                    };
+
+                    div.ondragstart = () => {
+                        return false;
+                    };
                 });
             }
+
             let bars = )" + jsonString + R"(;
             drawChart(bars.bars);
 
@@ -324,6 +366,14 @@ void MainWindow::readClient()
             clientSocket->write(response);
             clientSocket->disconnectFromHost();
             break;
+        } else if (line.startsWith("POST /update")) {
+            while (clientSocket->canReadLine()) {
+                QString body = clientSocket->readLine();
+                QJsonDocument doc = QJsonDocument::fromJson(body.toUtf8());
+                QJsonObject obj = doc.object();
+                // Обновите данные бара в приложении на основе obj
+                // Здесь вы можете обновить позиции баров и другие параметры
+            }
         }
     }
 }
