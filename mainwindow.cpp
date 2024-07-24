@@ -165,7 +165,6 @@ void MainWindow::updateBarPosition()
         QString color = overlap ? "red" : "blue";
         QString script = generateUpdateScript(selectedBar->rect, color);
         webView->page()->runJavaScript(script);
-        updateBarChart();
     }
 }
 
@@ -362,7 +361,12 @@ QString MainWindow::generateUpdateScript(const QRect &rect, const QString &color
 
     QString script = R"(
         let bar = )" + jsonString + R"(;
-        updateBar(bar);
+        let div = document.querySelector('.bar[data-label="' + bar.label + '"]');
+        if (div) {
+            div.style.left = (bar.x + 50) + 'px';
+            div.style.top = (bar.y + 50) + 'px';
+            div.style.backgroundColor = bar.color;
+        }
     )";
 
     return script;
