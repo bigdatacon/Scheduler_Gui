@@ -7,6 +7,8 @@
 #include <QMouseEvent>
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QLabel>
+#include <QPixmap>
 
 class MainWindow : public QMainWindow
 {
@@ -22,16 +24,21 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
-    void drawBarChart();
+    void drawBarChart(QPixmap &pixmap);
+    void updateBarChart();
     void updateBarPosition();
     bool barsOverlap(const QRect &rect1, const QRect &rect2);
     QString generateHtmlChart();
-    QString generateUpdateScript();
+    QString generateUpdateScript(const QRect &rect, const QString &color);
     void startHttpServer();
+    bool isPortInUse(int port);
 
     QWebEngineView *webView;
     QVBoxLayout *mainLayout;
     QTcpServer *httpServer;
+
+    QPixmap chartPixmap;
+    QLabel *chartLabel;
 
     struct Bar {
         QRect rect;
