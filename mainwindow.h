@@ -13,6 +13,8 @@ class MainWindow : public QMainWindow {
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    QWidget *centralWidget; // Добавляем здесь
+    QWidget* getCentralWidget(); // Метод для получения centralWidget
 
 private slots:
     void onApplyButtonClicked();

@@ -11,9 +11,8 @@ MainWindow::MainWindow(QWidget *parent)
       resetButton(new QPushButton("Reset", this)),
       layout(new QVBoxLayout)
 {
-    QWidget *centralWidget = new QWidget(this);
-    setCentralWidget(centralWidget);
 
+    setCentralWidget(centralWidget); // Установка центрального виджета
     setupPlot();
 
     layout->addWidget(customPlot);
@@ -35,6 +34,10 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 MainWindow::~MainWindow() {}
+
+QWidget* MainWindow::getCentralWidget() {
+    return centralWidget;
+}
 
 void MainWindow::setupPlot() {
     customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);

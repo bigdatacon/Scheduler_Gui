@@ -203,6 +203,7 @@ int main(int argc, char *argv[]) {
 
     // Создание виджетов
     QWidget *centralWidget = new QWidget;
+//    QWidget *centralWidget = window.centralWidget();
     QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
 
     plot1 = new QCustomPlot;
