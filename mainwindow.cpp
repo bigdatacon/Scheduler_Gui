@@ -200,19 +200,60 @@ QString MainWindow::generateHtmlChart()
     <head>
         <title>Bar Chart</title>
         <style>
-            body { font-family: Arial, sans-serif; }
+            body { font-family: Arial, sans-serif; position: relative; }
             .bar { position: absolute; cursor: pointer; }
+            .axis { position: absolute; background-color: black; }
+            .label { position: absolute; }
         </style>
     </head>
     <body>
         <script>
             function drawChart(bars) {
                 document.body.innerHTML = '';
+
+                // Draw Y axis
+                let yAxis = document.createElement('div');
+                yAxis.className = 'axis';
+                yAxis.style.width = '2px';
+                yAxis.style.height = '600px';
+                yAxis.style.left = '50px';
+                yAxis.style.top = '50px';
+                document.body.appendChild(yAxis);
+
+                // Draw X axis
+                let xAxis = document.createElement('div');
+                xAxis.className = 'axis';
+                xAxis.style.width = '700px';
+                xAxis.style.height = '2px';
+                xAxis.style.left = '50px';
+                xAxis.style.top = '650px';
+                document.body.appendChild(xAxis);
+
+                // Draw X axis labels
+                for (let i = 0; i <= 700; i += 50) {
+                    let xLabel = document.createElement('div');
+                    xLabel.className = 'label';
+                    xLabel.style.left = (50 + i - 10) + 'px';
+                    xLabel.style.top = '670px';
+                    xLabel.innerText = i / 10;
+                    document.body.appendChild(xLabel);
+                }
+
+                // Draw Y axis labels
+                for (let i = 0; i <= 600; i += 50) {
+                    let yLabel = document.createElement('div');
+                    yLabel.className = 'label';
+                    yLabel.style.left = '20px';
+                    yLabel.style.top = (650 - i - 10) + 'px';
+                    yLabel.innerText = i / 10;
+                    document.body.appendChild(yLabel);
+                }
+
                 bars.forEach(bar => {
                     let div = document.createElement('div');
                     div.className = 'bar';
-                    div.style.left = bar.x + 'px';
-                    div.style.top = bar.y + 'px';
+                    div.style.left = (bar.x + 50) + 'px';
+                    div.style.top = (bar.y + 50) + 'px';
                     div.style.width = bar.width + 'px';
                     div.style.height = bar.height + 'px';
                     div.style.backgroundColor = bar.color;
@@ -244,8 +285,8 @@ QString MainWindow::generateHtmlChart()
                             div.onmouseup = null;
                             // Send updated position to the server
                             let bar = {
-                                x: parseInt(div.style.left),
-                                y: parseInt(div.style.top),
+                                x: parseInt(div.style.left) - 50,
+                                y: parseInt(div.style.top) - 50,
                                 width: parseInt(div.style.width),
                                 height: parseInt(div.style.height),
                                 label: div.getAttribute('data-label'),
@@ -273,8 +314,8 @@ QString MainWindow::generateHtmlChart()
             function updateBar(bar) {
                 let div = document.querySelector('.bar[data-label="' + bar.label + '"]');
                 if (div) {
-                    div.style.left = bar.x + 'px';
-                    div.style.top = bar.y + 'px';
+                    div.style.left = (bar.x + 50) + 'px';
+                    div.style.top = (bar.y + 50) + 'px';
                     div.style.backgroundColor = bar.color;
                 }
             }
@@ -305,6 +346,7 @@ QString MainWindow::generateHtmlChart()
 
     return html;
 }
+
 
 QString MainWindow::generateUpdateScript(const QRect &rect, const QString &color)
 {
