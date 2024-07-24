@@ -2,37 +2,39 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "qcustomplot.h"
-#include <QPushButton>
-#include <QLineEdit>
+#include <QPixmap>
+#include <QLabel>
+#include <QMouseEvent>
 #include <QVBoxLayout>
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow
+{
     Q_OBJECT
 
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    QWidget *centralWidget; // Добавляем здесь
-    QWidget* getCentralWidget(); // Метод для получения centralWidget
 
-private slots:
-    void onApplyButtonClicked();
-    void onResetButtonClicked();
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
-    QCustomPlot *customPlot;
-    QCPBars *machinesBars;
-    QCPBars *jobsBars;
-    QLineEdit *startTimeEdit;
-    QLineEdit *finishTimeEdit;
-    QLineEdit *jobEdit;
-    QLineEdit *machineEdit;
-    QPushButton *applyButton;
-    QPushButton *resetButton;
-    QVBoxLayout *layout;
-    void setupPlot();
-    void updateBars();
+    void drawBarChart(QPixmap &pixmap);
+    void updateBarChart();
+
+    QPixmap chartPixmap;
+    QLabel *chartLabel;
+    QVBoxLayout *mainLayout;
+
+    struct Bar {
+        QRect rect;
+        QString label;
+    };
+
+    QVector<Bar> bars;
+    Bar *selectedBar;
+    QPoint lastMousePos;
 };
 
 #endif // MAINWINDOW_H
