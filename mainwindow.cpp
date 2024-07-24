@@ -230,6 +230,7 @@ QString MainWindow::generateHtmlChart()
                         const moveAt = (pageX, pageY) => {
                             div.style.left = pageX - shiftX + 'px';
                             div.style.top = pageY - shiftY + 'px';
+                            updateOverlap();
                         };
 
                         const onMouseMove = (e) => {
@@ -245,10 +246,10 @@ QString MainWindow::generateHtmlChart()
                             let bar = {
                                 x: parseInt(div.style.left),
                                 y: parseInt(div.style.top),
-                                width: bar.width,
-                                height: bar.height,
-                                label: bar.label,
-                                color: bar.color
+                                width: parseInt(div.style.width),
+                                height: parseInt(div.style.height),
+                                label: div.getAttribute('data-label'),
+                                color: div.style.backgroundColor
                             };
                             fetch('/update', {
                                 method: 'POST',
@@ -276,6 +277,26 @@ QString MainWindow::generateHtmlChart()
                     div.style.top = bar.y + 'px';
                     div.style.backgroundColor = bar.color;
                 }
+            }
+
+            function updateOverlap() {
+                let barDivs = document.querySelectorAll('.bar');
+                barDivs.forEach(div1 => {
+                    let rect1 = div1.getBoundingClientRect();
+                    let overlap = false;
+                    barDivs.forEach(div2 => {
+                        if (div1 !== div2) {
+                            let rect2 = div2.getBoundingClientRect();
+                            if (rect1.left < rect2.right &&
+                                rect1.right > rect2.left &&
+                                rect1.top < rect2.bottom &&
+                                rect1.bottom > rect2.top) {
+                                overlap = true;
+                            }
+                        }
+                    });
+                    div1.style.backgroundColor = overlap ? 'red' : 'blue';
+                });
             }
         </script>
     </body>
