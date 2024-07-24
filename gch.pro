@@ -2,6 +2,8 @@ QT       += core gui
 QT       += charts  # Добавляем модуль QtCharts
 QT       += printsupport
 QT += core gui charts
+QT += webenginewidgets
+QT += core gui webenginewidgets network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

@@ -2,10 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QPixmap>
-#include <QLabel>
-#include <QMouseEvent>
+#include <QWebEngineView>
 #include <QVBoxLayout>
+#include <QMouseEvent>
+#include <QTcpServer>
+#include <QTcpSocket>
 
 class MainWindow : public QMainWindow
 {
@@ -21,13 +22,16 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
-    void drawBarChart(QPixmap &pixmap);
-    void updateBarChart();
+    void drawBarChart();
+    void updateBarPosition();
     bool barsOverlap(const QRect &rect1, const QRect &rect2);
+    QString generateHtmlChart();
+    QString generateUpdateScript();
+    void startHttpServer();
 
-    QPixmap chartPixmap;
-    QLabel *chartLabel;
+    QWebEngineView *webView;
     QVBoxLayout *mainLayout;
+    QTcpServer *httpServer;
 
     struct Bar {
         QRect rect;
@@ -37,6 +41,10 @@ private:
     QVector<Bar> bars;
     Bar *selectedBar;
     QPoint lastMousePos;
+
+private slots:
+    void handleNewConnection();
+    void readClient();
 };
 
 #endif // MAINWINDOW_H
