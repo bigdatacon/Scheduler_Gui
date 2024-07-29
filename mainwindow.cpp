@@ -106,52 +106,6 @@ void MainWindow::drawBarChart(QPixmap &pixmap)
     }
 }
 
-void MainWindow::updateBarChart()
-{
-    QPixmap newPixmap = chartPixmap; // Копируем текущий график
-    newPixmap.fill(Qt::white);
-    QPainter painter(&newPixmap);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    // Draw X and Y axes
-    painter.setPen(QPen(Qt::black, 2));
-    painter.drawLine(50, 50, 50, newPixmap.height() - 50); // Y axis
-    painter.drawLine(50, newPixmap.height() - 50, newPixmap.width() - 50, newPixmap.height() - 50); // X axis
-
-    // Draw X axis labels
-    int xLabelInterval = 50;
-    for (int i = 50; i < newPixmap.width() - 50; i += xLabelInterval) {
-        painter.drawLine(i, newPixmap.height() - 55, i, newPixmap.height() - 45);
-        painter.drawText(i - 10, newPixmap.height() - 30, QString::number((i - 50) / 10));
-    }
-
-    // Draw Y axis labels
-    int yLabelInterval = 50;
-    for (int i = newPixmap.height() - 50; i > 50; i -= yLabelInterval) {
-        painter.drawLine(45, i, 55, i);
-        painter.drawText(20, i + 5, QString::number((newPixmap.height() - 50 - i) / 10));
-    }
-
-    for (const Bar &bar : bars) {
-        bool overlap = false;
-        for (const Bar &otherBar : bars) {
-            if (&bar != &otherBar && barsOverlap(bar.rect, otherBar.rect)) {
-                overlap = true;
-                break;
-            }
-        }
-        if (overlap) {
-            painter.setBrush(Qt::red);
-        } else {
-            painter.setBrush(Qt::blue);
-        }
-        painter.drawRect(bar.rect);
-        painter.drawText(bar.rect, Qt::AlignCenter, bar.label);
-    }
-
-    chartLabel->setPixmap(newPixmap);
-}
-
 void MainWindow::updateBarPosition()
 {
     if (selectedBar) {
