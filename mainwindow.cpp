@@ -21,12 +21,16 @@ MainWindow::MainWindow(QWidget *parent)
     mainLayout = new QVBoxLayout;
     chartLabel->setPixmap(chartPixmap);
     mainLayout->addWidget(chartLabel);
+    mainLayout->addWidget(webView);
     QWidget *centralWidget = new QWidget(this);
     centralWidget->setLayout(mainLayout);
     setCentralWidget(centralWidget);
 
     drawBarChart(chartPixmap);
     chartLabel->setPixmap(chartPixmap);
+
+    // Load the initial HTML chart into the QWebEngineView
+    webView->setHtml(generateHtmlChart());
 
     startHttpServer(); // Запуск веб-сервера
 }
@@ -309,6 +313,7 @@ QString MainWindow::generateUpdateScript(const QRect &rect, const QString &color
     jsonBar["width"] = rect.width();
     jsonBar["height"] = rect.height();
     jsonBar["color"] = color;
+    jsonBar["label"] = selectedBar->label;
 
     QJsonDocument doc(jsonBar);
     QString jsonString = doc.toJson(QJsonDocument::Compact);
@@ -321,10 +326,11 @@ QString MainWindow::generateUpdateScript(const QRect &rect, const QString &color
             div.style.top = (bar.y + 50) + 'px';
             div.style.backgroundColor = bar.color;
         }
-    )";
+    )"; // Закрывающая скобка для строки скрипта
 
     return script;
 }
+
 
 void MainWindow::startHttpServer()
 {
