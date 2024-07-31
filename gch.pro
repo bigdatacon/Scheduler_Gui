@@ -13,16 +13,12 @@ CONFIG += c++17  # Использование стандарта C++17
 QMAKE_CXXFLAGS += -w
 
 SOURCES += \
-    barchartview.cpp \
     main.cpp \
-    mainwindow.cpp \
-    qcustomplot.cpp
+    mainwindow.cpp
      # draggablebarchart.cpp # Добавьте этот файл
 
 HEADERS += \
-    barchartview.h \
-    mainwindow.h \
-    qcustomplot.h
+    mainwindow.h
      # draggablebarchart.h # Добавьте этот файл
 
 FORMS += \
