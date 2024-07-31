@@ -8,5 +8,6 @@ Rectangle::Rectangle(int x, int y, int width, int height)
 
 void Rectangle::draw(QPainter &painter)
 {
+    painter.setBrush(Qt::blue); // Устанавливаем синий цвет для заливки
     painter.drawRect(x, y, width, height);
 }
