@@ -19,14 +19,17 @@ public:
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     int clickCount;
     bool isColored;
     Rectangle *rectangle;
     QPixmap pixmap;
+    QRect innerRect;
 
     void updatePixmap();
+    void updateInnerRect();
 };
 
 #endif // SECONDWINDOW_H

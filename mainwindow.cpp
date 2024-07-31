@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
       secondWindow(new SecondWindow(this))
 {
     setCentralWidget(secondWindow);
+    setMinimumSize(800, 600); // Устанавливаем минимальный размер окна
 }
 
 MainWindow::~MainWindow()
