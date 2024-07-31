@@ -27,12 +27,16 @@ private:
     QPixmap pixmap;
     QRect innerRect;
     QPixmap innerPixmap; // Для хранения отрисованного изображения внутреннего виджета
-    bool needsRedraw; // Флаг для проверки, нужно ли перерисовывать innerPixmap
+    QPixmap basePixmap;  // Базовый pixmap для хранения начального состояния
+    QPixmap rectanglePixmap; // Pixmap для хранения отрисованного прямоугольника
+    bool rectangleVisible; // Флаг для отслеживания видимости прямоугольника
 
     void initializePixmap();
     void updateInnerRect();
-    void drawInnerPixmap();
+    void drawBasePixmap();
+    void drawRectanglePixmap();
     void updateDrawing();
+    void restoreBasePixmap();
 };
 
 #endif // SECONDWINDOW_H

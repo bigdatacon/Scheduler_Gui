@@ -5,8 +5,8 @@ SecondWindow::SecondWindow(QWidget *parent, int width, int height)
       clickCount(0),
       isColored(false),
       rectangle(nullptr),
-      pixmap(size()),
-      needsRedraw(true)
+      rectangleVisible(false),
+      pixmap(size())
 {
     setAttribute(Qt::WA_TranslucentBackground, true); // Устанавливаем прозрачный фон
     setStyleSheet("background-color: transparent;"); // Устанавливаем стиль прозрачного фона
@@ -26,19 +26,24 @@ void SecondWindow::mousePressEvent(QMouseEvent *event)
         clickCount++;
         if (clickCount == 1) {
             isColored = true;
+            drawBasePixmap();
+            // После первого клика достаточно обновить только basePixmap
         } else if (clickCount == 2) {
             if (!rectangle) {
                 rectangle = new Rectangle(innerRect.width() / 4, innerRect.height() / 4, innerRect.width() / 2, innerRect.height() / 2);
+                drawRectanglePixmap();
             }
+            rectangleVisible = true;
+            updateDrawing();
         } else if (clickCount == 3) {
             isColored = false;
+            rectangleVisible = false;
             delete rectangle;
             rectangle = nullptr;
             clickCount = 0;
+            restoreBasePixmap();
         }
-        needsRedraw = true;
-        updateDrawing();
-        update();
+        update(); // Обновляем виджет для отрисовки
     }
 }
 
@@ -47,6 +52,7 @@ void SecondWindow::paintEvent(QPaintEvent *event)
     QPainter painter(this); // Создаем объект QPainter для рисования на виджете
     painter.drawPixmap(0, 0, pixmap); // Отображаем pixmap на виджете
     painter.drawPixmap(innerRect.topLeft(), innerPixmap); // Отображаем innerPixmap на виджете
+    Q_UNUSED(event);
 }
 
 void SecondWindow::resizeEvent(QResizeEvent *event)
@@ -63,7 +69,12 @@ void SecondWindow::initializePixmap()
 {
     innerPixmap = QPixmap(innerRect.size());
     innerPixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для innerPixmap
-    drawInnerPixmap();
+    basePixmap = QPixmap(innerRect.size());
+    basePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для basePixmap
+    drawBasePixmap(); // Рисуем базовый innerPixmap
+    innerPixmap = basePixmap.copy(); // Сохраняем базовое изображение в innerPixmap
+    rectanglePixmap = QPixmap(innerRect.size());
+    rectanglePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для rectanglePixmap
 }
 
 void SecondWindow::updateInnerRect()
@@ -74,23 +85,41 @@ void SecondWindow::updateInnerRect()
     innerRect = QRect((width() - innerWidth) / 2, (height() - innerHeight) / 2, innerWidth, innerHeight);
 }
 
-void SecondWindow::drawInnerPixmap()
+void SecondWindow::drawBasePixmap()
 {
-    innerPixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для innerPixmap
-    QPainter painter(&innerPixmap);
+    basePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для basePixmap
+    QPainter painter(&basePixmap);
     painter.setPen(Qt::black);
-    painter.drawRect(innerPixmap.rect().adjusted(0, 0, -1, -1)); // Рисуем границу внутреннего окна
+    painter.drawRect(basePixmap.rect().adjusted(0, 0, -1, -1)); // Рисуем границу внутреннего окна
     if (isColored) {
-        painter.fillRect(innerPixmap.rect().adjusted(1, 1, -1, -1), Qt::yellow); // Заливаем внутреннее окно желтым цветом
+        painter.fillRect(basePixmap.rect().adjusted(1, 1, -1, -1), Qt::yellow); // Заливаем внутреннее окно желтым цветом
     }
+    innerPixmap = basePixmap.copy(); // Копируем basePixmap в innerPixmap после изменений
+}
+
+void SecondWindow::drawRectanglePixmap()
+{
     if (rectangle) {
-        rectangle->draw(painter); // Рисуем прямоугольник внутри innerPixmap
+        rectanglePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для rectanglePixmap
+        QPainter painter(&rectanglePixmap);
+        rectangle->draw(painter); // Рисуем прямоугольник внутри rectanglePixmap
     }
-    needsRedraw = false;
 }
 
 void SecondWindow::updateDrawing()
 {
-    innerPixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для innerPixmap
-    drawInnerPixmap();
+    innerPixmap = basePixmap.copy(); // Восстанавливаем изначальное состояние
+    if (rectangleVisible) {
+        QPainter painter(&innerPixmap);
+        painter.drawPixmap(0, 0, rectanglePixmap); // Отображаем rectanglePixmap внутри innerPixmap
+    }
+}
+
+void SecondWindow::restoreBasePixmap()
+{
+    basePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для basePixmap
+    QPainter painter(&basePixmap);
+    painter.setPen(Qt::black);
+    painter.drawRect(basePixmap.rect().adjusted(0, 0, -1, -1)); // Рисуем границу внутреннего окна
+    innerPixmap = basePixmap.copy(); // Восстанавливаем изначальное состояние
 }
