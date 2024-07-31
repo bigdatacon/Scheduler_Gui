@@ -27,9 +27,10 @@ private:
     Rectangle *rectangle;
     QPixmap pixmap;
     QRect innerRect;
+    QPixmap innerPixmap; // Для хранения отрисованного изображения внутреннего виджета
 
-    void updatePixmap();
     void updateInnerRect();
+    void drawInnerPixmap();
 };
 
 #endif // SECONDWINDOW_H
