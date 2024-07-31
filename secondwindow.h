@@ -1,4 +1,3 @@
-// secondwindow.h
 #ifndef SECONDWINDOW_H
 #define SECONDWINDOW_H
 
@@ -13,7 +12,7 @@ class SecondWindow : public QWidget
     Q_OBJECT
 
 public:
-    SecondWindow(QWidget *parent = nullptr);
+    SecondWindow(QWidget *parent = nullptr, int width = 400, int height = 300);
     ~SecondWindow();
 
 protected:
@@ -30,7 +29,8 @@ private:
     QPixmap innerPixmap; // Для хранения отрисованного изображения внутреннего виджета
 
     void updateInnerRect();
-    void drawInnerPixmap();
-};
 
 #endif // SECONDWINDOW_H
+
+    void drawInnerPixmap();
+};

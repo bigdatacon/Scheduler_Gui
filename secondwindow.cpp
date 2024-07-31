@@ -1,7 +1,6 @@
-// secondwindow.cpp
 #include "secondwindow.h"
 
-SecondWindow::SecondWindow(QWidget *parent)
+SecondWindow::SecondWindow(QWidget *parent, int width, int height)
     : QWidget(parent),
       clickCount(0),
       isColored(false),
@@ -10,6 +9,7 @@ SecondWindow::SecondWindow(QWidget *parent)
 {
     setAttribute(Qt::WA_TranslucentBackground, true); // Устанавливаем прозрачный фон
     setStyleSheet("background-color: transparent;"); // Устанавливаем стиль прозрачного фона
+    setFixedSize(width, height); // Устанавливаем фиксированный размер окна
     updateInnerRect();
     drawInnerPixmap();
 }
