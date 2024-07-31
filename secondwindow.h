@@ -27,10 +27,12 @@ private:
     QPixmap pixmap;
     QRect innerRect;
     QPixmap innerPixmap; // Для хранения отрисованного изображения внутреннего виджета
+    bool needsRedraw; // Флаг для проверки, нужно ли перерисовывать innerPixmap
 
+    void initializePixmap();
     void updateInnerRect();
+    void drawInnerPixmap();
+    void updateDrawing();
+};
 
 #endif // SECONDWINDOW_H
-
-    void drawInnerPixmap();
-};

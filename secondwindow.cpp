@@ -5,13 +5,14 @@ SecondWindow::SecondWindow(QWidget *parent, int width, int height)
       clickCount(0),
       isColored(false),
       rectangle(nullptr),
-      pixmap(size())
+      pixmap(size()),
+      needsRedraw(true)
 {
     setAttribute(Qt::WA_TranslucentBackground, true); // Устанавливаем прозрачный фон
     setStyleSheet("background-color: transparent;"); // Устанавливаем стиль прозрачного фона
     setFixedSize(width, height); // Устанавливаем фиксированный размер окна
     updateInnerRect();
-    drawInnerPixmap();
+    initializePixmap();
 }
 
 SecondWindow::~SecondWindow()
@@ -35,7 +36,8 @@ void SecondWindow::mousePressEvent(QMouseEvent *event)
             rectangle = nullptr;
             clickCount = 0;
         }
-        drawInnerPixmap();
+        needsRedraw = true;
+        updateDrawing();
         update();
     }
 }
@@ -53,6 +55,14 @@ void SecondWindow::resizeEvent(QResizeEvent *event)
     pixmap = QPixmap(size());
     pixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для pixmap
     updateInnerRect();
+    initializePixmap();
+    update();
+}
+
+void SecondWindow::initializePixmap()
+{
+    innerPixmap = QPixmap(innerRect.size());
+    innerPixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для innerPixmap
     drawInnerPixmap();
 }
 
@@ -62,8 +72,6 @@ void SecondWindow::updateInnerRect()
     int innerWidth = width() / 2 - margin;
     int innerHeight = height() / 2 - margin;
     innerRect = QRect((width() - innerWidth) / 2, (height() - innerHeight) / 2, innerWidth, innerHeight);
-    innerPixmap = QPixmap(innerRect.size()); // Обновляем размер innerPixmap
-    innerPixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для innerPixmap
 }
 
 void SecondWindow::drawInnerPixmap()
@@ -78,4 +86,11 @@ void SecondWindow::drawInnerPixmap()
     if (rectangle) {
         rectangle->draw(painter); // Рисуем прямоугольник внутри innerPixmap
     }
+    needsRedraw = false;
+}
+
+void SecondWindow::updateDrawing()
+{
+    innerPixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для innerPixmap
+    drawInnerPixmap();
 }
