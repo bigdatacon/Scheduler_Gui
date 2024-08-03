@@ -1,4 +1,3 @@
-// rectangle.h
 #ifndef RECTANGLE_H
 #define RECTANGLE_H
 
@@ -9,9 +8,13 @@ class Rectangle
 public:
     Rectangle(int x, int y, int width, int height);
     void draw(QPainter &painter);
+    void setSize(int width, int height);
+    void setPosition(int x, int y);
 
-private:
-    int x, y, width, height;
+    int x;
+    int y;
+    int width;
+    int height;
 };
 
 #endif // RECTANGLE_H

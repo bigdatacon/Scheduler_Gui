@@ -1,21 +1,19 @@
 #include "secondwindow.h"
 #include <QDebug>
 
-//SecondWindow::SecondWindow(QWidget *parent, int width, int height)
-SecondWindow::SecondWindow(QWidget *parent)
+SecondWindow::SecondWindow(QWidget *parent, int width, int height)
     : QWidget(parent),
       clickCount(0),
       isColored(false),
       rectangle(nullptr),
       rectangleVisible(false),
-      pixmap(size())
-//    ,
-//      windowWidth(width),
-//      windowHeight(height)
+      pixmap(size()),
+      windowWidth(width),
+      windowHeight(height)
 {
     setAttribute(Qt::WA_TranslucentBackground, true); // Устанавливаем прозрачный фон
     setStyleSheet("background-color: transparent;"); // Устанавливаем стиль прозрачного фона
-//    setFixedSize(width, height); // Устанавливаем фиксированный размер окна
+    setFixedSize(width, height); // Устанавливаем фиксированный размер окна
     updateInnerRect();
     initializePixmap();
 
@@ -38,7 +36,8 @@ void SecondWindow::mousePressEvent(QMouseEvent *event)
             // После первого клика достаточно обновить только basePixmap
         } else if (clickCount == 2) {
             if (!rectangle) {
-                rectangle = new Rectangle(innerRect.width() / 4, innerRect.height() / 4, innerRect.width() / 2, innerRect.height() / 2);
+//                rectangle = new Rectangle(innerRect.width() / 4, innerRect.height() / 4, innerRect.width() / 2, innerRect.height() / 2);
+                rectangle = new Rectangle(0, 0, width() * 2, height() * 2);
                 drawRectanglePixmap();
             }
             rectangleVisible = true;
