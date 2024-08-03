@@ -12,7 +12,8 @@ class SecondWindow : public QWidget
     Q_OBJECT
 
 public:
-    SecondWindow(QWidget *parent = nullptr, int width = 400, int height = 300);
+//    SecondWindow(QWidget *parent = nullptr, int width = 400, int height = 300);
+    SecondWindow(QWidget *parent = nullptr);
     ~SecondWindow();
 
 protected:

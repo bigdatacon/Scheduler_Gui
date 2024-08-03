@@ -12,6 +12,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 private:
     SecondWindow *secondWindow;
 };
