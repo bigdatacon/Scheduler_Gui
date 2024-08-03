@@ -1,4 +1,5 @@
 #include "secondwindow.h"
+#include <QDebug>
 
 SecondWindow::SecondWindow(QWidget *parent, int width, int height)
     : QWidget(parent),
@@ -6,13 +7,18 @@ SecondWindow::SecondWindow(QWidget *parent, int width, int height)
       isColored(false),
       rectangle(nullptr),
       rectangleVisible(false),
-      pixmap(size())
+      pixmap(size()),
+      windowWidth(width),
+      windowHeight(height)
 {
     setAttribute(Qt::WA_TranslucentBackground, true); // Устанавливаем прозрачный фон
     setStyleSheet("background-color: transparent;"); // Устанавливаем стиль прозрачного фона
     setFixedSize(width, height); // Устанавливаем фиксированный размер окна
     updateInnerRect();
     initializePixmap();
+
+    // Выводим размеры окна в консоль
+    qDebug() << "Размер окна: " << windowWidth << "x" << windowHeight;
 }
 
 SecondWindow::~SecondWindow()
@@ -67,6 +73,15 @@ void SecondWindow::resizeEvent(QResizeEvent *event)
 
 void SecondWindow::initializePixmap()
 {
+//    innerPixmap = QPixmap(innerRect.size());
+//    innerPixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для innerPixmap
+//    basePixmap = QPixmap(innerRect.size());
+//    basePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для basePixmap
+//    drawBasePixmap(); // Рисуем базовый innerPixmap
+//    innerPixmap = basePixmap.copy(); // Сохраняем базовое изображение в innerPixmap
+//    rectanglePixmap = QPixmap(innerRect.size());
+//    rectanglePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для rectanglePixmap
+
     innerPixmap = QPixmap(innerRect.size());
     innerPixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для innerPixmap
     basePixmap = QPixmap(innerRect.size());
@@ -75,22 +90,26 @@ void SecondWindow::initializePixmap()
     innerPixmap = basePixmap.copy(); // Сохраняем базовое изображение в innerPixmap
     rectanglePixmap = QPixmap(innerRect.size());
     rectanglePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для rectanglePixmap
+
 }
 
 void SecondWindow::updateInnerRect()
 {
-    int margin = 20;
-    int innerWidth = width() / 2 - margin;
-    int innerHeight = height() / 2 - margin;
-    innerRect = QRect((width() - innerWidth) / 2, (height() - innerHeight) / 2, innerWidth, innerHeight);
+//    int margin = 20;
+//    int innerWidth = width() / 2 - margin;
+//    int innerHeight = height() / 2 - margin;
+//    innerRect = QRect((width() - innerWidth) / 2, (height() - innerHeight) / 2, innerWidth, innerHeight);
+    innerRect = rect(); // Устанавливаем innerRect на весь размер окна
+
+
 }
 
 void SecondWindow::drawBasePixmap()
 {
     basePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для basePixmap
     QPainter painter(&basePixmap);
-    painter.setPen(Qt::black);
-    painter.drawRect(basePixmap.rect().adjusted(0, 0, -1, -1)); // Рисуем границу внутреннего окна
+//    painter.setPen(Qt::black);
+//    painter.drawRect(basePixmap.rect().adjusted(0, 0, -1, -1)); // Рисуем границу внутреннего окна
     if (isColored) {
         painter.fillRect(basePixmap.rect().adjusted(1, 1, -1, -1), Qt::yellow); // Заливаем внутреннее окно желтым цветом
     }

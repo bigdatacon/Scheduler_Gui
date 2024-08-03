@@ -31,6 +31,9 @@ private:
     QPixmap rectanglePixmap; // Pixmap для хранения отрисованного прямоугольника
     bool rectangleVisible; // Флаг для отслеживания видимости прямоугольника
 
+    int windowWidth;
+    int windowHeight;
+
     void initializePixmap();
     void updateInnerRect();
     void drawBasePixmap();
