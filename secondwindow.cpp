@@ -1,20 +1,22 @@
 #include "secondwindow.h"
 #include <QDebug>
+#include <QPainter>
+#include <QMouseEvent>
+#include <QScrollArea>
 
 SecondWindow::SecondWindow(QWidget *parent, int width, int height)
     : QWidget(parent),
-      clickCount(0),
-      isColored(false),
       rectangle(nullptr),
+      isColored(false),
+      clickCount(0),
       rectangleVisible(false),
-      pixmap(size()),
       windowWidth(width),
       windowHeight(height)
 {
     setAttribute(Qt::WA_TranslucentBackground, true); // Устанавливаем прозрачный фон
     setStyleSheet("background-color: transparent;"); // Устанавливаем стиль прозрачного фона
-    setFixedSize(width, height); // Устанавливаем фиксированный размер окна
-    updateInnerRect();
+    setMinimumSize(width, height); // Устанавливаем минимальный размер окна
+    resize(width, height); // Устанавливаем начальный размер окна
     initializePixmap();
 
     // Выводим размеры окна в консоль
@@ -28,20 +30,21 @@ SecondWindow::~SecondWindow()
 
 void SecondWindow::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton && innerRect.contains(event->pos())) {
+    if (event->button() == Qt::LeftButton) {
         clickCount++;
         if (clickCount == 1) {
             isColored = true;
             drawBasePixmap();
-            // После первого клика достаточно обновить только basePixmap
         } else if (clickCount == 2) {
             if (!rectangle) {
-//                rectangle = new Rectangle(innerRect.width() / 4, innerRect.height() / 4, innerRect.width() / 2, innerRect.height() / 2);
-                rectangle = new Rectangle(0, 0, width() * 2, height() * 2);
+                rectangle = new Rectangle(0, 0, windowWidth * 2, windowHeight * 2); // Прямоугольник больше окна
                 drawRectanglePixmap();
             }
             rectangleVisible = true;
             updateDrawing();
+
+            // Сообщаем QScrollArea о новых размерах содержимого
+            updateScrollArea();
         } else if (clickCount == 3) {
             isColored = false;
             rectangleVisible = false;
@@ -49,6 +52,9 @@ void SecondWindow::mousePressEvent(QMouseEvent *event)
             rectangle = nullptr;
             clickCount = 0;
             restoreBasePixmap();
+
+            // Сообщаем QScrollArea о возврате к исходным размерам
+            updateScrollArea();
         }
         update(); // Обновляем виджет для отрисовки
     }
@@ -57,60 +63,29 @@ void SecondWindow::mousePressEvent(QMouseEvent *event)
 void SecondWindow::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this); // Создаем объект QPainter для рисования на виджете
-    painter.drawPixmap(0, 0, pixmap); // Отображаем pixmap на виджете
-    painter.drawPixmap(innerRect.topLeft(), innerPixmap); // Отображаем innerPixmap на виджете
-    Q_UNUSED(event);
-}
+    painter.drawPixmap(0, 0, innerPixmap); // Отображаем innerPixmap на виджете
 
-void SecondWindow::resizeEvent(QResizeEvent *event)
-{
-    QWidget::resizeEvent(event);
-    pixmap = QPixmap(size());
-    pixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для pixmap
-    updateInnerRect();
-    initializePixmap();
-    update();
+    if (rectangleVisible && rectangle) {
+        painter.drawPixmap(0, 0, rectanglePixmap); // Отображаем rectanglePixmap на виджете
+    }
+
+    Q_UNUSED(event);
 }
 
 void SecondWindow::initializePixmap()
 {
-//    innerPixmap = QPixmap(innerRect.size());
-//    innerPixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для innerPixmap
-//    basePixmap = QPixmap(innerRect.size());
-//    basePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для basePixmap
-//    drawBasePixmap(); // Рисуем базовый innerPixmap
-//    innerPixmap = basePixmap.copy(); // Сохраняем базовое изображение в innerPixmap
-//    rectanglePixmap = QPixmap(innerRect.size());
-//    rectanglePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для rectanglePixmap
-
-    innerPixmap = QPixmap(innerRect.size());
+    innerPixmap = QPixmap(windowWidth, windowHeight);
     innerPixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для innerPixmap
-    basePixmap = QPixmap(innerRect.size());
+    basePixmap = QPixmap(windowWidth, windowHeight);
     basePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для basePixmap
     drawBasePixmap(); // Рисуем базовый innerPixmap
     innerPixmap = basePixmap.copy(); // Сохраняем базовое изображение в innerPixmap
-    rectanglePixmap = QPixmap(innerRect.size());
-    rectanglePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для rectanglePixmap
-
-}
-
-void SecondWindow::updateInnerRect()
-{
-//    int margin = 20;
-//    int innerWidth = width() / 2 - margin;
-//    int innerHeight = height() / 2 - margin;
-//    innerRect = QRect((width() - innerWidth) / 2, (height() - innerHeight) / 2, innerWidth, innerHeight);
-    innerRect = rect(); // Устанавливаем innerRect на весь размер окна
-
-
 }
 
 void SecondWindow::drawBasePixmap()
 {
     basePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для basePixmap
     QPainter painter(&basePixmap);
-//    painter.setPen(Qt::black);
-//    painter.drawRect(basePixmap.rect().adjusted(0, 0, -1, -1)); // Рисуем границу внутреннего окна
     if (isColored) {
         painter.fillRect(basePixmap.rect().adjusted(1, 1, -1, -1), Qt::yellow); // Заливаем внутреннее окно желтым цветом
     }
@@ -120,6 +95,7 @@ void SecondWindow::drawBasePixmap()
 void SecondWindow::drawRectanglePixmap()
 {
     if (rectangle) {
+        rectanglePixmap = QPixmap(rectangle->width, rectangle->height);
         rectanglePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для rectanglePixmap
         QPainter painter(&rectanglePixmap);
         rectangle->draw(painter); // Рисуем прямоугольник внутри rectanglePixmap
@@ -142,4 +118,18 @@ void SecondWindow::restoreBasePixmap()
     painter.setPen(Qt::black);
     painter.drawRect(basePixmap.rect().adjusted(0, 0, -1, -1)); // Рисуем границу внутреннего окна
     innerPixmap = basePixmap.copy(); // Восстанавливаем изначальное состояние
+}
+
+void SecondWindow::updateScrollArea()
+{
+    if (parentWidget() && parentWidget()->parentWidget()) {
+        QScrollArea *scrollArea = qobject_cast<QScrollArea *>(parentWidget()->parentWidget());
+        if (scrollArea) {
+            if (rectangleVisible && rectangle) {
+                scrollArea->widget()->setMinimumSize(rectangle->width, rectangle->height);
+            } else {
+                scrollArea->widget()->setMinimumSize(windowWidth, windowHeight);
+            }
+        }
+    }
 }

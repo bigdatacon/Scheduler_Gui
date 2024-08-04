@@ -2,9 +2,8 @@
 #define SECONDWINDOW_H
 
 #include <QWidget>
-#include <QMouseEvent>
-#include <QPainter>
 #include <QPixmap>
+#include <QScrollArea>
 #include "rectangle.h"
 
 class SecondWindow : public QWidget
@@ -12,34 +11,32 @@ class SecondWindow : public QWidget
     Q_OBJECT
 
 public:
-    SecondWindow(QWidget *parent = nullptr, int width = 400, int height = 300);
+    SecondWindow(QWidget *parent = nullptr, int width = 800, int height = 600);
     ~SecondWindow();
 
 protected:
-    void mousePressEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
-    void resizeEvent(QResizeEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
 
 private:
-    int clickCount;
-    bool isColored;
-    Rectangle *rectangle;
-    QPixmap pixmap;
-    QRect innerRect;
-    QPixmap innerPixmap; // Для хранения отрисованного изображения внутреннего виджета
-    QPixmap basePixmap;  // Базовый pixmap для хранения начального состояния
-    QPixmap rectanglePixmap; // Pixmap для хранения отрисованного прямоугольника
-    bool rectangleVisible; // Флаг для отслеживания видимости прямоугольника
-
-    int windowWidth;
-    int windowHeight;
-
     void initializePixmap();
-    void updateInnerRect();
     void drawBasePixmap();
     void drawRectanglePixmap();
     void updateDrawing();
     void restoreBasePixmap();
+    void updateScrollArea();
+
+    QPixmap innerPixmap;
+    QPixmap basePixmap;
+    QPixmap rectanglePixmap;
+
+    Rectangle *rectangle;
+    bool rectangleVisible;
+    bool isColored;
+    int clickCount;
+
+    int windowWidth;
+    int windowHeight;
 };
 
 #endif // SECONDWINDOW_H
