@@ -12,6 +12,10 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void showEvent(QShowEvent *event);
+
+    void printRealSize();
+
 private:
     SecondWindow *secondWindow;
 };

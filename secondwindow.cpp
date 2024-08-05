@@ -3,6 +3,8 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QScrollArea>
+#include <iostream>
+
 
 SecondWindow::SecondWindow(QWidget *parent, int width, int height)
     : QWidget(parent),
@@ -21,6 +23,18 @@ SecondWindow::SecondWindow(QWidget *parent, int width, int height)
 
     // Выводим размеры окна в консоль
     qDebug() << "Размер окна: " << windowWidth << "x" << windowHeight;
+
+
+
+
+    auto window_width = this->width();
+    auto window_height = this->height();
+    auto basePixmap_width=  basePixmap.width();
+    auto basePixmap_height=  basePixmap.height();
+
+    std::cout << "SecWindow Width : " << this->width() << " SecWindow height: " << this->height();
+    std::cout <<std::endl;
+    std::cout << "BasePixMapwidth: " << basePixmap.width() << " BasePixmapheight: " << basePixmap.height();
 }
 
 SecondWindow::~SecondWindow()
@@ -91,6 +105,10 @@ void SecondWindow::initializePixmap()
 
 void SecondWindow::drawBasePixmap()
 {
+    std::cout << "SecWindow Width : " << this->width() << " SecWindow height: " << this->height();
+    std::cout <<std::endl;
+    std::cout << "BasePixMapwidth: " << basePixmap.width() << " BasePixmapheight: " << basePixmap.height();
+
     basePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для basePixmap
     QPainter painter(&basePixmap);
     if (isColored) {
@@ -124,6 +142,10 @@ void SecondWindow::updateDrawing()
 
 void SecondWindow::restoreBasePixmap()
 {
+    std::cout << "SecWindow Width : " << this->width() << " SecWindow height: " << this->height();
+    std::cout <<std::endl;
+    std::cout << "BasePixMapwidth: " << basePixmap.width() << " BasePixmapheight: " << basePixmap.height();
+
     basePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для basePixmap
     QPainter painter(&basePixmap);
     painter.setPen(Qt::black);
