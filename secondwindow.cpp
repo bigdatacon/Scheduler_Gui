@@ -5,7 +5,6 @@
 #include <QScrollArea>
 #include <iostream>
 
-
 SecondWindow::SecondWindow(QWidget *parent, int width, int height)
     : QWidget(parent),
       rectangle(nullptr),
@@ -19,22 +18,10 @@ SecondWindow::SecondWindow(QWidget *parent, int width, int height)
     setStyleSheet("background-color: transparent;"); // Устанавливаем стиль прозрачного фона
     setMinimumSize(width, height); // Устанавливаем минимальный размер окна
     resize(width, height); // Устанавливаем начальный размер окна
-    initializePixmap();
+    initializeImage();
 
     // Выводим размеры окна в консоль
     qDebug() << "Размер окна secondwindow при инициализации : " << windowWidth << "x" << windowHeight;
-
-
-
-
-//    auto window_width = this->width();
-//    auto window_height = this->height();
-//    auto basePixmap_width=  basePixmap.width();
-//    auto basePixmap_height=  basePixmap.height();
-
-//    std::cout << "SecWindow Width : " << this->width() << " SecWindow height: " << this->height();
-//    std::cout <<std::endl;
-//    std::cout << "BasePixMapwidth: " << basePixmap.width() << " BasePixmapheight: " << basePixmap.height();
 }
 
 SecondWindow::~SecondWindow()
@@ -48,12 +35,11 @@ void SecondWindow::mousePressEvent(QMouseEvent *event)
         clickCount++;
         if (clickCount == 1) {
             isColored = true;
-            drawBasePixmap();
+            drawBaseImage();
         } else if (clickCount == 2) {
             if (!rectangle) {
                 rectangle = new Rectangle(0, 0, windowWidth * 2, windowHeight * 2); // Прямоугольник больше окна
-//                rectangle = new Rectangle(0, 0, windowWidth * 0.2, windowHeight * 0.2); // Прямоугольник больше окна
-                drawRectanglePixmap();
+                drawRectangleImage();
             }
             rectangleVisible = true;
             updateDrawing();
@@ -66,7 +52,7 @@ void SecondWindow::mousePressEvent(QMouseEvent *event)
             delete rectangle;
             rectangle = nullptr;
             clickCount = 0;
-            restoreBasePixmap();
+            restoreBaseImage();
 
             // Сообщаем QScrollArea о возврате к исходным размерам
             updateScrollArea();
@@ -78,84 +64,78 @@ void SecondWindow::mousePressEvent(QMouseEvent *event)
 void SecondWindow::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this); // Создаем объект QPainter для рисования на виджете
-    painter.drawPixmap(0, 0, innerPixmap); // Отображаем innerPixmap на виджете
-
-//    if (rectangleVisible && rectangle) {
-//        painter.drawPixmap(0, 0, rectanglePixmap); // Отображаем rectanglePixmap на виджете
-//    }
+    painter.drawImage(0, 0, innerImage); // Отображаем innerImage на виджете
 
     if (rectangleVisible && rectangle) {
-        int centerX = (innerPixmap.width() - rectanglePixmap.width()) / 2;
-        int centerY = (innerPixmap.height() - rectanglePixmap.height()) / 2;
-        painter.drawPixmap(centerX, centerY, rectanglePixmap); // Отображаем rectanglePixmap на виджете по центру
+        int centerX = (innerImage.width() - rectangleImage.width()) / 2;
+        int centerY = (innerImage.height() - rectangleImage.height()) / 2;
+        painter.drawImage(centerX, centerY, rectangleImage); // Отображаем rectangleImage на виджете по центру
     }
 
     Q_UNUSED(event);
 }
 
-void SecondWindow::initializePixmap()
+void SecondWindow::initializeImage()
 {
-    innerPixmap = QPixmap(windowWidth, windowHeight);
-    innerPixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для innerPixmap
-    basePixmap = QPixmap(windowWidth, windowHeight);
-    basePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для basePixmap
-    drawBasePixmap(); // Рисуем базовый innerPixmap
-    innerPixmap = basePixmap.copy(); // Сохраняем базовое изображение в innerPixmap
+    innerImage = QImage(windowWidth, windowHeight, QImage::Format_ARGB32);
+    innerImage.fill(Qt::transparent); // Устанавливаем прозрачный фон для innerImage
+    baseImage = QImage(windowWidth, windowHeight, QImage::Format_ARGB32);
+    baseImage.fill(Qt::transparent); // Устанавливаем прозрачный фон для baseImage
+    drawBaseImage(); // Рисуем базовый innerImage
+    innerImage = baseImage.copy(); // Сохраняем базовое изображение в innerImage
 }
 
-void SecondWindow::drawBasePixmap()
+void SecondWindow::drawBaseImage()
 {
     std::cout << std::endl;
-    std::cout << " In drawBasePixmap :: " << std::endl;
+    std::cout << " In drawBaseImage :: " << std::endl;
 
     std::cout << "  SecWindow Width : " << this->width() << " SecWindow height: " << this->height();
     std::cout <<std::endl;
-    std::cout << "  BasePixMapwidth: " << basePixmap.width() << " BasePixmapheight: " << basePixmap.height();
+    std::cout << "  BaseImage width: " << baseImage.width() << " BaseImage height: " << baseImage.height();
 
-    basePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для basePixmap
-    QPainter painter(&basePixmap);
+    baseImage.fill(Qt::transparent); // Устанавливаем прозрачный фон для baseImage
+    QPainter painter(&baseImage);
     if (isColored) {
-        painter.fillRect(basePixmap.rect().adjusted(1, 1, -1, -1), Qt::yellow); // Заливаем внутреннее окно желтым цветом
+        painter.fillRect(baseImage.rect().adjusted(1, 1, -1, -1), Qt::yellow); // Заливаем внутреннее окно желтым цветом
     }
-    innerPixmap = basePixmap.copy(); // Копируем basePixmap в innerPixmap после изменений
+    innerImage = baseImage.copy(); // Копируем baseImage в innerImage после изменений
 }
 
-void SecondWindow::drawRectanglePixmap()
+void SecondWindow::drawRectangleImage()
 {
     if (rectangle) {
-        rectanglePixmap = QPixmap(rectangle->width, rectangle->height);
-        rectanglePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для rectanglePixmap
-        QPainter painter(&rectanglePixmap);
-        rectangle->draw(painter); // Рисуем прямоугольник внутри rectanglePixmap
+        rectangleImage = QImage(rectangle->width, rectangle->height, QImage::Format_ARGB32);
+        rectangleImage.fill(Qt::transparent); // Устанавливаем прозрачный фон для rectangleImage
+        QPainter painter(&rectangleImage);
+        rectangle->draw(painter); // Рисуем прямоугольник внутри rectangleImage
     }
 }
 
 void SecondWindow::updateDrawing()
 {
-    innerPixmap = basePixmap.copy(); // Восстанавливаем изначальное состояние
+    innerImage = baseImage.copy(); // Восстанавливаем изначальное состояние
     if (rectangleVisible) {
-        QPainter painter(&innerPixmap);
-//        painter.drawPixmap(0, 0, rectanglePixmap); // Отображаем rectanglePixmap внутри innerPixmap
-
-        int centerX = (innerPixmap.width() - rectanglePixmap.width()) / 2;
-        int centerY = (innerPixmap.height() - rectanglePixmap.height()) / 2;
-        painter.drawPixmap(centerX, centerY, rectanglePixmap); // Отображаем rectanglePixmap внутри innerPixmap по центру
+        QPainter painter(&innerImage);
+        int centerX = (innerImage.width() - rectangleImage.width()) / 2;
+        int centerY = (innerImage.height() - rectangleImage.height()) / 2;
+        painter.drawImage(centerX, centerY, rectangleImage); // Отображаем rectangleImage внутри innerImage по центру
     }
 }
 
-void SecondWindow::restoreBasePixmap()
+void SecondWindow::restoreBaseImage()
 {
     std::cout << std::endl;
-    std::cout << " In restoreBasePixmap  :: " << std::endl;
-    std::cout << " In restoreBasePixmap SecWindow Width : " << this->width() << " SecWindow height: " << this->height();
+    std::cout << " In restoreBaseImage  :: " << std::endl;
+    std::cout << " In restoreBaseImage SecWindow Width : " << this->width() << " SecWindow height: " << this->height();
     std::cout <<std::endl;
-    std::cout << "BasePixMapwidth: " << basePixmap.width() << " BasePixmapheight: " << basePixmap.height();
+    std::cout << "BaseImage width: " << baseImage.width() << " BaseImage height: " << baseImage.height();
 
-    basePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для basePixmap
-    QPainter painter(&basePixmap);
+    baseImage.fill(Qt::transparent); // Устанавливаем прозрачный фон для baseImage
+    QPainter painter(&baseImage);
     painter.setPen(Qt::black);
-    painter.drawRect(basePixmap.rect().adjusted(0, 0, -1, -1)); // Рисуем границу внутреннего окна
-    innerPixmap = basePixmap.copy(); // Восстанавливаем изначальное состояние
+    painter.drawRect(baseImage.rect().adjusted(0, 0, -1, -1)); // Рисуем границу внутреннего окна
+    innerImage = baseImage.copy(); // Восстанавливаем изначальное состояние
 }
 
 void SecondWindow::updateScrollArea()
