@@ -17,10 +17,10 @@ MainWindow::MainWindow(QWidget *parent)
 //    setCentralWidget(secondWindow);
     setMinimumSize(800, 600); // Устанавливаем минимальный размер окна
 
-    auto main_window_width = this->width();
-    auto main_window_height = this->height();
-    int a = 10;
-    std::cout <<a;
+//    auto main_window_width = this->width();
+//    auto main_window_height = this->height();
+//    int a = 10;
+//    std::cout <<a;
 }
 
 MainWindow::~MainWindow()

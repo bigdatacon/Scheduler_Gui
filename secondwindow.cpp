@@ -22,19 +22,19 @@ SecondWindow::SecondWindow(QWidget *parent, int width, int height)
     initializePixmap();
 
     // Выводим размеры окна в консоль
-    qDebug() << "Размер окна: " << windowWidth << "x" << windowHeight;
+    qDebug() << "Размер окна secondwindow при инициализации : " << windowWidth << "x" << windowHeight;
 
 
 
 
-    auto window_width = this->width();
-    auto window_height = this->height();
-    auto basePixmap_width=  basePixmap.width();
-    auto basePixmap_height=  basePixmap.height();
+//    auto window_width = this->width();
+//    auto window_height = this->height();
+//    auto basePixmap_width=  basePixmap.width();
+//    auto basePixmap_height=  basePixmap.height();
 
-    std::cout << "SecWindow Width : " << this->width() << " SecWindow height: " << this->height();
-    std::cout <<std::endl;
-    std::cout << "BasePixMapwidth: " << basePixmap.width() << " BasePixmapheight: " << basePixmap.height();
+//    std::cout << "SecWindow Width : " << this->width() << " SecWindow height: " << this->height();
+//    std::cout <<std::endl;
+//    std::cout << "BasePixMapwidth: " << basePixmap.width() << " BasePixmapheight: " << basePixmap.height();
 }
 
 SecondWindow::~SecondWindow()
@@ -105,9 +105,12 @@ void SecondWindow::initializePixmap()
 
 void SecondWindow::drawBasePixmap()
 {
-    std::cout << "SecWindow Width : " << this->width() << " SecWindow height: " << this->height();
+    std::cout << std::endl;
+    std::cout << " In drawBasePixmap :: " << std::endl;
+
+    std::cout << "  SecWindow Width : " << this->width() << " SecWindow height: " << this->height();
     std::cout <<std::endl;
-    std::cout << "BasePixMapwidth: " << basePixmap.width() << " BasePixmapheight: " << basePixmap.height();
+    std::cout << "  BasePixMapwidth: " << basePixmap.width() << " BasePixmapheight: " << basePixmap.height();
 
     basePixmap.fill(Qt::transparent); // Устанавливаем прозрачный фон для basePixmap
     QPainter painter(&basePixmap);
@@ -142,7 +145,9 @@ void SecondWindow::updateDrawing()
 
 void SecondWindow::restoreBasePixmap()
 {
-    std::cout << "SecWindow Width : " << this->width() << " SecWindow height: " << this->height();
+    std::cout << std::endl;
+    std::cout << " In restoreBasePixmap  :: " << std::endl;
+    std::cout << " In restoreBasePixmap SecWindow Width : " << this->width() << " SecWindow height: " << this->height();
     std::cout <<std::endl;
     std::cout << "BasePixMapwidth: " << basePixmap.width() << " BasePixmapheight: " << basePixmap.height();
 
