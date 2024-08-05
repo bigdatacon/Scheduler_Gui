@@ -38,6 +38,7 @@ void SecondWindow::mousePressEvent(QMouseEvent *event)
         } else if (clickCount == 2) {
             if (!rectangle) {
                 rectangle = new Rectangle(0, 0, windowWidth * 2, windowHeight * 2); // Прямоугольник больше окна
+//                rectangle = new Rectangle(0, 0, windowWidth * 0.2, windowHeight * 0.2); // Прямоугольник больше окна
                 drawRectanglePixmap();
             }
             rectangleVisible = true;
@@ -65,8 +66,14 @@ void SecondWindow::paintEvent(QPaintEvent *event)
     QPainter painter(this); // Создаем объект QPainter для рисования на виджете
     painter.drawPixmap(0, 0, innerPixmap); // Отображаем innerPixmap на виджете
 
+//    if (rectangleVisible && rectangle) {
+//        painter.drawPixmap(0, 0, rectanglePixmap); // Отображаем rectanglePixmap на виджете
+//    }
+
     if (rectangleVisible && rectangle) {
-        painter.drawPixmap(0, 0, rectanglePixmap); // Отображаем rectanglePixmap на виджете
+        int centerX = (innerPixmap.width() - rectanglePixmap.width()) / 2;
+        int centerY = (innerPixmap.height() - rectanglePixmap.height()) / 2;
+        painter.drawPixmap(centerX, centerY, rectanglePixmap); // Отображаем rectanglePixmap на виджете по центру
     }
 
     Q_UNUSED(event);
@@ -107,7 +114,11 @@ void SecondWindow::updateDrawing()
     innerPixmap = basePixmap.copy(); // Восстанавливаем изначальное состояние
     if (rectangleVisible) {
         QPainter painter(&innerPixmap);
-        painter.drawPixmap(0, 0, rectanglePixmap); // Отображаем rectanglePixmap внутри innerPixmap
+//        painter.drawPixmap(0, 0, rectanglePixmap); // Отображаем rectanglePixmap внутри innerPixmap
+
+        int centerX = (innerPixmap.width() - rectanglePixmap.width()) / 2;
+        int centerY = (innerPixmap.height() - rectanglePixmap.height()) / 2;
+        painter.drawPixmap(centerX, centerY, rectanglePixmap); // Отображаем rectanglePixmap внутри innerPixmap по центру
     }
 }
 
