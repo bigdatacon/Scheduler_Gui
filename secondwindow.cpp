@@ -14,8 +14,15 @@ SecondWindow::SecondWindow(QWidget *parent, int width, int height)
       windowWidth(width),
       windowHeight(height)
 {
-    setAttribute(Qt::WA_TranslucentBackground, true); // Устанавливаем прозрачный фон
-    setStyleSheet("background-color: transparent;"); // Устанавливаем стиль прозрачного фона
+//    setAttribute(Qt::WA_TranslucentBackground, true); // Устанавливаем прозрачный фон
+    // Устанавливаем серый фон через палитру
+    QPalette pal = palette();
+    pal.setColor(QPalette::Background, Qt::green);
+    setAutoFillBackground(true);
+    setPalette(pal);
+
+//    setStyleSheet("background-color: transparent;"); // Устанавливаем стиль прозрачного фона
+
     setMinimumSize(width, height); // Устанавливаем минимальный размер окна
     resize(width, height); // Устанавливаем начальный размер окна
     initializeImage();
@@ -38,8 +45,8 @@ void SecondWindow::mousePressEvent(QMouseEvent *event)
             drawBaseImage();
         } else if (clickCount == 2) {
             if (!rectangle) {
-//                rectangle = new Rectangle(0, 0, windowWidth * 2, windowHeight * 2); // Прямоугольник больше окна
-                rectangle = new Rectangle(0, 0, windowWidth * 0.2, windowHeight * 0.2); // Прямоугольник больше окна
+                rectangle = new Rectangle(0, 0, windowWidth * 2, windowHeight * 2); // Прямоугольник больше окна
+//                rectangle = new Rectangle(0, 0, windowWidth * 0.2, windowHeight * 0.2); // Прямоугольник больше окна
                 drawRectangleImage();
             }
             rectangleVisible = true;
@@ -80,7 +87,8 @@ void SecondWindow::initializeImage()
     innerImage = QImage(windowWidth, windowHeight, QImage::Format_ARGB32);
     innerImage.fill(Qt::transparent); // Устанавливаем прозрачный фон для innerImage
     baseImage = QImage(windowWidth, windowHeight, QImage::Format_ARGB32);
-    baseImage.fill(Qt::transparent); // Устанавливаем прозрачный фон для baseImage
+//    baseImage.fill(Qt::transparent); // Устанавливаем прозрачный фон для baseImage
+    baseImage.fill(Qt::gray); // Устанавливаем прозрачный фон для baseImage
     drawBaseImage(); // Рисуем базовый innerImage
 //    innerImage = baseImage.copy(); // Сохраняем базовое изображение в innerImage
 }
@@ -94,11 +102,17 @@ void SecondWindow::drawBaseImage()
     std::cout <<std::endl;
     std::cout << "  BaseImage width: " << baseImage.width() << " BaseImage height: " << baseImage.height();
 
-    baseImage.fill(Qt::transparent); // Устанавливаем прозрачный фон для baseImage
+//    baseImage.fill(Qt::transparent); // Устанавливаем прозрачный фон для baseImage
+    baseImage.fill(Qt::gray); // Устанавливаем прозрачный фон для baseImage
 //    QPainter painter(&baseImage);
     QPainter painter(&innerImage);
     if (isColored) {
         painter.fillRect(innerImage.rect().adjusted(1, 1, -1, -1), Qt::yellow); // Заливаем внутреннее окно желтым цветом
+    }
+    else {
+        QPainter painter(&baseImage);
+        painter.fillRect(baseImage.rect().adjusted(1, 1, -1, -1), Qt::gray); // Заливаем внутреннее окно желтым цветом
+
     }
 //    innerImage = baseImage.copy(); // Копируем baseImage в innerImage после изменений
 }
@@ -135,7 +149,7 @@ void SecondWindow::restoreBaseImage()
     std::cout << "BaseImage width: " << baseImage.width() << " BaseImage height: " << baseImage.height();
 
 //    baseImage.fill(Qt::transparent); // Устанавливаем прозрачный фон для baseImage
-    baseImage.fill(Qt::red); // Устанавливаем прозрачный фон для baseImage
+//    baseImage.fill(Qt::gray); // Устанавливаем прозрачный фон для baseImage
 //    QPainter painter(&baseImage);
     QPainter painter(&innerImage);
 //    painter.setPen(Qt::black);
