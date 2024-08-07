@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     secondWindow = new SecondWindow(this, 1400, 800); // Задаем размеры внутреннего окна
-    QScrollArea *scrollArea = new QScrollArea;
+    QScrollArea *scrollArea = new QScrollArea();
     scrollArea->setWidget(secondWindow);
     scrollArea->setWidgetResizable(true);
     setCentralWidget(scrollArea);
