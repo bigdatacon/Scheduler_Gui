@@ -45,8 +45,8 @@ void SecondWindow::mousePressEvent(QMouseEvent *event)
             drawBaseImage();
         } else if (clickCount == 2) {
             if (!rectangle) {
-                rectangle = new Rectangle(0, 0, windowWidth * 2, windowHeight * 2); // Прямоугольник больше окна
-//                rectangle = new Rectangle(0, 0, windowWidth * 0.2, windowHeight * 0.2); // Прямоугольник больше окна
+//                rectangle = new Rectangle(0, 0, windowWidth * 2, windowHeight * 2); // Прямоугольник больше окна
+                rectangle = new Rectangle(0, 0, windowWidth * 0.2, windowHeight * 0.2); // Прямоугольник больше окна
                 drawRectangleImage();
             }
             rectangleVisible = true;

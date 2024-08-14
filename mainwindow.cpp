@@ -1,43 +1,54 @@
 #include "mainwindow.h"
 #include "secondwindow.h"
-#include <QScrollArea>
-#include <iostream>
-#include <QTimer>
-
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    secondWindow = new SecondWindow(this, 1400, 800); // Задаем размеры внутреннего окна
-    QScrollArea *scrollArea = new QScrollArea();
-    scrollArea->setWidget(secondWindow);
-    scrollArea->setWidgetResizable(true);
-    setCentralWidget(scrollArea);
+    QWidget *centralWidget = new QWidget(this);
+    setCentralWidget(centralWidget);
 
-//    setCentralWidget(secondWindow);
-    setMinimumSize(800, 600); // Устанавливаем минимальный размер окна
+    // Создаем виджет SecondWindow
+    SecondWindow *secondWindow = new SecondWindow(this, 800, 600);
 
-//    auto main_window_width = this->width();
-//    auto main_window_height = this->height();
-//    int a = 10;
-//    std::cout <<a;
+    // Создаем контейнер для кнопок
+    QWidget *buttonsWidget = new QWidget(this);
+    QPushButton *pushButton1 = new QPushButton("Push Button 1", buttonsWidget);
+//    QPushButton *pushButton2 = new QPushButton("Button 2", buttonsWidget);
+    QRadioButton *radioButton2 = new QRadioButton("Radio Button 2", buttonsWidget);
+
+    // Устанавливаем макет для кнопок
+    QVBoxLayout *buttonsLayout = new QVBoxLayout(buttonsWidget);
+    buttonsLayout->addWidget(pushButton1);
+//    buttonsLayout->addWidget(pushButton2);
+    buttonsLayout->addWidget(radioButton2);
+    buttonsWidget->setLayout(buttonsLayout);
+
+    // Добавляем виджет SecondWindow
+    QVBoxLayout *layout = new QVBoxLayout(centralWidget);
+    layout->addWidget(secondWindow);
+    layout->addWidget(buttonsWidget);
+
+    centralWidget->setLayout(layout);
+
+    // Поднимаем кнопки на передний план
+    buttonsWidget->raise();
+    // Подключаем сигнал clicked к слоту onPushButtonClicked
+    connect(pushButton1, &QPushButton::clicked, this, &MainWindow::onPushButtonClicked);
 }
 
 MainWindow::~MainWindow()
 {
-    delete secondWindow;
 }
-
 void MainWindow::showEvent(QShowEvent *event)
 {
-    QMainWindow::showEvent(event);
-    QTimer::singleShot(0, this, &MainWindow::printRealSize);
+    QMainWindow::showEvent(event);  // Вызов базового метода
+    // Ваша реализация
 }
-
-void MainWindow::printRealSize()
+void MainWindow::onPushButtonClicked()
 {
-    int realWidth = this->width();
-    int realHeight = this->height();
-    std::cout << std::endl;
-    std::cout << "Real MainWindow size : " << realWidth << "x" << realHeight << std::endl;
+    qDebug() << "Button 1 clicked!";
+    // Добавьте сюда код, который должен выполняться при нажатии кнопки
 }
