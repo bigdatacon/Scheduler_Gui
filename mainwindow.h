@@ -2,33 +2,27 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "secondwindow.h"
-#include <QPushButton>
-#include <QRadioButton>
-#include <QVBoxLayout>
+
+namespace Ui {
+    class MainWindow;
+}
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void showEvent(QShowEvent *event);
-
-    void printRealSize();
+protected:
+    void showEvent(QShowEvent *event) override;
 
 private slots:
     void onPushButtonClicked();
 
 private:
-    SecondWindow *secondWindow;
-
-    // Добавляем виджеты как приватные члены
-    QPushButton *pushButton;
-    QRadioButton *radioButton1;
-    QRadioButton *radioButton2;
+    Ui::MainWindow *ui;
 };
 
 #endif // MAINWINDOW_H

@@ -1,54 +1,73 @@
 #include "mainwindow.h"
+#include "ui_mainwindow.h"
 #include "secondwindow.h"
-#include <QPushButton>
 #include <QVBoxLayout>
+#include <QPushButton>
+#include <QLabel>
+#include <QRadioButton>
 #include <QDebug>
+#include "solver.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow) // Инициализация объекта ui
 {
-    QWidget *centralWidget = new QWidget(this);
-    setCentralWidget(centralWidget);
+    // Инициализируем виджеты из mainwindow.ui
+    ui->setupUi(this);
 
-    // Создаем виджет SecondWindow
+    // Создаем контейнеры для SecondWindow и кнопок
+    QVBoxLayout *centralLayout = new QVBoxLayout();  // Главный макет для centralwidget
+
+    // Создаем виджет SecondWindow и добавляем его в главный макет
     SecondWindow *secondWindow = new SecondWindow(this, 800, 600);
+    centralLayout->addWidget(secondWindow);  // Добавляем SecondWindow первым
 
-    // Создаем контейнер для кнопок
-    QWidget *buttonsWidget = new QWidget(this);
-    QPushButton *pushButton1 = new QPushButton("Push Button 1", buttonsWidget);
-//    QPushButton *pushButton2 = new QPushButton("Button 2", buttonsWidget);
-    QRadioButton *radioButton2 = new QRadioButton("Radio Button 2", buttonsWidget);
+    // Добавляем кнопки из Qt Designer
+    centralLayout->addWidget(ui->pushButton);
+    centralLayout->addWidget(ui->radioButton);
+    centralLayout->addWidget(ui->radioButton_2);
+    centralLayout->addWidget(ui->resultLabel);
 
-    // Устанавливаем макет для кнопок
-    QVBoxLayout *buttonsLayout = new QVBoxLayout(buttonsWidget);
-    buttonsLayout->addWidget(pushButton1);
-//    buttonsLayout->addWidget(pushButton2);
-    buttonsLayout->addWidget(radioButton2);
-    buttonsWidget->setLayout(buttonsLayout);
-
-    // Добавляем виджет SecondWindow
-    QVBoxLayout *layout = new QVBoxLayout(centralWidget);
-    layout->addWidget(secondWindow);
-    layout->addWidget(buttonsWidget);
-
-    centralWidget->setLayout(layout);
+    // Устанавливаем макет для центрального виджета
+    ui->centralwidget->setLayout(centralLayout);
 
     // Поднимаем кнопки на передний план
-    buttonsWidget->raise();
-    // Подключаем сигнал clicked к слоту onPushButtonClicked
-    connect(pushButton1, &QPushButton::clicked, this, &MainWindow::onPushButtonClicked);
-}
+    ui->pushButton->raise();
+    ui->radioButton->raise();
+    ui->radioButton_2->raise();
+    ui->resultLabel->raise();
 
+    // Подключаем сигнал clicked к слоту onPushButtonClicked
+    connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onPushButtonClicked);
+}
 MainWindow::~MainWindow()
 {
+    delete ui;
 }
 void MainWindow::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);  // Вызов базового метода
     // Ваша реализация
 }
+
 void MainWindow::onPushButtonClicked()
 {
     qDebug() << "Button 1 clicked!";
-    // Добавьте сюда код, который должен выполняться при нажатии кнопки
+
+    // Создаем объект Solver
+    Solver solver;
+
+    // Задаем данные
+    SolverData inputData;
+    inputData.x1 = 1;
+    inputData.x2 = 2;
+    inputData.x3 = 3;
+
+    // Выполняем вычисление
+    result res = solver.solve(inputData);
+
+    // Выводим результат в консоль
+    qDebug() << "Solver result: y1 =" << res.y1 << ", y2 =" << res.y2;
+
+    // Выводим результат в QLabel
+    ui->resultLabel->setText(QString("Result: y1 = %1, y2 = %2").arg(res.y1).arg(res.y2));
 }
