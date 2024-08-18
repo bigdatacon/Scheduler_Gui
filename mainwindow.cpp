@@ -10,7 +10,7 @@
 #include <dlfcn.h>  // Для динамической загрузки библиотеки в Linux
 #include <filesystem>
 #include <iostream>
-
+#include <QToolBar>  // Добавлено для QToolBar
 
 // Типы функций, которые мы будем загружать из DLL
 typedef result (*SolveFunc)(const SolverData&);
@@ -31,23 +31,42 @@ MainWindow::MainWindow(QWidget *parent)
     SecondWindow *secondWindow = new SecondWindow(this, 800, 600);
     centralLayout->addWidget(secondWindow);  // Добавляем SecondWindow первым
 
-    // Добавляем кнопки из Qt Designer
-    centralLayout->addWidget(ui->pushButton);
-    centralLayout->addWidget(ui->radioButton);
-    centralLayout->addWidget(ui->radioButton_2);
+    // Создаем тулбар программно
+    QToolBar *toolBar = addToolBar("Main Toolbar");
+//    toolBar->setMovable(true);  // Позволяет тулбару двигаться
+    addToolBar(Qt::TopToolBarArea, toolBar);  // добавляю тулбар в qt designer
+
+
+    // Создаем QAction для тулбара
+    QAction *actionPush = new QAction("Solve", this);
+    QAction *actionEmpty1 = new QAction("Empty1", this);
+    QAction *actionEmpty2 = new QAction("Empty2", this);
+
+    // Добавляем действие в тулбар
+    toolBar->addAction(actionPush);
+    toolBar->addAction(actionEmpty1); // Это пустая кнопка, клик по которой не вызывает действия
+    toolBar->addAction(actionEmpty2); // Еще одна пустая кнопка
+
+    // Подключаем действие к существующему слоту
+    connect(actionPush, &QAction::triggered, this, &MainWindow::onPushButtonClicked);
+
+//    // Добавляем кнопки из Qt Designer
+//    centralLayout->addWidget(ui->pushButton);
+//    centralLayout->addWidget(ui->radioButton)
+//    centralLayout->addWidget(ui->radioButton_2);
     centralLayout->addWidget(ui->resultLabel);
 
-    // Устанавливаем макет для центрального виджета
+//    // Устанавливаем макет для центрального виджета
     ui->centralwidget->setLayout(centralLayout);
 
-    // Поднимаем кнопки на передний план
-    ui->pushButton->raise();
-    ui->radioButton->raise();
-    ui->radioButton_2->raise();
+//    // Поднимаем кнопки на передний план
+//    ui->pushButton->raise();
+//    ui->radioButton->raise();
+//    ui->radioButton_2->raise();
     ui->resultLabel->raise();
 
-    // Подключаем сигнал clicked к слоту onPushButtonClicked
-    connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onPushButtonClicked);
+//    // Подключаем сигнал clicked к слоту onPushButtonClicked
+//    connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onPushButtonClicked);
 }
 MainWindow::~MainWindow()
 {
