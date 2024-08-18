@@ -16,8 +16,8 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
-#include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
+#include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -27,28 +27,29 @@ class Ui_MainWindow
 public:
     QAction *actionPushClick;
     QWidget *centralwidget;
-    QPushButton *pushButton;
     QLabel *resultLabel;
+    QWidget *secondWindowWidget;
     QMenuBar *menubar;
     QMenu *menu;
     QStatusBar *statusbar;
+    QToolBar *toolBar;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(800, 600);
+        MainWindow->resize(800, 800);
         actionPushClick = new QAction(MainWindow);
         actionPushClick->setObjectName(QString::fromUtf8("actionPushClick"));
         actionPushClick->setCheckable(true);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
-        pushButton = new QPushButton(centralwidget);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
-        pushButton->setGeometry(QRect(80, 50, 106, 30));
         resultLabel = new QLabel(centralwidget);
         resultLabel->setObjectName(QString::fromUtf8("resultLabel"));
         resultLabel->setGeometry(QRect(90, 120, 80, 21));
+        secondWindowWidget = new QWidget(centralwidget);
+        secondWindowWidget->setObjectName(QString::fromUtf8("secondWindowWidget"));
+        secondWindowWidget->setGeometry(QRect(90, 210, 800, 600));
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
@@ -59,6 +60,9 @@ public:
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
         MainWindow->setStatusBar(statusbar);
+        toolBar = new QToolBar(MainWindow);
+        toolBar->setObjectName(QString::fromUtf8("toolBar"));
+        MainWindow->addToolBar(Qt::TopToolBarArea, toolBar);
 
         menubar->addAction(menu->menuAction());
 
@@ -74,9 +78,9 @@ public:
 #if QT_CONFIG(tooltip)
         actionPushClick->setToolTip(QCoreApplication::translate("MainWindow", "click", nullptr));
 #endif // QT_CONFIG(tooltip)
-        pushButton->setText(QCoreApplication::translate("MainWindow", "\320\272\320\275\320\276\320\277\320\272\320\260 \320\277\321\203\321\210", nullptr));
         resultLabel->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
         menu->setTitle(QString());
+        toolBar->setWindowTitle(QCoreApplication::translate("MainWindow", "toolBar", nullptr));
     } // retranslateUi
 
 };

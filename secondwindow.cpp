@@ -47,6 +47,7 @@ void SecondWindow::mousePressEvent(QMouseEvent *event)
             if (!rectangle) {
 //                rectangle = new Rectangle(0, 0, windowWidth * 2, windowHeight * 2); // Прямоугольник больше окна
                 rectangle = new Rectangle(0, 0, windowWidth * 0.2, windowHeight * 0.2); // Прямоугольник больше окна
+
                 drawRectangleImage();
             }
             rectangleVisible = true;
@@ -75,6 +76,7 @@ void SecondWindow::paintEvent(QPaintEvent *event)
     painter.drawImage(0, 0, innerImage); // Отображаем innerImage на виджете
 
     if (rectangleVisible && rectangle) {
+        qDebug() << "Отрисовываю прямоугольник";  // Отладочный вывод
         int centerX = (innerImage.width() - rectangleImage.width()) / 2;
         int centerY = (innerImage.height() - rectangleImage.height()) / 2;
         painter.drawImage(centerX, centerY, rectangleImage); // Отображаем rectangleImage на виджете по центру

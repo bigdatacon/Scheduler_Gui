@@ -24,25 +24,22 @@ MainWindow::MainWindow(QWidget *parent)
     // Инициализируем виджеты из mainwindow.ui
     ui->setupUi(this);
 
-    // Создаем контейнеры для SecondWindow и кнопок
-    QVBoxLayout *centralLayout = new QVBoxLayout();  // Главный макет для centralwidget
-
-    // Создаем виджет SecondWindow и добавляем его в главный макет
+    // Подключаем secondWindowWidget к классу SecondWindow
     SecondWindow *secondWindow = new SecondWindow(this, 800, 600);
-    centralLayout->addWidget(secondWindow);  // Добавляем SecondWindow первым
+    secondWindow->setGeometry(ui->secondWindowWidget->geometry());  // Подгонка по размерам виджета
+    secondWindow->setParent(ui->secondWindowWidget); // Назначаем родителем виджет из Qt Designer
+    secondWindow->show();  // Отображаем виджет
 
     // Создаем тулбар программно
     QToolBar *toolBar = addToolBar("Main Toolbar");
-//    toolBar->setMovable(true);  // Позволяет тулбару двигаться
-    addToolBar(Qt::TopToolBarArea, toolBar);  // добавляю тулбар в qt designer
-
+    addToolBar(Qt::TopToolBarArea, toolBar);  // добавляю тулбар в Qt Designer
 
     // Создаем QAction для тулбара
     QAction *actionPush = new QAction("Solve", this);
     QAction *actionEmpty1 = new QAction("Empty1", this);
     QAction *actionEmpty2 = new QAction("Empty2", this);
 
-    // Добавляем действие в тулбар
+    // Добавляем действия в тулбар
     toolBar->addAction(actionPush);
     toolBar->addAction(actionEmpty1); // Это пустая кнопка, клик по которой не вызывает действия
     toolBar->addAction(actionEmpty2); // Еще одна пустая кнопка
@@ -50,24 +47,62 @@ MainWindow::MainWindow(QWidget *parent)
     // Подключаем действие к существующему слоту
     connect(actionPush, &QAction::triggered, this, &MainWindow::onPushButtonClicked);
 
-//    // Добавляем кнопки из Qt Designer
-//    centralLayout->addWidget(ui->pushButton);
-//    centralLayout->addWidget(ui->radioButton)
-//    centralLayout->addWidget(ui->radioButton_2);
-    centralLayout->addWidget(ui->resultLabel);
-
-//    // Устанавливаем макет для центрального виджета
-    ui->centralwidget->setLayout(centralLayout);
-
-//    // Поднимаем кнопки на передний план
-//    ui->pushButton->raise();
-//    ui->radioButton->raise();
-//    ui->radioButton_2->raise();
-    ui->resultLabel->raise();
-
-//    // Подключаем сигнал clicked к слоту onPushButtonClicked
-//    connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onPushButtonClicked);
+    // Добавляем другие виджеты из Qt Designer
+    // centralLayout больше не нужен, так как все добавлено через ui
+    // Например, если вам нужно добавить дополнительные виджеты в макет, вы можете использовать существующий макет через ui
 }
+
+//MainWindow::MainWindow(QWidget *parent)
+//    : QMainWindow(parent), ui(new Ui::MainWindow) // Инициализация объекта ui
+//{
+//    // Инициализируем виджеты из mainwindow.ui
+//    ui->setupUi(this);
+
+//    // Создаем контейнеры для SecondWindow и кнопок
+//    QVBoxLayout *centralLayout = new QVBoxLayout();  // Главный макет для centralwidget
+
+//    // Создаем виджет SecondWindow и добавляем его в главный макет
+//    SecondWindow *secondWindow = new SecondWindow(this, 800, 600);
+//    centralLayout->addWidget(secondWindow);  // Добавляем SecondWindow первым
+
+//    // Создаем тулбар программно
+//    QToolBar *toolBar = addToolBar("Main Toolbar");
+//    addToolBar(Qt::TopToolBarArea, toolBar);  // добавляю тулбар в qt designer
+
+
+//    // Создаем QAction для тулбара
+//    QAction *actionPush = new QAction("Solve", this);
+//    QAction *actionEmpty1 = new QAction("Empty1", this);
+//    QAction *actionEmpty2 = new QAction("Empty2", this);
+
+//    // Добавляем действие в тулбар
+//    toolBar->addAction(actionPush);
+//    toolBar->addAction(actionEmpty1); // Это пустая кнопка, клик по которой не вызывает действия
+//    toolBar->addAction(actionEmpty2); // Еще одна пустая кнопка
+
+//    // Подключаем действие к существующему слоту
+//    connect(actionPush, &QAction::triggered, this, &MainWindow::onPushButtonClicked);
+
+////    // Добавляем кнопки из Qt Designer
+////    centralLayout->addWidget(ui->pushButton);
+////    centralLayout->addWidget(ui->radioButton)
+////    centralLayout->addWidget(ui->radioButton_2);
+//    centralLayout->addWidget(ui->resultLabel);
+
+////    // Устанавливаем макет для центрального виджета
+//    ui->centralwidget->setLayout(centralLayout);
+
+////    // Поднимаем кнопки на передний план
+////    ui->pushButton->raise();
+////    ui->radioButton->raise();
+////    ui->radioButton_2->raise();
+//    ui->resultLabel->raise();
+
+////    // Подключаем сигнал clicked к слоту onPushButtonClicked
+////    connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onPushButtonClicked);
+//}
+
+
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -164,6 +199,7 @@ void MainWindow::onPushButtonClicked()
 
     // Отображаем результат в QLabel
     ui->resultLabel->setText(QString("Result: y1 = %1, y2 = %2").arg(res.y1).arg(res.y2));
+    ui->resultLabel->adjustSize();  // Автоматическая подгонка размера под текст
 
     // Закрываем библиотеку
     dlclose(handle);
