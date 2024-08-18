@@ -34,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
     QToolBar *toolBar = addToolBar("Main Toolbar");
     addToolBar(Qt::TopToolBarArea, toolBar);  // добавляю тулбар в Qt Designer
 
+//    ui->toolBar->addAction(ui->actionExit);
+
     // Создаем QAction для тулбара
     QAction *actionPush = new QAction("Solve", this);
     QAction *actionEmpty1 = new QAction("Empty1", this);
@@ -44,8 +46,12 @@ MainWindow::MainWindow(QWidget *parent)
     toolBar->addAction(actionEmpty1); // Это пустая кнопка, клик по которой не вызывает действия
     toolBar->addAction(actionEmpty2); // Еще одна пустая кнопка
 
+
+
     // Подключаем действие к существующему слоту
     connect(actionPush, &QAction::triggered, this, &MainWindow::onPushButtonClicked);
+    // Подключаем действие созданное через qt designer
+    connect(ui->actionPushClick, &QAction::triggered, this, &MainWindow::onPushButtonClicked);
 
     // Добавляем другие виджеты из Qt Designer
     // centralLayout больше не нужен, так как все добавлено через ui

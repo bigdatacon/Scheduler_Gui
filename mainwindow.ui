@@ -65,16 +65,25 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionPushClick"/>
   </widget>
   <action name="actionPushClick">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>PushClick</string>
+    <string>solve2</string>
    </property>
    <property name="toolTip">
     <string>click</string>
+   </property>
+  </action>
+  <action name="actionsolve2">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>solve2</string>
    </property>
   </action>
  </widget>

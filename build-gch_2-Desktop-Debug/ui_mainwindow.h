@@ -26,6 +26,7 @@ class Ui_MainWindow
 {
 public:
     QAction *actionPushClick;
+    QAction *actionsolve2;
     QWidget *centralwidget;
     QLabel *resultLabel;
     QWidget *secondWindowWidget;
@@ -42,6 +43,9 @@ public:
         actionPushClick = new QAction(MainWindow);
         actionPushClick->setObjectName(QString::fromUtf8("actionPushClick"));
         actionPushClick->setCheckable(true);
+        actionsolve2 = new QAction(MainWindow);
+        actionsolve2->setObjectName(QString::fromUtf8("actionsolve2"));
+        actionsolve2->setCheckable(true);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         resultLabel = new QLabel(centralwidget);
@@ -65,6 +69,7 @@ public:
         MainWindow->addToolBar(Qt::TopToolBarArea, toolBar);
 
         menubar->addAction(menu->menuAction());
+        toolBar->addAction(actionPushClick);
 
         retranslateUi(MainWindow);
 
@@ -74,10 +79,11 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
-        actionPushClick->setText(QCoreApplication::translate("MainWindow", "PushClick", nullptr));
+        actionPushClick->setText(QCoreApplication::translate("MainWindow", "solve2", nullptr));
 #if QT_CONFIG(tooltip)
         actionPushClick->setToolTip(QCoreApplication::translate("MainWindow", "click", nullptr));
 #endif // QT_CONFIG(tooltip)
+        actionsolve2->setText(QCoreApplication::translate("MainWindow", "solve2", nullptr));
         resultLabel->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
         menu->setTitle(QString());
         toolBar->setWindowTitle(QCoreApplication::translate("MainWindow", "toolBar", nullptr));
