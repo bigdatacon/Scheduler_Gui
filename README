@@ -1,0 +1,7 @@
+## в корне проекта
+
+cd solver_program
+mkdir build
+cd build
+cmake ..
+make

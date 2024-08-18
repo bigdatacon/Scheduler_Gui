@@ -1,0 +1,3 @@
+/home/user1/QT_Projects/gch_2/solver_program/build/CMakeFiles/solver.dir
+/home/user1/QT_Projects/gch_2/solver_program/build/CMakeFiles/edit_cache.dir
+/home/user1/QT_Projects/gch_2/solver_program/build/CMakeFiles/rebuild_cache.dir
