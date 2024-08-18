@@ -1,3 +1,5 @@
+
+# Сборка dll для solver_program
 ## в корне проекта
 
 cd solver_program
@@ -5,3 +7,8 @@ mkdir build
 cd build
 cmake ..
 make
+
+## Сборка основной программы
+в корне cntrl_shift_b
+./build-gch_2-Desktop-Debug/gch_2
+

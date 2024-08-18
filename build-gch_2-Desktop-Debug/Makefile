@@ -66,6 +66,7 @@ OBJECTS       = main.o \
 		moc_mainwindow.o \
 		moc_secondwindow.o
 DIST          = ../.gitignore \
+		../README \
 		../solver_program/CMakeLists.txt \
 		../solver_program/inputdata.json \
 		../solver_program/outputdata.json \

@@ -16,7 +16,7 @@ CC            = gcc
 CXX           = g++
 DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
-CXXFLAGS      = -pipe -O2 -std=gnu++11 -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
+CXXFLAGS      = -pipe -O2 -std=gnu++1z -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -I. -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
 QMAKE         = /usr/lib/qt5/bin/qmake
 DEL_FILE      = rm -f
@@ -55,15 +55,21 @@ OBJECTS_DIR   = ./
 SOURCES       = main.cpp \
 		mainwindow.cpp \
 		rectangle.cpp \
-		secondwindow.cpp moc_mainwindow.cpp \
+		secondwindow.cpp \
+		solver_program/solver.cpp moc_mainwindow.cpp \
 		moc_secondwindow.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
 		rectangle.o \
 		secondwindow.o \
+		solver.o \
 		moc_mainwindow.o \
 		moc_secondwindow.o
 DIST          = .gitignore \
+		README \
+		solver_program/CMakeLists.txt \
+		solver_program/inputdata.json \
+		solver_program/outputdata.json \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -157,10 +163,12 @@ DIST          = .gitignore \
 		gch_2.pro mainwindow.h \
 		rectangle.h \
 		secondwindow.h \
-		solver.h main.cpp \
+		solver.h \
+		solver_program/solver.h main.cpp \
 		mainwindow.cpp \
 		rectangle.cpp \
-		secondwindow.cpp
+		secondwindow.cpp \
+		solver_program/solver.cpp
 QMAKE_TARGET  = gch_2
 DESTDIR       = 
 TARGET        = gch_2
@@ -370,8 +378,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents mainwindow.h rectangle.h secondwindow.h solver.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp mainwindow.cpp rectangle.cpp secondwindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents mainwindow.h rectangle.h secondwindow.h solver.h solver_program/solver.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp mainwindow.cpp rectangle.cpp secondwindow.cpp solver_program/solver.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents mainwindow.ui $(DISTDIR)/
 
 
@@ -402,7 +410,7 @@ compiler_moc_predefs_make_all: moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) moc_predefs.h
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
-	g++ -pipe -O2 -std=gnu++11 -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
+	g++ -pipe -O2 -std=gnu++1z -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
 compiler_moc_header_make_all: moc_mainwindow.cpp moc_secondwindow.cpp
 compiler_moc_header_clean:
@@ -455,6 +463,9 @@ rectangle.o: rectangle.cpp rectangle.h
 secondwindow.o: secondwindow.cpp secondwindow.h \
 		rectangle.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o secondwindow.o secondwindow.cpp
+
+solver.o: solver_program/solver.cpp solver_program/solver.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o solver.o solver_program/solver.cpp
 
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp

@@ -59,20 +59,28 @@ void MainWindow::showEvent(QShowEvent *event)
     // Ваша реализация
 }
 
+
 void MainWindow::onPushButtonClicked()
 {
-    // Загружаем динамическую библиотеку
-//    void* handle = dlopen("/home/user1/QT_Projects/gch_2/solver_program/build/libsolver.so", RTLD_LAZY);
-
     // Получаем текущую рабочую директорию
     std::filesystem::path currentPath = std::filesystem::current_path();
     std::cout << "Current working directory: " << currentPath << std::endl;
 
-    // Поднимаемся на одну директорию выше
-    std::filesystem::path projectRoot = currentPath.parent_path();
+    // Формируем пути для проверки
+    std::filesystem::path libPathInCurrent = currentPath / "solver_program" / "build" / "libsolver.so";
+    std::filesystem::path libPathInParent = currentPath.parent_path() / "solver_program" / "build" / "libsolver.so";
 
-    // Формируем путь к библиотеке libsolver.so
-    std::filesystem::path libPath = projectRoot / "solver_program" / "build" / "libsolver.so";
+    std::filesystem::path libPath;
+
+    // Проверяем, где находится библиотека
+    if (std::filesystem::exists(libPathInCurrent)) {
+        libPath = libPathInCurrent;
+    } else if (std::filesystem::exists(libPathInParent)) {
+        libPath = libPathInParent;
+    } else {
+        std::cerr << "Не удалось найти библиотеку libsolver.so ни в текущей директории, ни на уровне выше" << std::endl;
+        return;
+    }
 
     // Загружаем библиотеку
     void* handle = dlopen(libPath.c_str(), RTLD_LAZY);
@@ -81,14 +89,7 @@ void MainWindow::onPushButtonClicked()
         return;
     }
 
-    // Если библиотека успешно загружена, продолжаем работу
     std::cout << "Библиотека успешно загружена: " << libPath << std::endl;
-
-
-    if (!handle) {
-        qDebug() << "Не удалось загрузить библиотеку:" << dlerror();
-        return;
-    }
 
     // Очищаем ошибки
     dlerror();
@@ -118,20 +119,29 @@ void MainWindow::onPushButtonClicked()
         return;
     }
 
-    std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
+    // Формируем пути к JSON-файлам
+    std::filesystem::path inputJsonPath;
+    std::filesystem::path outputJsonPath;
+
+    if (libPath == libPathInCurrent) {
+        inputJsonPath = currentPath / "solver_program" / "inputdata.json";
+        outputJsonPath = currentPath / "solver_program" / "outputdata.json";
+    } else {
+        inputJsonPath = currentPath.parent_path() / "solver_program" / "inputdata.json";
+        outputJsonPath = currentPath.parent_path() / "solver_program" / "outputdata.json";
+    }
+
     // Читаем входные данные из JSON
-//    SolverData inputData = readInputFunc("solver_program/inputdata.json");
-    SolverData inputData = readInputFunc("../solver_program/inputdata.json");
+    SolverData inputData = readInputFunc(inputJsonPath.string());
 
     // Выполняем вычисления
     result res = solveFunc(inputData);
 
     // Записываем результат в JSON
-//    writeOutputFunc(res, "solver_program/outputdata.json");
-    writeOutputFunc(res, "../solver_program/outputdata.json");;
+    writeOutputFunc(res, outputJsonPath.string());
 
     // Выводим результат в консоль
-        qDebug() << "Solver result: y1 =" << res.y1 << ", y2 =" << res.y2;
+    qDebug() << "Solver result: y1 =" << res.y1 << ", y2 =" << res.y2;
 
     // Отображаем результат в QLabel
     ui->resultLabel->setText(QString("Result: y1 = %1, y2 = %2").arg(res.y1).arg(res.y2));
@@ -141,25 +151,4 @@ void MainWindow::onPushButtonClicked()
 }
 
 
-//void MainWindow::onPushButtonClicked()
-//{
-//    qDebug() << "Button 1 clicked!";
 
-//    // Создаем объект Solver
-//    Solver solver;
-
-//    // Задаем данные
-//    SolverData inputData;
-//    inputData.x1 = 1;
-//    inputData.x2 = 2;
-//    inputData.x3 = 3;
-
-//    // Выполняем вычисление
-//    result res = solver.solve(inputData);
-
-//    // Выводим результат в консоль
-//    qDebug() << "Solver result: y1 =" << res.y1 << ", y2 =" << res.y2;
-
-//    // Выводим результат в QLabel
-//    ui->resultLabel->setText(QString("Result: y1 = %1, y2 = %2").arg(res.y1).arg(res.y2));
-//}
