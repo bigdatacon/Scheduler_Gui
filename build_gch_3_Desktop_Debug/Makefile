@@ -59,7 +59,8 @@ OBJECTS       = GanttChart.o \
 		JsonReader.o \
 		main.o \
 		moc_GanttChart.o
-DIST          = ../operation_data.json \
+DIST          = ../.gitignore \
+		../operation_data.json \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \

@@ -1,66 +1,16 @@
 {
     "js_operations": [
-        {
-            "Finish": 36,
-            "Job": 1,
-            "Machine": 1,
-            "Start": 0
-        },
-        {
-            "Finish": 64,
-            "Job": 1,
-            "Machine": 2,
-            "Start": 36
-        },
-        {
-            "Finish": 107,
-            "Job": 1,
-            "Machine": 2,
-            "Start": 64
-        },
-        {
-            "Finish": 144,
-            "Job": 1,
-            "Machine": 2,
-            "Start": 107
-        },
-        {
-            "Finish": 166,
-            "Job": 1,
-            "Machine": 1,
-            "Start": 144
-        }
+        {"Finish": 36, "Job": 1, "Machine": 1, "Start": 0},
+        {"Finish": 64, "Job": 1, "Machine": 2, "Start": 36},
+        {"Finish": 107, "Job": 1, "Machine": 2, "Start": 64},
+        {"Finish": 144, "Job": 1, "Machine": 2, "Start": 107},
+        {"Finish": 166, "Job": 1, "Machine": 1, "Start": 144}
     ],
     "ms_operations": [
-        {
-            "Finish": 36,
-            "Job": 1,
-            "Machine": 1,
-            "Start": 0
-        },
-        {
-            "Finish": 166,
-            "Job": 1,
-            "Machine": 1,
-            "Start": 144
-        },
-        {
-            "Finish": 64,
-            "Job": 1,
-            "Machine": 2,
-            "Start": 36
-        },
-        {
-            "Finish": 107,
-            "Job": 1,
-            "Machine": 2,
-            "Start": 64
-        },
-        {
-            "Finish": 144,
-            "Job": 1,
-            "Machine": 2,
-            "Start": 107
-        }
+        {"Finish": 36, "Job": 1, "Machine": 1, "Start": 0},
+        {"Finish": 166, "Job": 1, "Machine": 1, "Start": 144},
+        {"Finish": 64, "Job": 1, "Machine": 2, "Start": 36},
+        {"Finish": 107, "Job": 1, "Machine": 2, "Start": 64},
+        {"Finish": 144, "Job": 1, "Machine": 2, "Start": 107}
     ]
 }

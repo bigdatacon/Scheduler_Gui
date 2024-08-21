@@ -66,11 +66,22 @@ void GanttChart::DrawGanttChart() {
     if (maxFinish == 0) {
         maxFinish = 1;
     }
-    // Определяем отступы и масштабирование
-    int iLabelOffsetX = 150;  // Начальное значение для iLabelOffsetX
-//    int iScaleFactorX = (width() - iLabelOffsetX - 50) / maxFinish;  // Масштабирование по X
-    int iScaleFactorX = (width() - iLabelOffsetX - 50) / maxFinish;
 
+    // Размеры экрана
+    int iScreenWidth = width();
+    int iScreenHeight = height();
+
+    // Масштабирование для оси X
+    int iLabelOffsetX = iScreenWidth * 0.1;  // 10% от ширины окна на подписи
+    int iScaleFactorX = (iScreenWidth - iLabelOffsetX - 50) / maxFinish;  // Масштабирование по X
+
+    // Динамически рассчитываем высоты и отступы
+    int iJobHeight = iScreenHeight * 0.05;  // 5% от высоты окна для каждого job
+    int iMachineHeight = iScreenHeight * 0.05;  // 5% от высоты окна для каждой машины
+
+    // Увеличиваем отступы по Y для большего расстояния между графиками
+    int iOffsetYJs = iScreenHeight * 0.1;  // Верхний отступ - 10% от высоты экрана
+    int iOffsetYMs = iScreenHeight * 0.6;  // Нижний отступ - 60% от высоты экрана
 
     // Перерисовываем изображение с новыми размерами окна
     m_oChartImage = QImage(size(), QImage::Format_ARGB32);
@@ -79,22 +90,15 @@ void GanttChart::DrawGanttChart() {
     QPainter oPainter(&m_oChartImage);
     oPainter.setPen(QPen(Qt::black, 2));
 
-    int iJobHeight = 40;
-    int iMachineHeight = 40;
-
-    // Увеличиваем отступы по Y для большего расстояния между графиками
-    int iOffsetYJs = 100;
-    int iOffsetYMs = 500;  // Увеличиваем отступ для нижнего графика
-
     // Отрисовка осей и сетки с учетом maxFinish
     DrawAxesAndLabels(oPainter, iOffsetYJs, iOffsetYMs, iScaleFactorX, iLabelOffsetX, maxFinish);
 
     // Отрисовка заголовков сверху
     QFont titleFont = oPainter.font();
-    titleFont.setPointSize(16);
+    titleFont.setPointSize(iScreenHeight * 0.03);  // Шрифт заголовка в зависимости от высоты окна
     oPainter.setFont(titleFont);
-    oPainter.drawText(iLabelOffsetX + (width() / 2) - 50, iOffsetYJs - 40, "Machines");
-    oPainter.drawText(iLabelOffsetX + (width() / 2) - 50, iOffsetYMs - 40, "Jobs");
+    oPainter.drawText(iLabelOffsetX + (iScreenWidth / 2) - 50, iOffsetYJs - iJobHeight, "Machines");
+    oPainter.drawText(iLabelOffsetX + (iScreenWidth / 2) - 50, iOffsetYMs - iJobHeight, "Jobs");
 
     // Отрисовка js_operations (график машин)
     for (const auto &sOp : m_vJsOperations) {
@@ -102,7 +106,7 @@ void GanttChart::DrawGanttChart() {
         int iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
         int iBarY = iOffsetYJs + (sOp.iMachine - 1) * iMachineHeight;
 
-        QRect oMachineRect(iBarStartX, iBarY, iBarWidth, iMachineHeight * 0.4);
+        QRect oMachineRect(iBarStartX, iBarY, iBarWidth, iMachineHeight * 0.6);  // Высота бара пропорциональна высоте машины
         oPainter.fillRect(oMachineRect, m_umapJobColors[sOp.iJob]);
         oPainter.setPen(QPen(Qt::black, 1));
         oPainter.drawRect(oMachineRect);
@@ -115,7 +119,7 @@ void GanttChart::DrawGanttChart() {
         int iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
         int iBarY = iOffsetYMs + (sOp.iJob - 1) * iJobHeight;
 
-        QRect oJobRect(iBarStartX, iBarY, iBarWidth, iJobHeight * 0.4);
+        QRect oJobRect(iBarStartX, iBarY, iBarWidth, iJobHeight * 0.6);  // Высота бара пропорциональна высоте работы
         oPainter.fillRect(oJobRect, m_umapMachineColors[sOp.iMachine]);
         oPainter.setPen(QPen(Qt::black, 1));
         oPainter.drawRect(oJobRect);
@@ -126,14 +130,15 @@ void GanttChart::DrawGanttChart() {
 }
 
 
-//void GanttChart::resizeEvent(QResizeEvent *event) {
-//    // Пересоздаем изображение с новыми размерами окна
-//    m_oChartImage = QImage(event->size(), QImage::Format_ARGB32);
-//    m_oChartImage.fill(Qt::white);
 
-//    // Перерисовываем график с учетом нового размера окна
-//    DrawGanttChart();
-//}
+void GanttChart::resizeEvent(QResizeEvent *event) {
+    // Пересоздаем изображение с новыми размерами окна
+    m_oChartImage = QImage(event->size(), QImage::Format_ARGB32);
+    m_oChartImage.fill(Qt::white);
+
+    // Перерисовываем график с учетом нового размера окна
+    DrawGanttChart();
+}
 
 
 //void GanttChart::DrawGanttChart() {
