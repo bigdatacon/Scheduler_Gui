@@ -34,6 +34,8 @@ protected:
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    // Эти функции должны быть объявлены
+
 
 private:
     void Initialize();

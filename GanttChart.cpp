@@ -70,14 +70,15 @@ void GanttChart::DrawGanttChart() {
     // Размеры экрана
     int iScreenWidth = width();
     int iScreenHeight = height();
+    int offset_koef = width()*0.025;
 
     // Масштабирование для оси X
     int iLabelOffsetX = iScreenWidth * 0.1;  // 10% от ширины окна на подписи
-    int iScaleFactorX = (iScreenWidth - iLabelOffsetX - 50) / maxFinish;  // Масштабирование по X
+    int iScaleFactorX = (iScreenWidth - iLabelOffsetX - offset_koef) / maxFinish;  // Масштабирование по X
 
     // Динамически рассчитываем высоты и отступы
-    int iJobHeight = iScreenHeight * 0.05;  // 5% от высоты окна для каждого job
-    int iMachineHeight = iScreenHeight * 0.05;  // 5% от высоты окна для каждой машины
+    int iJobHeight = iScreenHeight * 0.025;  // 5% от высоты окна для каждого job
+    int iMachineHeight = iScreenHeight * 0.025;  // 5% от высоты окна для каждой машины
 
     // Увеличиваем отступы по Y для большего расстояния между графиками
     int iOffsetYJs = iScreenHeight * 0.1;  // Верхний отступ - 10% от высоты экрана
@@ -95,10 +96,10 @@ void GanttChart::DrawGanttChart() {
 
     // Отрисовка заголовков сверху
     QFont titleFont = oPainter.font();
-    titleFont.setPointSize(iScreenHeight * 0.03);  // Шрифт заголовка в зависимости от высоты окна
+    titleFont.setPointSize(iScreenHeight * 0.013);  // Шрифт заголовка в зависимости от высоты окна
     oPainter.setFont(titleFont);
-    oPainter.drawText(iLabelOffsetX + (iScreenWidth / 2) - 50, iOffsetYJs - iJobHeight, "Machines");
-    oPainter.drawText(iLabelOffsetX + (iScreenWidth / 2) - 50, iOffsetYMs - iJobHeight, "Jobs");
+    oPainter.drawText(iLabelOffsetX + (iScreenWidth / 2) - offset_koef, iOffsetYJs - iJobHeight, "Machines");
+    oPainter.drawText(iLabelOffsetX + (iScreenWidth / 2) - offset_koef, iOffsetYMs - iJobHeight, "Jobs");
 
     // Отрисовка js_operations (график машин)
     for (const auto &sOp : m_vJsOperations) {
@@ -141,55 +142,55 @@ void GanttChart::resizeEvent(QResizeEvent *event) {
 }
 
 
-//void GanttChart::DrawGanttChart() {
-//    QPainter oPainter(&m_oChartImage);
-//    oPainter.setPen(QPen(Qt::black, 2));  // Сделаем оси толще
-
-//    int iJobHeight = 40;  // Фиксированная высота для каждого job/machine
-//    int iMachineHeight = 40;
-
-//    int iOffsetYJs = 50;  // Смещение по Y для верхнего графика (машины)
-//    int iOffsetYMs = 400; // Смещение по Y для нижнего графика (задачи)
-//    int iLabelOffsetX = 160; // Увеличенный отступ для подписей осей
-//    int iScaleFactorX = 5;  // Масштабирование по X
-
-//    // 1. Отрисовка осей и подписей
-//    DrawAxesAndLabels(oPainter, iOffsetYJs, iOffsetYMs, iScaleFactorX, iLabelOffsetX);
-
-//    // 2. Отрисовка js_operations (график машин)
-//    for (const auto &sOp : m_vJsOperations) {
-//        int iBarStartX = iLabelOffsetX + sOp.iStart * iScaleFactorX;
-//        int iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
-//        int iBarY = iOffsetYJs + (sOp.iMachine - 1) * iMachineHeight;
-
-//        QRect oMachineRect(iBarStartX, iBarY, iBarWidth, iMachineHeight * 0.4);
-//        oPainter.fillRect(oMachineRect, m_umapJobColors[sOp.iJob]);
-//        oPainter.setPen(QPen(Qt::black, 1));
-//        oPainter.drawRect(oMachineRect);  // Черная рамка вокруг бара
-//        oPainter.drawText(oMachineRect, Qt::AlignCenter, QString("Job %1").arg(sOp.iJob));
-//    }
-
-//    // 3. Отрисовка ms_operations (график задач)
-//    for (const auto &sOp : m_vMsOperations) {
-//        int iBarStartX = iLabelOffsetX + sOp.iStart * iScaleFactorX;
-//        int iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
-//        int iBarY = iOffsetYMs + (sOp.iJob - 1) * iJobHeight;
-
-//        QRect oJobRect(iBarStartX, iBarY, iBarWidth, iJobHeight * 0.4);
-//        oPainter.fillRect(oJobRect, m_umapMachineColors[sOp.iMachine]);
-//        oPainter.setPen(QPen(Qt::black, 1));
-//        oPainter.drawRect(oJobRect);  // Черная рамка вокруг бара
-//        oPainter.drawText(oJobRect, Qt::AlignCenter, QString("Machine %1").arg(sOp.iMachine));
-//    }
-
-//    update();
-//}
 
 void GanttChart::DrawAxesAndLabels(QPainter &oPainter, int iOffsetYJs, int iOffsetYMs, int iScaleFactorX, int iLabelOffsetX, int maxFinish) {
+
+    // Определение максимального значения machine для верхнего графика и job для нижнего графика
+    int maxMachine = 0;
+    int maxJob = 0;
+
+    // Проходим по m_vJsOperations, чтобы найти максимальное значение iMachine
+    for (const auto &op : m_vJsOperations) {
+        if (op.iMachine > maxMachine) {
+            maxMachine = op.iMachine;
+        }
+    }
+
+    // Проходим по m_vMsOperations, чтобы найти максимальное значение iJob
+    for (const auto &op : m_vMsOperations) {
+        if (op.iJob > maxJob) {
+            maxJob = op.iJob;
+        }
+    }
+
+    // Устанавливаем количество строк для машин и задач, добавляя 2 к максимальному значению
+    float machineRowCount = maxMachine + 2.0;  // Количество строк для машин
+    float jobRowCount = maxJob + 2.0;          // Количество строк для задач
+
+    // Размеры окна
+    int iScreenWidth = width();
+    int iScreenHeight = height();
+
+    // Коэффициенты для размеров и отступов
+    float labelTextProportion = 0.025;  // Пропорция для размера текста (2.5% от высоты окна)
+    float labelOffsetProportion = 0.1;  // Пропорция для отступа слева для подписей
+    float lineOffsetProportion = 0.05;  // Пропорция для отступа от краев графика (5% от ширины)
+    float rowHeightProportion = 0.05;   // Пропорция для высоты строк (5% от высоты экрана)
+    float textHeightOffsetProportion = 0.03; // Пропорция для отступа текста от графиков
+
+    // Рассчитанные размеры и отступы
+    int iMachineHeight = iScreenHeight * rowHeightProportion;  // Высота строки машины
+    int iJobHeight = iScreenHeight * rowHeightProportion;      // Высота строки задачи
+    int textHeightOffset = iScreenHeight * textHeightOffsetProportion;  // Отступ текста под графиком
+    int lineOffset = iScreenWidth * lineOffsetProportion;  // Отступ линий графика
+    int iLabelTextSize = iScreenHeight * labelTextProportion;  // Размер текста в зависимости от высоты экрана
+//    int iDynamicLabelOffsetX = iLabelOffsetX - lineOffset;  // Динамический отступ для подписей
+
+
+
     // Прозрачная сетка внутри графиков
     QPen gridPen(QColor(0, 0, 0, 50));  // Прозрачный черный цвет для сетки
     oPainter.setPen(gridPen);
-
     // Ось X и Y для js_operations (верхний график)
     for (int i = 0; i <= maxFinish; i += 10) {  // Проходим до maxFinish
         oPainter.setPen(QPen(Qt::black, 1));  // Установим черный цвет для текста
@@ -273,8 +274,6 @@ void GanttChart::DrawAxesAndLabels(QPainter &oPainter, int iOffsetYJs, int iOffs
     oPainter.drawText(0, 0, "Jobs");
     oPainter.restore();
 }
-
-
 
 
 
