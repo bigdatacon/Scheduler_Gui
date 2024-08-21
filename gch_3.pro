@@ -1,0 +1,42 @@
+QT       += core gui
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+CONFIG += c++17
+
+# You can make your code fail to compile if it uses deprecated APIs.
+# In order to do so, uncomment the following line.
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+
+# Указываем пути к файлам исходного кода
+SOURCES += \
+    GanttChart.cpp \
+    JsonReader.cpp \
+    main.cpp
+
+# Указываем пути к файлам заголовков
+HEADERS += \
+    GanttChart.h \
+    JsonReader.h
+
+# Если есть формы Qt Designer, включаем их здесь
+FORMS +=
+
+# Указываем JSON-файл в разделе ресурсов
+DISTFILES += \
+    .gitignore \
+    operation_data.json
+
+# Пакеты и библиотеки, которые будут использоваться
+QT += core gui widgets
+
+# Для работы с библиотекой nlohmann_json (если она подключена локально или установлена)
+#LIBS += -lnlohmann_json
+
+# Указываем путь к библиотекам, если требуется
+#INCLUDEPATH += /usr/local/include/nlohmann
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
