@@ -174,6 +174,59 @@ void GanttChart::DrawGanttChart() {
     oPainter.drawText(0, 0, "Jobs");
     oPainter.restore();
 
+    // Отрисовка баров для операций на графике машин (m_vJsOperations)
+    for (const auto &sOp : m_vJsOperations) {
+        int iBarStartX = iLabelOffsetX + sOp.iStart * iScaleFactorX;
+        int iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
+        int iBarCenterY = iOffsetYJs + (sOp.iMachine - 1) * iMachineHeight + iMachineHeight / 2;
+
+        // Уменьшаем высоту бара до 50% от высоты строки машины
+        QRect oMachineRect(iBarStartX, iBarCenterY - iMachineHeight * 0.25, iBarWidth, iMachineHeight * 0.5);
+
+        // Уменьшаем ширину и отрисовываем бар
+        oPainter.fillRect(oMachineRect, m_umapJobColors[sOp.iJob]);
+        oPainter.setPen(QPen(Qt::black, 1));
+        oPainter.drawRect(oMachineRect);
+
+
+        // Устанавливаем шрифт на основе высоты окна
+        int dynamicFontSize = std::max(8, static_cast<int>(iScreenHeight * 0.01));  // Размер шрифта пропорционален высоте окна
+        QFont dynamicFont = oPainter.font();
+        dynamicFont.setPointSize(dynamicFontSize);  // Привязываем размер шрифта к размеру окна
+        oPainter.setFont(dynamicFont);
+
+
+
+        // Отрисовка текста
+        oPainter.drawText(oMachineRect, Qt::AlignCenter, QString("Job %1").arg(sOp.iJob));
+    }
+
+    // Отрисовка баров для операций на графике задач (m_vMsOperations)
+    for (const auto &sOp : m_vMsOperations) {
+        int iBarStartX = iLabelOffsetX + sOp.iStart * iScaleFactorX;
+        int iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
+        int iBarCenterY = iOffsetYMs + (sOp.iJob - 1) * iJobHeight + iJobHeight / 2;
+
+        // Уменьшаем высоту бара до 50% от высоты строки задачи
+        QRect oJobRect(iBarStartX, iBarCenterY - iJobHeight * 0.25, iBarWidth, iJobHeight * 0.5);
+
+        // Уменьшаем ширину и отрисовываем бар
+        oPainter.fillRect(oJobRect, m_umapMachineColors[sOp.iMachine]);
+        oPainter.setPen(QPen(Qt::black, 1));
+        oPainter.drawRect(oJobRect);
+
+        // Устанавливаем шрифт на основе высоты окна
+        int dynamicFontSize = std::max(8, static_cast<int>(iScreenHeight * 0.01));  // Размер шрифта пропорционален высоте окна
+        QFont dynamicFont = oPainter.font();
+        dynamicFont.setPointSize(dynamicFontSize);  // Привязываем размер шрифта к размеру окна
+        oPainter.setFont(dynamicFont);
+
+
+        // Отрисовка текста
+        oPainter.drawText(oJobRect, Qt::AlignCenter, QString("Machine %1").arg(sOp.iMachine));
+    }
+
+
     update();
 }
 
