@@ -40,7 +40,6 @@ protected:
 private:
     void Initialize();
     void DrawGanttChart();
-    void DrawAxesAndLabels(QPainter &oPainter, int iOffsetYJs, int iOffsetYMs, int iScaleFactorX, int iLabelOffsetX, int maxFinish);
     void resizeEvent(QResizeEvent *event);
     void UpdateBar(int iJob, int iMachine, int iNewStart, int iNewJob);
 
