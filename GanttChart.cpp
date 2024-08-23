@@ -67,12 +67,20 @@ void GanttChart::DrawGanttChart() {
     int iScaleFactorX = (iScreenWidth - iLabelOffsetX - offset_koef) / maxFinish;  // Масштабирование по X
 
     // Динамически рассчитываем высоты и отступы
-    int iMachineHeight = iScreenHeight * 0.08;  // Высота строки для каждой машины (8% от высоты окна)
-    int iJobHeight = iScreenHeight * 0.08;      // Высота строки для каждой работы (8% от высоты окна)
+    int iMachineHeight = std::min(iScreenHeight * 0.05, 40.0);  // Ограничение на высоту строки (5% от высоты экрана или 40px)
+    int iJobHeight = std::min(iScreenHeight * 0.05, 40.0);      // Ограничение на высоту строки
 
     // Увеличиваем отступы по Y для большего расстояния между графиками
     int iOffsetYJs = iScreenHeight * 0.1;  // Верхний отступ - 10% от высоты экрана
     int iOffsetYMs = iOffsetYJs + 7 * iMachineHeight + iScreenHeight * 0.05;  // Нижний график ниже верхнего на 5% высоты экрана
+
+    // Проверка на то, помещаются ли графики на экране
+    if (iOffsetYMs + 4 * iJobHeight + 40 > iScreenHeight) {
+        // Уменьшаем высоты строк и отступы для лучшего вмещения
+        iMachineHeight = std::min(iScreenHeight * 0.04, 30.0);
+        iJobHeight = std::min(iScreenHeight * 0.04, 30.0);
+        iOffsetYMs = iOffsetYJs + 7 * iMachineHeight + iScreenHeight * 0.05;
+    }
 
     // Перерисовываем изображение с новыми размерами окна
     m_oChartImage = QImage(size(), QImage::Format_ARGB32);
@@ -80,6 +88,12 @@ void GanttChart::DrawGanttChart() {
 
     QPainter oPainter(&m_oChartImage);
     oPainter.setPen(QPen(Qt::black, 2));
+
+    // Устанавливаем шрифт
+    int fontSize = std::max(8, static_cast<int>(iScreenHeight * 0.015));
+    QFont font = oPainter.font();
+    font.setPointSize(fontSize);
+    oPainter.setFont(font);
 
     // Отрисовка сетки и подписей на оси X
     QPen gridPen(QColor(0, 0, 0, 50));  // Прозрачный черный цвет для сетки
@@ -104,7 +118,7 @@ void GanttChart::DrawGanttChart() {
         oPainter.setPen(QPen(Qt::black, 1));
 
         // Подписи для машин выравниваются по линиям сетки и не заезжают на график
-        oPainter.drawText(iLabelBoundX - oPainter.fontMetrics().width(QString("Machine %1").arg(i + 1)), yPos + 5, QString("Machine %1").arg(i + 1));
+        oPainter.drawText(iLabelBoundX - oPainter.fontMetrics().horizontalAdvance(QString("Machine %1").arg(i + 1)), yPos + 5, QString("Machine %1").arg(i + 1));
         oPainter.setPen(gridPen);  // Вернем прозрачный цвет для сетки
     }
 
@@ -115,18 +129,18 @@ void GanttChart::DrawGanttChart() {
         oPainter.setPen(QPen(Qt::black, 1));
 
         // Подписи для работ выравниваются по линиям сетки и не заезжают на график
-        oPainter.drawText(iLabelBoundX - oPainter.fontMetrics().width(QString("Job %1").arg(i + 1)), yPos + 5, QString("Job %1").arg(i + 1));
+        oPainter.drawText(iLabelBoundX - oPainter.fontMetrics().horizontalAdvance(QString("Job %1").arg(i + 1)), yPos + 5, QString("Job %1").arg(i + 1));
         oPainter.setPen(gridPen);  // Вернем прозрачный цвет для сетки
     }
 
     // Отрисовка вертикальных подписей слева от осей Y
     QFont verticalFont = oPainter.font();
-    verticalFont.setPointSize(iScreenHeight * 0.025);  // Масштабируем размер текста вертикальных подписей
+    verticalFont.setPointSize(std::max(10, static_cast<int>(iScreenHeight * 0.015)));  // Масштабируем размер текста вертикальных подписей
     oPainter.setFont(verticalFont);
 
     // Подпись для "Machines" слева от графика
     oPainter.save();
-    oPainter.translate(iVerticalLabelBoundX*0.5, iOffsetYJs + (7 * iMachineHeight) / 2);  // Центрируем по высоте графика
+    oPainter.translate(iVerticalLabelBoundX, iOffsetYJs + (7 * iMachineHeight) / 2);  // Центрируем по высоте графика
     oPainter.rotate(-90);  // Поворачиваем текст на 90 градусов против часовой стрелки
     oPainter.drawText(0, 0, "Machines");
     oPainter.restore();
@@ -143,85 +157,6 @@ void GanttChart::DrawGanttChart() {
 
 
 
-
-//void GanttChart::DrawGanttChart() {
-//    // Рассчитываем максимальное значение Finish для ограничения оси X
-//    int maxFinish = 160;
-
-//    // Размеры экрана
-//    int iScreenWidth = width();
-//    int iScreenHeight = height();
-//    int offset_koef = width() * 0.025;
-
-//    // Определяем границу для размещения подписей
-//    int iLabelBoundX = iScreenWidth * 0.1;  // 10% от ширины окна
-
-//    // Масштабирование для оси X
-//    int iLabelOffsetX = iLabelBoundX + 20;  // Начало оси Y на 20 пикселей правее от границы
-//    int iScaleFactorX = (iScreenWidth - iLabelOffsetX - offset_koef) / maxFinish;  // Масштабирование по X
-
-//    // Динамически рассчитываем высоты и отступы
-//    int iMachineHeight = iScreenHeight * 0.08;  // Высота строки для каждой машины (8% от высоты окна)
-//    int iJobHeight = iScreenHeight * 0.08;      // Высота строки для каждой работы (8% от высоты окна)
-
-//    // Увеличиваем отступы по Y для большего расстояния между графиками
-//    int iOffsetYJs = iScreenHeight * 0.15;  // Верхний отступ - 15% от высоты экрана
-//    int iOffsetYMs = iOffsetYJs + 7 * iMachineHeight + iScreenHeight * 0.1;  // Нижний график ниже верхнего на 10% высоты экрана
-
-//    // Перерисовываем изображение с новыми размерами окна
-//    m_oChartImage = QImage(size(), QImage::Format_ARGB32);
-//    m_oChartImage.fill(Qt::white);
-
-//    QPainter oPainter(&m_oChartImage);
-//    oPainter.setPen(QPen(Qt::black, 2));
-
-//    // Отрисовка заголовков сверху
-//    QFont titleFont = oPainter.font();
-//    titleFont.setPointSize(iScreenHeight * 0.025);  // Шрифт заголовка в зависимости от высоты окна
-//    oPainter.setFont(titleFont);
-//    oPainter.drawText(iLabelOffsetX + (iScreenWidth / 2) - offset_koef, iOffsetYJs - iMachineHeight / 2, "Machines");
-//    oPainter.drawText(iLabelOffsetX + (iScreenWidth / 2) - offset_koef, iOffsetYMs - iJobHeight / 2, "Jobs");
-
-//    // Отрисовка сетки и подписей на оси X
-//    QPen gridPen(QColor(0, 0, 0, 50));  // Прозрачный черный цвет для сетки
-//    oPainter.setPen(gridPen);
-
-//    for (int i = 0; i <= maxFinish; i += 10) {
-//        // Отрисовка вертикальных линий сетки
-//        oPainter.drawLine(iLabelOffsetX + i * iScaleFactorX, iOffsetYJs, iLabelOffsetX + i * iScaleFactorX, iOffsetYJs + 7 * iMachineHeight);
-//        oPainter.drawLine(iLabelOffsetX + i * iScaleFactorX, iOffsetYMs, iLabelOffsetX + i * iScaleFactorX, iOffsetYMs + 4 * iJobHeight);
-
-//        // Подписи по оси X
-//        oPainter.setPen(QPen(Qt::black, 1));  // Черный цвет для подписей
-//        oPainter.drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYJs + 7 * iMachineHeight + 20, QString::number(i));
-//        oPainter.drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYMs + 4 * iJobHeight + 20, QString::number(i));
-//        oPainter.setPen(gridPen);  // Вернем прозрачный цвет для сетки
-//    }
-
-//    // Отрисовка горизонтальных линий сетки для машин
-//    for (int i = 0; i < 7; ++i) {
-//        int yPos = iOffsetYJs + (i + 0.5) * iMachineHeight;  // Смещение линии сетки
-//        oPainter.drawLine(iLabelOffsetX, yPos, width() - offset_koef, yPos);
-//        oPainter.setPen(QPen(Qt::black, 1));
-
-//        // Подписи для машин выравниваются по линиям сетки и не заезжают на график
-//        oPainter.drawText(iLabelBoundX - oPainter.fontMetrics().width(QString("Machine %1").arg(i + 1)), yPos + 5, QString("Machine %1").arg(i + 1));
-//        oPainter.setPen(gridPen);  // Вернем прозрачный цвет для сетки
-//    }
-
-//    // Отрисовка горизонтальных линий сетки для работ
-//    for (int i = 0; i < 4; ++i) {
-//        int yPos = iOffsetYMs + (i + 0.5) * iJobHeight;  // Смещение линии сетки
-//        oPainter.drawLine(iLabelOffsetX, yPos, width() - offset_koef, yPos);
-//        oPainter.setPen(QPen(Qt::black, 1));
-
-//        // Подписи для работ выравниваются по линиям сетки и не заезжают на график
-//        oPainter.drawText(iLabelBoundX - oPainter.fontMetrics().width(QString("Job %1").arg(i + 1)), yPos + 5, QString("Job %1").arg(i + 1));
-//        oPainter.setPen(gridPen);  // Вернем прозрачный цвет для сетки
-//    }
-
-//    update();
-//}
 
 
 void GanttChart::DrawAxesAndLabels(QPainter &oPainter, int iOffsetYJs, int iOffsetYMs, int iScaleFactorX, int iLabelOffsetX, int maxFinish) {
