@@ -51,46 +51,43 @@ void GanttChart::LoadJsonData(const QString &sFilename) {
 
 void GanttChart::DrawGanttChart() {
     // Рассчитываем максимальное значение Finish для ограничения оси X
-    // Рассчитываем максимальное значение Finish для ограничения оси X
-    int maxFinish = 0;
+    int iMaxFinish = 0;
     for (const auto &op : m_vJsOperations) {
-        if (op.iFinish > maxFinish) {
-            maxFinish = op.iFinish;
+        if (op.iFinish > iMaxFinish) {
+            iMaxFinish = op.iFinish;
         }
     }
     for (const auto &op : m_vMsOperations) {
-        if (op.iFinish > maxFinish) {
-            maxFinish = op.iFinish;
+        if (op.iFinish > iMaxFinish) {
+            iMaxFinish = op.iFinish;
         }
     }
-    // Если maxFinish равен 0, устанавливаем его в 1, чтобы избежать деления на ноль
-    if (maxFinish == 0) {
-        maxFinish = 1;
+    // Если iMaxFinish равен 0, устанавливаем его в 1, чтобы избежать деления на ноль
+    if (iMaxFinish == 0) {
+        iMaxFinish = 1;
     }
 
     // Определение максимального значения machine для верхнего графика и job для нижнего графика
-    int maxMachine = 0;
-    int maxJob = 0;
+    int iMaxMachine = 0;
+    int iMaxJob = 0;
 
     // Проходим по m_vJsOperations, чтобы найти максимальное значение iMachine
     for (const auto &op : m_vJsOperations) {
-        if (op.iMachine > maxMachine) {
-            maxMachine = op.iMachine;
+        if (op.iMachine > iMaxMachine) {
+            iMaxMachine = op.iMachine;
         }
     }
 
     // Проходим по m_vMsOperations, чтобы найти максимальное значение iJob
     for (const auto &op : m_vMsOperations) {
-        if (op.iJob > maxJob) {
-            maxJob = op.iJob;
+        if (op.iJob > iMaxJob) {
+            iMaxJob = op.iJob;
         }
     }
 
     // Устанавливаем количество строк для машин и задач, добавляя 2 к максимальному значению
-    float machineRowCount = maxMachine + 2.0;  // Количество строк для машин
-    float jobRowCount = maxJob + 2.0;          // Количество строк для задач
-
-
+    float fMachineRowCount = iMaxMachine + 2.0f;  // Количество строк для машин
+    float fJobRowCount = iMaxJob + 2.0f;          // Количество строк для задач
 
     // Размеры экрана
     int iScreenWidth = width();
@@ -103,29 +100,29 @@ void GanttChart::DrawGanttChart() {
     QPainter oPainter(&m_oChartImage);
     oPainter.setPen(QPen(Qt::black, 2));
 
-    QFontMetrics metrics(oPainter.font());
+    QFontMetrics oMetrics(oPainter.font());
 
     // Рассчитываем длину строки "Machine 10000"
-    int labelWidth = metrics.horizontalAdvance("Machine 10000");
+    int iLabelWidth = oMetrics.horizontalAdvance("Machine 10000");
 
     // Увеличиваем длину на 20%
-    int labelWidthWithPadding = static_cast<int>(labelWidth * 1.2);
+    int iLabelWidthWithPadding = static_cast<int>(iLabelWidth * 1.2);
 
     // Пропорциональные отступы от краев окна, приводим оба значения к int
-    int offset1 = std::max(static_cast<int>(iScreenWidth * 0.05), 50);  // Отступ 1: от левого края до вертикальных подписей
-    int offset3 = std::max(static_cast<int>(iScreenWidth * 0.015), 10);  // Минимальный отступ между подписями по оси Y и самой осью Y
+    int iOffset1 = std::max(static_cast<int>(iScreenWidth * 0.05), 50);  // Отступ 1: от левого края до вертикальных подписей
+    int iOffset3 = std::max(static_cast<int>(iScreenWidth * 0.015), 10);  // Минимальный отступ между подписями по оси Y и самой осью Y
 
-    // Рассчитываем offset2 как увеличенную на 20% длину строки, с учетом масштаба окна
-    int minOffset2 = static_cast<int>(labelWidthWithPadding * 0.5);  // Минимальное значение offset2 при маленьком окне
-    int maxOffset2 = labelWidthWithPadding;  // Максимальное значение offset2 при большом окне
-    int offset2 = std::min(std::max(static_cast<int>(iScreenWidth * 0.2), minOffset2), maxOffset2);
+    // Рассчитываем iOffset2 как увеличенную на 20% длину строки, с учетом масштаба окна
+    int iMinOffset2 = static_cast<int>(iLabelWidthWithPadding * 0.5);  // Минимальное значение iOffset2 при маленьком окне
+    int iMaxOffset2 = iLabelWidthWithPadding;  // Максимальное значение iOffset2 при большом окне
+    int iOffset2 = std::min(std::max(static_cast<int>(iScreenWidth * 0.2), iMinOffset2), iMaxOffset2);
 
     // Общий отступ для начала оси X (зависит от отступов и ширины подписи)
-    int iLabelBoundX = offset1 + offset2;
+    int iLabelBoundX = iOffset1 + iOffset2;
 
     // Масштабирование для оси X
-    int iLabelOffsetX = iLabelBoundX + offset3;  // Отступ осей X
-    int iScaleFactorX = (iScreenWidth - iLabelOffsetX - offset1) / maxFinish;  // Масштабирование по X
+    int iLabelOffsetX = iLabelBoundX + iOffset3;  // Отступ осей X
+    int iScaleFactorX = (iScreenWidth - iLabelOffsetX - iOffset1) / iMaxFinish;  // Масштабирование по X
 
     // Динамически рассчитываем высоты и отступы
     int iMachineHeight = std::min(static_cast<int>(iScreenHeight * 0.07), 40);  // Ограничение на высоту строки (7% от высоты экрана или 40px)
@@ -133,67 +130,67 @@ void GanttChart::DrawGanttChart() {
 
     // Увеличиваем отступы по Y для большего расстояния между графиками
     int iOffsetYJs = static_cast<int>(iScreenHeight * 0.1);  // Верхний отступ - 10% от высоты экрана
-    int iOffsetYMs = iOffsetYJs + machineRowCount * iMachineHeight + static_cast<int>(iScreenHeight * 0.05);  // Нижний график ниже верхнего на 5% высоты экрана
+    int iOffsetYMs = iOffsetYJs + fMachineRowCount * iMachineHeight + static_cast<int>(iScreenHeight * 0.05);  // Нижний график ниже верхнего на 5% высоты экрана
 
     // Устанавливаем шрифт
-    int fontSize = std::max(8, static_cast<int>(iScreenHeight * 0.015));
-    QFont font = oPainter.font();
-    font.setPointSize(fontSize);
-    oPainter.setFont(font);
+    int iFontSize = std::max(8, static_cast<int>(iScreenHeight * 0.015));
+    QFont oFont = oPainter.font();
+    oFont.setPointSize(iFontSize);
+    oPainter.setFont(oFont);
 
     // Отрисовка сетки и подписей на оси X
-    QPen gridPen(QColor(0, 0, 0, 50));  // Прозрачный черный цвет для сетки
-    oPainter.setPen(gridPen);
+    QPen oGridPen(QColor(0, 0, 0, 50));  // Прозрачный черный цвет для сетки
+    oPainter.setPen(oGridPen);
 
-    for (int i = 0; i <= maxFinish; i += 10) {
+    for (int i = 0; i <= iMaxFinish; i += 10) {
         // Отрисовка вертикальных линий сетки
-        oPainter.drawLine(iLabelOffsetX + i * iScaleFactorX, iOffsetYJs, iLabelOffsetX + i * iScaleFactorX, iOffsetYJs + machineRowCount * iMachineHeight);
-        oPainter.drawLine(iLabelOffsetX + i * iScaleFactorX, iOffsetYMs, iLabelOffsetX + i * iScaleFactorX, iOffsetYMs + jobRowCount * iJobHeight);
+        oPainter.drawLine(iLabelOffsetX + i * iScaleFactorX, iOffsetYJs, iLabelOffsetX + i * iScaleFactorX, iOffsetYJs + fMachineRowCount * iMachineHeight);
+        oPainter.drawLine(iLabelOffsetX + i * iScaleFactorX, iOffsetYMs, iLabelOffsetX + i * iScaleFactorX, iOffsetYMs + fJobRowCount * iJobHeight);
 
         // Подписи по оси X
         oPainter.setPen(QPen(Qt::black, 1));  // Черный цвет для подписей
-        oPainter.drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYJs + machineRowCount * iMachineHeight + 20, QString::number(i));
-        oPainter.drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYMs + jobRowCount * iJobHeight + 20, QString::number(i));
-        oPainter.setPen(gridPen);  // Вернем прозрачный цвет для сетки
+        oPainter.drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYJs + fMachineRowCount * iMachineHeight + 20, QString::number(i));
+        oPainter.drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYMs + fJobRowCount * iJobHeight + 20, QString::number(i));
+        oPainter.setPen(oGridPen);  // Вернем прозрачный цвет для сетки
     }
 
     // Отрисовка горизонтальных линий сетки для машин
-    for (int i = 0; i < machineRowCount; ++i) {
-        int yPos = iOffsetYJs + (i + 0.5) * iMachineHeight;  // Смещение линии сетки
-        oPainter.drawLine(iLabelOffsetX, yPos, iScreenWidth - offset1, yPos);
+    for (int i = 0; i < fMachineRowCount; ++i) {
+        int iYPos = iOffsetYJs + (i + 0.5) * iMachineHeight;  // Смещение линии сетки
+        oPainter.drawLine(iLabelOffsetX, iYPos, iScreenWidth - iOffset1, iYPos);
         oPainter.setPen(QPen(Qt::black, 1));
 
         // Подписи для машин, располагаем с отступом от оси Y
-        oPainter.drawText(iLabelBoundX - oPainter.fontMetrics().horizontalAdvance(QString("Machine %1").arg(i + 1)), yPos + 5, QString("Machine %1").arg(i + 1));
+        oPainter.drawText(iLabelBoundX - oPainter.fontMetrics().horizontalAdvance(QString("Machine %1").arg(i + 1)), iYPos + 5, QString("Machine %1").arg(i + 1));
 
-        oPainter.setPen(gridPen);  // Вернем прозрачный цвет для сетки
+        oPainter.setPen(oGridPen);  // Вернем прозрачный цвет для сетки
     }
 
     // Отрисовка горизонтальных линий сетки для работ
-    for (int i = 0; i < jobRowCount; ++i) {
-        int yPos = iOffsetYMs + (i + 0.5) * iJobHeight;  // Смещение линии сетки
-        oPainter.drawLine(iLabelOffsetX, yPos, iScreenWidth - offset1, yPos);
+    for (int i = 0; i < fJobRowCount; ++i) {
+        int iYPos = iOffsetYMs + (i + 0.5) * iJobHeight;  // Смещение линии сетки
+        oPainter.drawLine(iLabelOffsetX, iYPos, iScreenWidth - iOffset1, iYPos);
         oPainter.setPen(QPen(Qt::black, 1));
 
         // Подписи для работ, располагаем с отступом от оси Y
-        oPainter.drawText(iLabelBoundX - oPainter.fontMetrics().horizontalAdvance(QString("Job %1").arg(i + 1)), yPos + 5, QString("Job %1").arg(i + 1));
-        oPainter.setPen(gridPen);  // Вернем прозрачный цвет для сетки
+        oPainter.drawText(iLabelBoundX - oPainter.fontMetrics().horizontalAdvance(QString("Job %1").arg(i + 1)), iYPos + 5, QString("Job %1").arg(i + 1));
+        oPainter.setPen(oGridPen);  // Вернем прозрачный цвет для сетки
     }
 
     // Устанавливаем шрифт для вертикальных подписей
-    QFont verticalFont = oPainter.font();
-    verticalFont.setPointSize(std::max(10, static_cast<int>(iScreenHeight * 0.02)));  // Масштабируем размер текста вертикальных подписей
-    oPainter.setFont(verticalFont);
+    QFont oVerticalFont = oPainter.font();
+    oVerticalFont.setPointSize(std::max(10, static_cast<int>(iScreenHeight * 0.02)));  // Масштабируем размер текста вертикальных подписей
+    oPainter.setFont(oVerticalFont);
 
     // Подпись для "Machines" слева от графика, с отступом от левого края экрана
     oPainter.save();
     // Рассчитываем высоту текста "Machines"
-    QFontMetrics machineMetrics(oPainter.font());
-    int machineTextHeight = machineMetrics.height();
+    QFontMetrics oMachineMetrics(oPainter.font());
+    int iMachineTextHeight = oMachineMetrics.height();
     // Рассчитываем центральное положение для подписи "Machines" относительно оси X и верхней границы графика,
     // сдвигая на половину высоты текста вниз
-    int machineCenterY = (iOffsetYJs + iOffsetYJs + machineRowCount * iMachineHeight) / 2 + machineTextHeight / 2;
-    oPainter.translate(offset1 - 10, machineCenterY);  // Центрируем по высоте графика
+    int iMachineCenterY = (iOffsetYJs + iOffsetYJs + fMachineRowCount * iMachineHeight) / 2 + iMachineTextHeight / 2;
+    oPainter.translate(iOffset1 - 10, iMachineCenterY);  // Центрируем по высоте графика
     oPainter.rotate(-90);  // Поворачиваем текст на 90 градусов против часовой стрелки
     oPainter.drawText(0, 0, "Machines");
     oPainter.restore();
@@ -201,23 +198,19 @@ void GanttChart::DrawGanttChart() {
     // Подпись для "Jobs" слева от графика, с отступом от левого края экрана
     oPainter.save();
     // Рассчитываем высоту текста "Jobs"
-    QFontMetrics jobMetrics(oPainter.font());
-    int jobTextHeight = jobMetrics.height();
+    QFontMetrics oJobMetrics(oPainter.font());
+    int iJobTextHeight = oJobMetrics.height();
     // Рассчитываем центральное положение для подписи "Jobs" относительно оси X и верхней границы графика,
     // сдвигая на половину высоты текста вниз
-    int jobCenterY = (iOffsetYMs + iOffsetYMs + jobRowCount * iJobHeight) / 2 + jobTextHeight / 2;
-    oPainter.translate(offset1 - 10, jobCenterY);  // Центрируем по высоте графика
+    int iJobCenterY = (iOffsetYMs + iOffsetYMs + fJobRowCount * iJobHeight) / 2 + iJobTextHeight / 2;
+    oPainter.translate(iOffset1 - 10, iJobCenterY);  // Центрируем по высоте графика
     oPainter.rotate(-90);  // Поворачиваем текст на 90 градусов против часовой стрелки
     oPainter.drawText(0, 0, "Jobs");
     oPainter.restore();
 
-
-
-
-
-
     update();
 }
+
 
 
 
