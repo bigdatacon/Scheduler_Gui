@@ -52,13 +52,19 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = ../GanttChart.cpp \
+SOURCES       = ../GanttChartLogic.cpp \
+		../GanttChartMainWindow.cpp \
+		../GanttChartWidget.cpp \
 		../JsonReader.cpp \
-		../main.cpp moc_GanttChart.cpp
-OBJECTS       = GanttChart.o \
+		../main.cpp moc_GanttChartMainWindow.cpp \
+		moc_GanttChartWidget.cpp
+OBJECTS       = GanttChartLogic.o \
+		GanttChartMainWindow.o \
+		GanttChartWidget.o \
 		JsonReader.o \
 		main.o \
-		moc_GanttChart.o
+		moc_GanttChartMainWindow.o \
+		moc_GanttChartWidget.o
 DIST          = ../.gitignore \
 		../operation_data.json \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -152,8 +158,12 @@ DIST          = ../.gitignore \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		../../gch_3.pro ../GanttChart.h \
-		../JsonReader.h ../GanttChart.cpp \
+		../../gch_3.pro ../GanttChartLogic.h \
+		../GanttChartMainWindow.h \
+		../GanttChartWidget.h \
+		../JsonReader.h ../GanttChartLogic.cpp \
+		../GanttChartMainWindow.cpp \
+		../GanttChartWidget.cpp \
 		../JsonReader.cpp \
 		../main.cpp
 QMAKE_TARGET  = gch_3
@@ -367,8 +377,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../GanttChart.h ../JsonReader.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../GanttChart.cpp ../JsonReader.cpp ../main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../GanttChartLogic.h ../GanttChartMainWindow.h ../GanttChartWidget.h ../JsonReader.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../GanttChartLogic.cpp ../GanttChartMainWindow.cpp ../GanttChartWidget.cpp ../JsonReader.cpp ../main.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -400,13 +410,21 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -g -std=gnu++1z -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_GanttChart.cpp
+compiler_moc_header_make_all: moc_GanttChartMainWindow.cpp moc_GanttChartWidget.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_GanttChart.cpp
-moc_GanttChart.cpp: ../GanttChart.h \
+	-$(DEL_FILE) moc_GanttChartMainWindow.cpp moc_GanttChartWidget.cpp
+moc_GanttChartMainWindow.cpp: ../GanttChartMainWindow.h \
+		../GanttChartWidget.h \
+		../GanttChartLogic.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/user1/gch_3/build_gch_3_Desktop_Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/user1/gch_3 -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../GanttChart.h -o moc_GanttChart.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/user1/gch_3/build_gch_3_Desktop_Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/user1/gch_3 -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../GanttChartMainWindow.h -o moc_GanttChartMainWindow.cpp
+
+moc_GanttChartWidget.cpp: ../GanttChartWidget.h \
+		../GanttChartLogic.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/user1/gch_3/build_gch_3_Desktop_Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/user1/gch_3 -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../GanttChartWidget.h -o moc_GanttChartWidget.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -424,19 +442,33 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 
 ####### Compile
 
-GanttChart.o: ../GanttChart.cpp ../GanttChart.h \
+GanttChartLogic.o: ../GanttChartLogic.cpp ../GanttChartLogic.h \
 		../JsonReader.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o GanttChart.o ../GanttChart.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o GanttChartLogic.o ../GanttChartLogic.cpp
+
+GanttChartMainWindow.o: ../GanttChartMainWindow.cpp ../GanttChartMainWindow.h \
+		../GanttChartWidget.h \
+		../GanttChartLogic.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o GanttChartMainWindow.o ../GanttChartMainWindow.cpp
+
+GanttChartWidget.o: ../GanttChartWidget.cpp ../GanttChartWidget.h \
+		../GanttChartLogic.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o GanttChartWidget.o ../GanttChartWidget.cpp
 
 JsonReader.o: ../JsonReader.cpp ../JsonReader.h \
-		../GanttChart.h
+		../GanttChartLogic.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o JsonReader.o ../JsonReader.cpp
 
-main.o: ../main.cpp ../GanttChart.h
+main.o: ../main.cpp ../GanttChartMainWindow.h \
+		../GanttChartWidget.h \
+		../GanttChartLogic.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../main.cpp
 
-moc_GanttChart.o: moc_GanttChart.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_GanttChart.o moc_GanttChart.cpp
+moc_GanttChartMainWindow.o: moc_GanttChartMainWindow.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_GanttChartMainWindow.o moc_GanttChartMainWindow.cpp
+
+moc_GanttChartWidget.o: moc_GanttChartWidget.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_GanttChartWidget.o moc_GanttChartWidget.cpp
 
 ####### Install
 
