@@ -4,7 +4,7 @@
 #include <QString>
 #include <vector>
 #include <nlohmann/json.hpp>
-#include "GanttChartLogic.h"
+#include "GanttChart.h"
 
 class JsonReader {
 public:

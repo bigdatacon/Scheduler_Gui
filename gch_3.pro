@@ -11,19 +11,19 @@ CONFIG += c++17
 # Указываем пути к файлам исходного кода
 SOURCES += \
 #    GanttChart.cpp \
-    GanttChartLogic.cpp \
-    GanttChartMainWindow.cpp \
+    GanttChart.cpp \
     GanttChartWidget.cpp \
     JsonReader.cpp \
+    MainWindow.cpp \
     main.cpp
 
 # Указываем пути к файлам заголовков
 HEADERS += \
 #    GanttChart.h \
-    GanttChartLogic.h \
-    GanttChartMainWindow.h \
+    GanttChart.h \
     GanttChartWidget.h \
-    JsonReader.h
+    JsonReader.h \
+    MainWindow.h
 
 # Если есть формы Qt Designer, включаем их здесь
 FORMS +=

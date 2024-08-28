@@ -1,8 +1,33 @@
 #include "GanttChartWidget.h"
+#include <QVBoxLayout>
+#include <QFileDialog>
 
 GanttChartWidget::GanttChartWidget(QWidget *pParent)
     : QWidget(pParent), m_iDraggedJob(-1), m_iDraggedMachine(-1), m_bJsMode(true) {
+    m_oLogic = new GanttChart();
     Initialize();
+
+    // Создаем тулбар и кнопку
+    m_pToolBar = new QToolBar(this);
+    m_pSolveButton = new QPushButton("Запустить солвер из файла", this);
+
+    // Добавляем кнопку на тулбар
+    m_pToolBar->addWidget(m_pSolveButton);
+
+    // Создаем вертикальный layout и добавляем тулбар и график в него
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);  // Убираем отступы
+    layout->addWidget(m_pToolBar);  // Тулбар наверху
+    layout->addStretch(1);  // Пространство для графика
+
+    setLayout(layout);  // Устанавливаем layout для виджета
+
+    // Подключаем сигнал нажатия кнопки к слоту
+    connect(m_pSolveButton, &QPushButton::clicked, this, &GanttChartWidget::OnSolveButtonClicked);
+}
+
+GanttChartWidget::~GanttChartWidget() {
+    delete m_oLogic;
 }
 
 void GanttChartWidget::Initialize() {
@@ -11,10 +36,20 @@ void GanttChartWidget::Initialize() {
     m_oChartImage.fill(Qt::white);
 }
 
+void GanttChartWidget::OnSolveButtonClicked() {
+    // Здесь можно поместить логику для запуска солвера из файла
+    QString filename = QFileDialog::getOpenFileName(this, "Выберите файл для солвера", "", "JSON Files (*.json);;All Files (*)");
+    if (!filename.isEmpty()) {
+        LoadJsonData(filename);
+    }
+}
+
 void GanttChartWidget::LoadJsonData(const QString &filename) {
-    m_oLogic.LoadJsonData(filename);
-    DrawGanttChart();  // Перерисовываем диаграмму при загрузке данных
-    update();
+    if (m_oLogic) {
+        m_oLogic->LoadJsonData(filename);
+        DrawGanttChart(); // Перерисовываем диаграмму при загрузке данных
+        update();
+    }
 }
 
 void GanttChartWidget::DrawGanttChart() {
@@ -28,7 +63,9 @@ void GanttChartWidget::DrawGanttChart() {
     }
 
     // Передаем размеры виджета в функцию DrawGanttChart
-    m_oLogic.DrawGanttChart(&oPainter, width(), height());
+    if (m_oLogic) {
+        m_oLogic->DrawGanttChart(&oPainter, width(), height());
+    }
 
     // Обновляем виджет
     update();  // Обновляем экран

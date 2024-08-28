@@ -1,10 +1,10 @@
 #include <QApplication>
-#include "GanttChartMainWindow.h"
+#include "MainWindow.h"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
-    GanttChartMainWindow mainWindow;
+    MainWindow mainWindow;
     mainWindow.LoadJsonData("../operation_data.json");
     mainWindow.show();
 
