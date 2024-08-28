@@ -9,6 +9,7 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent)
 
     // Создаем тулбар и кнопку
     m_pToolBar = new QToolBar(this);
+
     m_pSolveButton = new QPushButton("Запустить солвер из файла", this);
 
     // Добавляем кнопку на тулбар
@@ -17,7 +18,7 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent)
     // Создаем вертикальный layout и добавляем тулбар и график в него
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);  // Убираем отступы
-    layout->addWidget(m_pToolBar);  // Тулбар наверху
+    layout->addWidget(m_pToolBar, 0, Qt::AlignLeft);  // Тулбар наверху, выравниваем влево
     layout->addStretch(1);  // Пространство для графика
 
     setLayout(layout);  // Устанавливаем layout для виджета
@@ -25,6 +26,8 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent)
     // Подключаем сигнал нажатия кнопки к слоту
     connect(m_pSolveButton, &QPushButton::clicked, this, &GanttChartWidget::OnSolveButtonClicked);
 }
+
+
 
 GanttChartWidget::~GanttChartWidget() {
     delete m_oLogic;
@@ -71,22 +74,30 @@ void GanttChartWidget::DrawGanttChart() {
     update();  // Обновляем экран
 }
 
+
 void GanttChartWidget::paintEvent(QPaintEvent *event) {
-    // Создаем QPainter для работы с виджетом
     QPainter oPainter(this);
 
-    // Рисуем сохраненную диаграмму
-    oPainter.drawImage(0, 0, m_oChartImage);
+    // Рисуем сохраненную диаграмму с учетом тулбара
+    int toolbarHeight = m_pToolBar->height();
+    oPainter.drawImage(0, toolbarHeight, m_oChartImage);
 }
 
+
 void GanttChartWidget::resizeEvent(QResizeEvent *event) {
-    // Изменяем размер m_oChartImage при изменении размера виджета
-    m_oChartImage = QImage(event->size(), QImage::Format_ARGB32);
+    // Получаем высоту тулбара
+    int toolbarHeight = m_pToolBar->height();
+
+    // Изменяем размер m_oChartImage с учетом высоты тулбара
+    m_oChartImage = QImage(event->size().width(), event->size().height() - toolbarHeight, QImage::Format_ARGB32);
     m_oChartImage.fill(Qt::white);
 
     // Перерисовываем диаграмму
     DrawGanttChart();
 }
+
+
+
 
 void GanttChartWidget::mousePressEvent(QMouseEvent *event) {
     // Логика по кликам мыши и взаимодействию с диаграммой

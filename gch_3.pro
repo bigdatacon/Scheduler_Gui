@@ -31,7 +31,8 @@ FORMS +=
 # Указываем JSON-файл в разделе ресурсов
 DISTFILES += \
     .gitignore \
-    operation_data.json
+    operation_data.json \
+    operation_data_2.json
 
 # Пакеты и библиотеки, которые будут использоваться
 QT += core gui widgets
