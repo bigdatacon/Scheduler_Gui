@@ -67,6 +67,7 @@ OBJECTS       = GanttChart.o \
 		moc_MainWindow.o
 DIST          = ../.gitignore \
 		../operation_data.json \
+		../operation_data_2.json \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -442,8 +443,8 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 
 ####### Compile
 
-GanttChart.o: ../GanttChart.cpp ../JsonReader.h \
-		../GanttChart.h
+GanttChart.o: ../GanttChart.cpp ../GanttChart.h \
+		../JsonReader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o GanttChart.o ../GanttChart.cpp
 
 GanttChartWidget.o: ../GanttChartWidget.cpp ../GanttChartWidget.h \

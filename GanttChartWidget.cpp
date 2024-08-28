@@ -1,6 +1,8 @@
 #include "GanttChartWidget.h"
 #include <QVBoxLayout>
 #include <QFileDialog>
+#include <iostream>
+#include <QMessageBox>
 
 GanttChartWidget::GanttChartWidget(QWidget *pParent)
     : QWidget(pParent), m_iDraggedJob(-1), m_iDraggedMachine(-1), m_bJsMode(true) {
@@ -43,12 +45,19 @@ void GanttChartWidget::OnSolveButtonClicked() {
     // Здесь можно поместить логику для запуска солвера из файла
     QString filename = QFileDialog::getOpenFileName(this, "Выберите файл для солвера", "", "JSON Files (*.json);;All Files (*)");
     if (!filename.isEmpty()) {
+        // Показываем новое название файла
+        QMessageBox::information(this, "Файл выбран", "Вы выбрали файл: " + filename);
         LoadJsonData(filename);
     }
+    else {
+           // Показываем сообщение, что ничего не было выбрано
+           QMessageBox::warning(this, "Нет файла", "Ничего не получено");
+       }
 }
 
 void GanttChartWidget::LoadJsonData(const QString &filename) {
     if (m_oLogic) {
+        std::cout << "This file_name in LoadJsonData: " << filename.toStdString() << std::endl;
         m_oLogic->LoadJsonData(filename);
         DrawGanttChart(); // Перерисовываем диаграмму при загрузке данных
         update();
