@@ -22,6 +22,7 @@
 *.swp
 *~
 Thumbs.db
+build-gch_3-Desktop-Debug/
 
 # Разрешить исходные файлы и файлы настроек
 !*.cpp

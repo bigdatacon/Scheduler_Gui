@@ -14,6 +14,20 @@ struct SOperation {
     int iMachine;
 };
 
+struct SJobOperation {
+    int iStart;
+    int iFinish;
+    int iJob;
+    int iMachine;
+};
+
+struct SMachineOperation {
+    int iStart;
+    int iFinish;
+    int iJob;
+    int iMachine;
+};
+
 // Определение структуры Bar для хранения прямоугольников баров
 struct Bar {
     int iJob;
@@ -31,8 +45,14 @@ public:
 private:
     std::vector<SOperation> m_vJsOperations;
     std::vector<SOperation> m_vMsOperations;
+
+    std::vector<SJobOperation> m_vJsOperations_cont;
+    std::vector<SMachineOperation> m_vMsOperations_cont;
     std::unordered_map<int, QColor> m_umapJobColors;
     std::unordered_map<int, QColor> m_umapMachineColors;
+
+//    std::unordered_map<Bar, Bar> matching_up_down;
+//    std::unordered_map<Bar, Bar> matching_down_up;
 
     void InitializeColors();
 };

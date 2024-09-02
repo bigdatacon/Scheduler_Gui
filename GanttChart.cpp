@@ -4,7 +4,7 @@
 
 void GanttChart::LoadJsonData(const QString &sFilename) {
     JsonReader oReader;
-    oReader.ReadOperationsFromFile(sFilename, m_vJsOperations, m_vMsOperations);
+    oReader.ReadOperationsFromFile(sFilename, /*m_vJsOperations, m_vMsOperations*/ m_vJsOperations_cont, m_vMsOperations_cont);
     InitializeColors();
 }
 
@@ -14,7 +14,27 @@ void GanttChart::InitializeColors() {
     std::uniform_int_distribution<> dis(0, 255);
 
     // Уникальные цвета для js_operations
-    for (const auto &sOp : m_vJsOperations) {
+//    for (const auto &sOp : m_vJsOperations) {
+//        if (m_umapJobColors.find(sOp.iJob) == m_umapJobColors.end()) {
+//            m_umapJobColors[sOp.iJob] = QColor(dis(gen), dis(gen), dis(gen));
+//        }
+//        if (m_umapMachineColors.find(sOp.iMachine) == m_umapMachineColors.end()) {
+//            m_umapMachineColors[sOp.iMachine] = QColor(dis(gen), dis(gen), dis(gen));
+//        }
+//    }
+
+//    // Уникальные цвета для ms_operations
+//    for (const auto &sOp : m_vMsOperations) {
+//        if (m_umapJobColors.find(sOp.iJob) == m_umapJobColors.end()) {
+//            m_umapJobColors[sOp.iJob] = QColor(dis(gen), dis(gen), dis(gen));
+//        }
+//        if (m_umapMachineColors.find(sOp.iMachine) == m_umapMachineColors.end()) {
+//            m_umapMachineColors[sOp.iMachine] = QColor(dis(gen), dis(gen), dis(gen));
+//        }
+//    }
+
+    // Уникальные цвета для js_operations
+    for (const auto &sOp : m_vJsOperations_cont) {
         if (m_umapJobColors.find(sOp.iJob) == m_umapJobColors.end()) {
             m_umapJobColors[sOp.iJob] = QColor(dis(gen), dis(gen), dis(gen));
         }
@@ -24,7 +44,7 @@ void GanttChart::InitializeColors() {
     }
 
     // Уникальные цвета для ms_operations
-    for (const auto &sOp : m_vMsOperations) {
+    for (const auto &sOp : m_vMsOperations_cont) {
         if (m_umapJobColors.find(sOp.iJob) == m_umapJobColors.end()) {
             m_umapJobColors[sOp.iJob] = QColor(dis(gen), dis(gen), dis(gen));
         }
@@ -38,12 +58,23 @@ void GanttChart::InitializeColors() {
 void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight) {
     // Рассчитываем максимальное значение Finish для ограничения оси X
     int iMaxFinish = 0;
-    for (const auto &op : m_vJsOperations) {
+//    for (const auto &op : m_vJsOperations) {
+//        if (op.iFinish > iMaxFinish) {
+//            iMaxFinish = op.iFinish;
+//        }
+//    }
+//    for (const auto &op : m_vMsOperations) {
+//        if (op.iFinish > iMaxFinish) {
+//            iMaxFinish = op.iFinish;
+//        }
+//    }
+
+    for (const auto &op : m_vJsOperations_cont) {
         if (op.iFinish > iMaxFinish) {
             iMaxFinish = op.iFinish;
         }
     }
-    for (const auto &op : m_vMsOperations) {
+    for (const auto &op : m_vMsOperations_cont) {
         if (op.iFinish > iMaxFinish) {
             iMaxFinish = op.iFinish;
         }
@@ -55,16 +86,28 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     // Определение максимального значения machine для верхнего графика и job для нижнего графика
     int iMaxMachine = 0;
     int iMaxJob = 0;
-    for (const auto &op : m_vJsOperations) {
+//    for (const auto &op : m_vJsOperations) {
+//        if (op.iMachine > iMaxMachine) {
+//            iMaxMachine = op.iMachine;
+//        }
+//    }
+//    for (const auto &op : m_vMsOperations) {
+//        if (op.iJob > iMaxJob) {
+//            iMaxJob = op.iJob;
+//        }
+//    }
+
+    for (const auto &op : m_vJsOperations_cont) {
         if (op.iMachine > iMaxMachine) {
             iMaxMachine = op.iMachine;
         }
     }
-    for (const auto &op : m_vMsOperations) {
+    for (const auto &op : m_vMsOperations_cont) {
         if (op.iJob > iMaxJob) {
             iMaxJob = op.iJob;
         }
     }
+
 
     float fMachineRowCount = iMaxMachine + 2.0f;  // Количество строк для машин
     float fJobRowCount = iMaxJob + 2.0f;          // Количество строк для задач
@@ -156,8 +199,61 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     pPainter->drawText(0, 0, "Jobs");
     pPainter->restore();
 
+//    // Отрисовка баров для операций на графике машин (m_vJsOperations)
+//    for (const auto &sOp : m_vJsOperations) {
+//        int iBarStartX = iLabelOffsetX + sOp.iStart * iScaleFactorX;
+//        int iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
+//        int iBarCenterY = iOffsetYJs + (sOp.iMachine - 1) * iMachineHeight + iMachineHeight / 2;
+
+//        // Уменьшаем высоту бара до 50% от высоты строки машины
+//        QRect oMachineRect(iBarStartX, iBarCenterY - iMachineHeight * 0.25, iBarWidth, iMachineHeight * 0.5);
+
+//        // Уменьшаем ширину и отрисовываем бар
+//        pPainter->fillRect(oMachineRect, m_umapJobColors[sOp.iJob]);
+//        pPainter->setPen(QPen(Qt::black, 1));
+//        pPainter->drawRect(oMachineRect);
+
+
+//        // Устанавливаем шрифт на основе высоты окна
+//        int dynamicFontSize = std::max(8, static_cast<int>(iScreenHeight * 0.01));  // Размер шрифта пропорционален высоте окна
+//        QFont dynamicFont = pPainter->font();
+//        dynamicFont.setPointSize(dynamicFontSize);  // Привязываем размер шрифта к размеру окна
+//        pPainter->setFont(dynamicFont);
+
+
+
+//        // Отрисовка текста
+//        pPainter->drawText(oMachineRect, Qt::AlignCenter, QString("Job %1").arg(sOp.iJob));
+//    }
+
+//    // Отрисовка баров для операций на графике задач (m_vMsOperations)
+//    for (const auto &sOp : m_vMsOperations) {
+//        int iBarStartX = iLabelOffsetX + sOp.iStart * iScaleFactorX;
+//        int iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
+//        int iBarCenterY = iOffsetYMs + (sOp.iJob - 1) * iJobHeight + iJobHeight / 2;
+
+//        // Уменьшаем высоту бара до 50% от высоты строки задачи
+//        QRect oJobRect(iBarStartX, iBarCenterY - iJobHeight * 0.25, iBarWidth, iJobHeight * 0.5);
+
+//        // Уменьшаем ширину и отрисовываем бар
+//        pPainter->fillRect(oJobRect, m_umapMachineColors[sOp.iMachine]);
+//        pPainter->setPen(QPen(Qt::black, 1));
+//        pPainter->drawRect(oJobRect);
+
+//        // Устанавливаем шрифт на основе высоты окна
+//        int dynamicFontSize = std::max(8, static_cast<int>(iScreenHeight * 0.01));  // Размер шрифта пропорционален высоте окна
+//        QFont dynamicFont = pPainter->font();
+//        dynamicFont.setPointSize(dynamicFontSize);  // Привязываем размер шрифта к размеру окна
+//        pPainter->setFont(dynamicFont);
+
+
+//        // Отрисовка текста
+//        pPainter->drawText(oJobRect, Qt::AlignCenter, QString("Machine %1").arg(sOp.iMachine));
+//    }
+
+
     // Отрисовка баров для операций на графике машин (m_vJsOperations)
-    for (const auto &sOp : m_vJsOperations) {
+    for (const auto &sOp : m_vJsOperations_cont) {
         int iBarStartX = iLabelOffsetX + sOp.iStart * iScaleFactorX;
         int iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
         int iBarCenterY = iOffsetYJs + (sOp.iMachine - 1) * iMachineHeight + iMachineHeight / 2;
@@ -184,7 +280,7 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     }
 
     // Отрисовка баров для операций на графике задач (m_vMsOperations)
-    for (const auto &sOp : m_vMsOperations) {
+    for (const auto &sOp : m_vMsOperations_cont) {
         int iBarStartX = iLabelOffsetX + sOp.iStart * iScaleFactorX;
         int iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
         int iBarCenterY = iOffsetYMs + (sOp.iJob - 1) * iJobHeight + iJobHeight / 2;
