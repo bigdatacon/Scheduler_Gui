@@ -73,6 +73,16 @@
 
 //}
 
+
+QString JsonReader::getHigherPath(const QString &currentPath, int levelsUp) {
+    QDir dir(currentPath);
+    for (int i = 0; i < levelsUp; ++i) {
+        dir.cdUp(); // Поднимаемся на один уровень вверх
+    }
+    return dir.absolutePath(); // Получаем полный путь
+}
+
+
 void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJobOperation> &m_vJsOperations_cont, std::vector<SMachineOperation> &m_vMsOperations_cont/*std::vector<SOperation> &vJsOperations, std::vector<SOperation> &vMsOperations*/) {
 //    std::ifstream oFile(sFilename.toStdString());
 //    nlohmann::json oJson;
