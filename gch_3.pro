@@ -22,8 +22,13 @@ HEADERS += \
 #    GanttChart.h \
     GanttChart.h \
     GanttChartWidget.h \
+    InputData.h \
     JsonReader.h \
-    MainWindow.h
+    MainWindow.h \
+    OutputData.h
+#    \
+#    Solver.h
+
 
 # Если есть формы Qt Designer, включаем их здесь
 FORMS +=
@@ -36,6 +41,10 @@ DISTFILES += \
 
 # Пакеты и библиотеки, которые будут использоваться
 QT += core gui widgets
+
+# Подключаем динамическую библиотеку libsolver.so
+#LIBS += -L$$PWD/ -lsolver
+#LIBS += -L$$PWD/build_gch_3_Desktop_Debug/ -lsolver
 
 # Для работы с библиотекой nlohmann_json (если она подключена локально или установлена)
 #LIBS += -lnlohmann_json
