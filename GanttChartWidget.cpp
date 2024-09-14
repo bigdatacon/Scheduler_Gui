@@ -26,7 +26,8 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent)
     setLayout(layout);  // Устанавливаем layout для виджета
 
     // Подключаем сигнал нажатия кнопки к слоту
-    connect(m_pSolveButton, &QPushButton::clicked, this, &GanttChartWidget::OnSolveButtonClicked);
+//    connect(m_pSolveButton, &QPushButton::clicked, this, &GanttChartWidget::OnSolveButtonClicked);
+    connect(m_pSolveButton, &QPushButton::clicked, this, &GanttChartWidget::OnSolveButtonClicked_2);
 }
 
 
@@ -55,6 +56,14 @@ void GanttChartWidget::OnSolveButtonClicked() {
        }
 }
 
+
+void GanttChartWidget::OnSolveButtonClicked_2() {
+    QMessageBox::information(this, "Файл не выбран", "перерисовывю на структурах: " );
+    const QString filename;
+    LoadJsonData_2(filename);
+}
+
+
 void GanttChartWidget::LoadJsonData(const QString &filename) {
     if (m_oLogic) {
         std::cout << "This file_name in LoadJsonData: " << filename.toStdString() << std::endl;
@@ -64,7 +73,20 @@ void GanttChartWidget::LoadJsonData(const QString &filename) {
     }
 }
 
+void GanttChartWidget::LoadJsonData_2(const QString &filename) {
+    if (m_oLogic) {
+        std::cout << "This file_name in LoadJsonData: " << filename.toStdString() << std::endl;
+        m_oLogic->LoadJsonData_2(filename);
+        DrawGanttChart(); // Перерисовываем диаграмму при загрузке данных
+        update();
+    }
+}
+
 void GanttChartWidget::DrawGanttChart() {
+    // Перед изменением изображения и вызовом QPainter убедимся, что изображение чистое
+    m_oChartImage = QImage(size(), QImage::Format_ARGB32);  // Обновляем размеры изображения
+    m_oChartImage.fill(Qt::white);  // Очищаем изображение
+
     // Создаем QPainter для работы с m_oChartImage
     QPainter oPainter(&m_oChartImage);
 
@@ -79,7 +101,7 @@ void GanttChartWidget::DrawGanttChart() {
         m_oLogic->DrawGanttChart(&oPainter, width(), height());
     }
 
-    // Обновляем виджет
+    // Обновляем виджет для отображения
     update();  // Обновляем экран
 }
 

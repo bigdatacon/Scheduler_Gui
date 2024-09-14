@@ -17,6 +17,7 @@ public:
     GanttChartWidget(QWidget *pParent = nullptr);
     ~GanttChartWidget();
     void LoadJsonData(const QString &sFilename);
+    void LoadJsonData_2(const QString &sFilename);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -26,6 +27,7 @@ protected:
 
 private slots:
     void OnSolveButtonClicked();  // Обработчик для нажатия кнопки
+    void OnSolveButtonClicked_2();  // Обработчик для нажатия кнопки
 
 private:
     void Initialize();

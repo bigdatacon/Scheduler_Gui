@@ -40,6 +40,7 @@ struct Bar {
 class GanttChart {
 public:
     void LoadJsonData(const QString &sFilename);
+    void LoadJsonData_2(const QString &sFilename);
     void DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight);
 
 private:
