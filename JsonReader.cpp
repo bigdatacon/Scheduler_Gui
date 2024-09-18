@@ -182,7 +182,7 @@ void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJ
                 m_vMsOperations_cont.push_back(SMachineOperation{
                     op->startTime,
                     op->finishTime,
-                    op->jobIndex,
+                    op->jobIndex+1,
                     i + 1
                 });
             }
@@ -207,7 +207,7 @@ void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJ
                     op->startTime,
                     op->finishTime,
                     i + 1,
-                    op->machineIndex
+                    op->machineIndex+1
                 });
             }
         }

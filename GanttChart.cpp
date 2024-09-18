@@ -219,7 +219,7 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
         // Проверка на разницу времени и выбор формата подписи
         QString labelText;
         if ((sOp.iFinish - sOp.iStart) < 20) {
-            labelText = QString("M%1").arg(sOp.iMachine);  // Короткая подпись
+            labelText = QString("J%1").arg(sOp.iMachine);  // Короткая подпись
         } else {
             labelText = QString("Job %1").arg(sOp.iJob);  // Полная подпись
         }
@@ -251,7 +251,7 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
         // Проверка на разницу времени и выбор формата подписи
         QString labelText;
         if ((sOp.iFinish - sOp.iStart) < 20) {
-            labelText = QString("J%1").arg(sOp.iJob);  // Короткая подпись
+            labelText = QString("M%1").arg(sOp.iJob);  // Короткая подпись
         } else {
             labelText = QString("Machine %1").arg(sOp.iMachine);  // Полная подпись
         }
