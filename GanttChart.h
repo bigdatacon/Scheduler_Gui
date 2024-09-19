@@ -50,7 +50,7 @@ private:
     std::vector<SJobOperation> m_vJsOperations_cont;
     std::vector<SMachineOperation> m_vMsOperations_cont;
     std::unordered_map<int, QColor> m_umapJobColors;
-    std::unordered_map<int, QColor> m_umapMachineColors;
+//    std::unordered_map<int, QColor> m_umapMachineColors;
 
 //    std::unordered_map<Bar, Bar> matching_up_down;
 //    std::unordered_map<Bar, Bar> matching_down_up;
