@@ -16,13 +16,35 @@ void GanttChart::LoadJsonData_2(const QString &sFilename) {
     InitializeColors();
 }
 
+
 void GanttChart::InitializeColors() {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 255);
 
-    // Уникальные цвета для js_operations
-//    for (const auto &sOp : m_vJsOperations) {
+    // Очистка предыдущих цветов
+    m_umapJobColors.clear();
+    m_umapMachineColors.clear();
+
+    // Создание уникальных цветов для каждого job
+    for (const auto &sOp : m_vJsOperations_cont) {
+        if (m_umapJobColors.find(sOp.iJob) == m_umapJobColors.end()) {
+            m_umapJobColors[sOp.iJob] = QColor(dis(gen), dis(gen), dis(gen));
+        }
+    }
+
+}
+
+
+
+//void GanttChart::InitializeColors() {
+//    std::random_device rd;
+//    std::mt19937 gen(rd());
+//    std::uniform_int_distribution<> dis(0, 255);
+
+
+//    // Уникальные цвета для js_operations
+//    for (const auto &sOp : m_vJsOperations_cont) {
 //        if (m_umapJobColors.find(sOp.iJob) == m_umapJobColors.end()) {
 //            m_umapJobColors[sOp.iJob] = QColor(dis(gen), dis(gen), dis(gen));
 //        }
@@ -32,7 +54,7 @@ void GanttChart::InitializeColors() {
 //    }
 
 //    // Уникальные цвета для ms_operations
-//    for (const auto &sOp : m_vMsOperations) {
+//    for (const auto &sOp : m_vMsOperations_cont) {
 //        if (m_umapJobColors.find(sOp.iJob) == m_umapJobColors.end()) {
 //            m_umapJobColors[sOp.iJob] = QColor(dis(gen), dis(gen), dis(gen));
 //        }
@@ -40,27 +62,7 @@ void GanttChart::InitializeColors() {
 //            m_umapMachineColors[sOp.iMachine] = QColor(dis(gen), dis(gen), dis(gen));
 //        }
 //    }
-
-    // Уникальные цвета для js_operations
-    for (const auto &sOp : m_vJsOperations_cont) {
-        if (m_umapJobColors.find(sOp.iJob) == m_umapJobColors.end()) {
-            m_umapJobColors[sOp.iJob] = QColor(dis(gen), dis(gen), dis(gen));
-        }
-        if (m_umapMachineColors.find(sOp.iMachine) == m_umapMachineColors.end()) {
-            m_umapMachineColors[sOp.iMachine] = QColor(dis(gen), dis(gen), dis(gen));
-        }
-    }
-
-    // Уникальные цвета для ms_operations
-    for (const auto &sOp : m_vMsOperations_cont) {
-        if (m_umapJobColors.find(sOp.iJob) == m_umapJobColors.end()) {
-            m_umapJobColors[sOp.iJob] = QColor(dis(gen), dis(gen), dis(gen));
-        }
-        if (m_umapMachineColors.find(sOp.iMachine) == m_umapMachineColors.end()) {
-            m_umapMachineColors[sOp.iMachine] = QColor(dis(gen), dis(gen), dis(gen));
-        }
-    }
-}
+//}
 
 
 
@@ -218,11 +220,14 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
 
         // Проверка на разницу времени и выбор формата подписи
         QString labelText;
-        if ((sOp.iFinish - sOp.iStart) < 20) {
-            labelText = QString("J%1").arg(sOp.iMachine);  // Короткая подпись
-        } else {
-            labelText = QString("Job %1").arg(sOp.iJob);  // Полная подпись
-        }
+        labelText = QString("J %1").arg(sOp.iJob);  // Полная подпись
+
+
+//        if ((sOp.iFinish - sOp.iStart) < 20) {
+//            labelText = QString("J%1").arg(sOp.iMachine);  // Короткая подпись
+//        } else {
+//            labelText = QString("Job %1").arg(sOp.iJob);  // Полная подпись
+//        }
 
         // Отрисовка текста
         pPainter->drawText(oMachineRect, Qt::AlignCenter, labelText);
@@ -238,7 +243,8 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
         QRect oJobRect(iBarStartX, iBarCenterY - iJobHeight * 0.25, iBarWidth, iJobHeight * 0.5);
 
         // Уменьшаем ширину и отрисовываем бар
-        pPainter->fillRect(oJobRect, m_umapMachineColors[sOp.iMachine]);
+//        pPainter->fillRect(oJobRect, m_umapMachineColors[sOp.iMachine]);
+        pPainter->fillRect(oJobRect, m_umapJobColors[sOp.iJob]);
         pPainter->setPen(QPen(Qt::black, 1));
         pPainter->drawRect(oJobRect);
 
@@ -250,11 +256,12 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
 
         // Проверка на разницу времени и выбор формата подписи
         QString labelText;
-        if ((sOp.iFinish - sOp.iStart) < 20) {
-            labelText = QString("M%1").arg(sOp.iJob);  // Короткая подпись
-        } else {
-            labelText = QString("Machine %1").arg(sOp.iMachine);  // Полная подпись
-        }
+        labelText = QString("M %1").arg(sOp.iMachine);  // Полная подпись
+//        if ((sOp.iFinish - sOp.iStart) < 20) {
+//            labelText = QString("M%1").arg(sOp.iJob);  // Короткая подпись
+//        } else {
+//            labelText = QString("Machine %1").arg(sOp.iMachine);  // Полная подпись
+//        }
 
         // Отрисовка текста
         pPainter->drawText(oJobRect, Qt::AlignCenter, labelText);
