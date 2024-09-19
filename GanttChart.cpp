@@ -140,11 +140,18 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
 
 //    // Центрирование подписи "Время (мин)" между графиками
     int timeLabelX = iLabelOffsetX + (iScreenWidth - iLabelOffsetX) / 2 - iLabelWidth / 2;
-    int labelOffset = static_cast<int>(iScreenHeight * 0.03); // Отступ для "Время (мин)" пропорционально высоте экрана
+    int labelOffset = static_cast<int>(iScreenHeight * 0.04); // Отступ для "Время (мин)" пропорционально высоте экрана
 
     // Отрисовка подписей "Время (мин)" с учетом динамического отступа
     pPainter->drawText(timeLabelX, iOffsetYJs + fMachineRowCount * iMachineHeight + labelOffset, "Время (мин)");
     pPainter->drawText(timeLabelX, iOffsetYMs + fJobRowCount * iJobHeight + labelOffset, "Время (мин)");
+
+    int timeLabelYBottom =iOffsetYMs + fJobRowCount * iJobHeight + labelOffset;
+    // Убедимся, что подпись не заезжает на график
+    if (timeLabelYBottom > iScreenHeight - 10) { // Если подпись слишком низко, поднимаем выше
+        timeLabelYBottom = iScreenHeight - 10;
+        pPainter->drawText(timeLabelX, timeLabelYBottom, "Время (мин)");
+    }
 
     for (int i = 0; i <= iMaxFinish; i += 10) {
         pPainter->drawLine(iLabelOffsetX + i * iScaleFactorX, iOffsetYJs, iLabelOffsetX + i * iScaleFactorX, iOffsetYJs + fMachineRowCount * iMachineHeight);
@@ -152,8 +159,8 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
 
         pPainter->setPen(QPen(Qt::black, 1));
 //        pPainter->drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYJs + fMachineRowCount * iMachineHeight + iScreenHeight * 0.005, QString::number(i));
-        pPainter->drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYJs + fMachineRowCount * iMachineHeight +iScreenHeight * 0.005, QString::number(i));
-        pPainter->drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYMs + fJobRowCount * iJobHeight + iScreenHeight * 0.005 , QString::number(i));
+        pPainter->drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYJs + fMachineRowCount * iMachineHeight +iScreenHeight * 0.01, QString::number(i));
+        pPainter->drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYMs + fJobRowCount * iJobHeight + iScreenHeight * 0.01 , QString::number(i));
 //        pPainter->drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYJs + fMachineRowCount * iMachineHeight +20, QString::number(i));
 //        pPainter->drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYMs + fJobRowCount * iJobHeight + 20 , QString::number(i));
 
