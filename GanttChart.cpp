@@ -16,24 +16,65 @@ void GanttChart::LoadJsonData_2(const QString &sFilename) {
     InitializeColors();
 }
 
-
 void GanttChart::InitializeColors() {
+    // Очистка предыдущих цветов
+    m_umapJobColors.clear();
+
+    // Набор основных цветов, которые будут сильно отличаться друг от друга
+    std::vector<QColor> primaryColors = {
+        QColor(255, 0, 0),   // Красный
+        QColor(0, 255, 0),   // Зеленый
+        QColor(0, 0, 255),   // Синий
+        QColor(255, 255, 0), // Желтый
+        QColor(255, 0, 255), // Пурпурный
+        QColor(0, 255, 255), // Голубой
+        QColor(128, 0, 128), // Фиолетовый
+        QColor(255, 165, 0), // Оранжевый
+        QColor(0, 128, 0),   // Темно-зеленый
+        QColor(128, 128, 128)// Серый
+    };
+
+    // Счетчик для отслеживания, когда закончатся основные цвета
+    int primaryColorIndex = 0;
+
+    // Генератор для случайных полутонов
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 255);
 
-    // Очистка предыдущих цветов
-    m_umapJobColors.clear();
-//    m_umapMachineColors.clear();
-
     // Создание уникальных цветов для каждого job
     for (const auto &sOp : m_vJsOperations_cont) {
         if (m_umapJobColors.find(sOp.iJob) == m_umapJobColors.end()) {
-            m_umapJobColors[sOp.iJob] = QColor(dis(gen), dis(gen), dis(gen));
+            if (primaryColorIndex < primaryColors.size()) {
+                // Если основные цвета еще остались
+                m_umapJobColors[sOp.iJob] = primaryColors[primaryColorIndex];
+                primaryColorIndex++;
+            } else {
+                // Если основные цвета закончились, генерируем случайные полутона
+                m_umapJobColors[sOp.iJob] = QColor(dis(gen), dis(gen), dis(gen));
+            }
         }
     }
-
 }
+
+
+//void GanttChart::InitializeColors() {
+//    std::random_device rd;
+//    std::mt19937 gen(rd());
+//    std::uniform_int_distribution<> dis(0, 255);
+
+//    // Очистка предыдущих цветов
+//    m_umapJobColors.clear();
+////    m_umapMachineColors.clear();
+
+//    // Создание уникальных цветов для каждого job
+//    for (const auto &sOp : m_vJsOperations_cont) {
+//        if (m_umapJobColors.find(sOp.iJob) == m_umapJobColors.end()) {
+//            m_umapJobColors[sOp.iJob] = QColor(dis(gen), dis(gen), dis(gen));
+//        }
+//    }
+
+//}
 
 
 void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight) {
