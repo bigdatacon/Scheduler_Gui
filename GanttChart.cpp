@@ -125,7 +125,6 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     iMachineHeight = std::max(minBarHeight, std::min(maxBarHeight, iMachineHeight));
 
 
-
     int iOffsetYJs = std::max(static_cast<int>(iScreenHeight * 0.1), iMinTopOffset);
 //    int iOffsetYMs = iMachineHeight*2 + fMachineRowCount * iMachineHeight + std::max(static_cast<int>(iScreenHeight * 0.05), iMinTopOffset)+offsetToXAxisLabels;
     // Используем iMinBottomOffset для расчета позиции нижнего графика
@@ -137,7 +136,9 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     int iBottomOffset = static_cast<int>(iScreenHeight * 0.1); // 10% от нижнего края экрана
 
     // Подписи графиков
-    pPainter->setPen(QPen(Qt::black, 1));
+//    pPainter->setPen(QPen(Qt::black, 1));
+
+
 
     int midPointMachine = iLabelOffsetX + (iScreenWidth - iLabelOffsetX) / 2 - oMetrics.horizontalAdvance("Диаграмма по рабочим") / 2;
     int midPointJob = iLabelOffsetX + (iScreenWidth - iLabelOffsetX) / 2 - oMetrics.horizontalAdvance("Диаграмма по деталям") / 2;
@@ -147,15 +148,20 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     oFont.setPointSize(iFontSize);
     pPainter->setFont(oFont);
 
+    oFont.setBold(true); // Установка жирного шрифта
+    pPainter->setPen(QPen(Qt::black, 2)); // Жирный и черный контур текста
+    // Отрисовка заголовков графиков
+    pPainter->drawText(midPointMachine, iOffsetYJs - iScreenHeight * 0.01, "Диаграмма по рабочим");
+    pPainter->drawText(midPointJob, iOffsetYMs - iScreenHeight * 0.01, "Диаграмма по деталям");
+
+
     QPen oGridPen(QColor(0, 0, 0, 50));
     pPainter->setPen(oGridPen);
 
     qDebug() << "iOffsetYJs:" << iOffsetYJs << "iOffsetYMs:" << iOffsetYMs;
     qDebug() << "fMachineRowCount:" << fMachineRowCount << "fJobRowCount:" << fJobRowCount;
 
-    // Отрисовка заголовков графиков
-    pPainter->drawText(midPointMachine, iOffsetYJs - iScreenHeight * 0.01, "Диаграмма по рабочим");
-    pPainter->drawText(midPointJob, iOffsetYMs - iScreenHeight * 0.01, "Диаграмма по деталям");
+
 
 //    // Центрирование подписи "Время (мин)" между графиками
     int timeLabelX = iLabelOffsetX + (iScreenWidth - iLabelOffsetX) / 2 - iLabelWidth / 2;
@@ -210,27 +216,39 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
         pPainter->setPen(oGridPen);
     }
 
-    QFont oVerticalFont = pPainter->font();
+    int distance = iLabelWidth / 2;  // Например, 1/3 от ширины текста
+
+    QFont oVerticalFont;
+//    oVerticalFont.setBold(true); // Установка жирного шрифта
     oVerticalFont.setPointSize(std::max(10, static_cast<int>(iScreenHeight * 0.02)));
+
+    // Перерисовываем шрифт для "Рабочие"
     pPainter->setFont(oVerticalFont);
+    pPainter->setPen(QPen(Qt::black, 2)); // Жирный и черный контур текста
 
     pPainter->save();
     QFontMetrics oMachineMetrics(pPainter->font());
     int iMachineTextHeight = oMachineMetrics.height();
     int iMachineCenterY = (iOffsetYJs + iOffsetYJs + fMachineRowCount * iMachineHeight) / 2 + iMachineTextHeight / 2;
-    pPainter->translate(iOffset1 - 10, iMachineCenterY);
+//    pPainter->translate(iOffset1 - 10, iMachineCenterY);
+    pPainter->translate(iOffset1 + distance, iMachineCenterY);
     pPainter->rotate(-90);
     pPainter->drawText(0, 0, "Рабочие");
     pPainter->restore();
+
+    // Перерисовываем шрифт для "Детали"
+    pPainter->setFont(oVerticalFont);
 
     pPainter->save();
     QFontMetrics oJobMetrics(pPainter->font());
     int iJobTextHeight = oJobMetrics.height();
     int iJobCenterY = (iOffsetYMs + iOffsetYMs + fJobRowCount * iMachineHeight) / 2 + iJobTextHeight / 2;
-    pPainter->translate(iOffset1 - 10, iJobCenterY);
+//    pPainter->translate(iOffset1 - 10, iJobCenterY);
+    pPainter->translate(iOffset1 + distance, iJobCenterY);
     pPainter->rotate(-90);
     pPainter->drawText(0, 0, "Детали");
     pPainter->restore();
+
 
     // Отрисовка баров для операций на графике машин (m_vJsOperations)
     for (const auto &sOp : m_vJsOperations_cont) {
