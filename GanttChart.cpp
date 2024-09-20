@@ -99,8 +99,12 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     int offsetToTimeLabel = iScreenHeight * 0.03;    // Отступ от подписей значений по оси X до подписи "Время (мин)"
     int offsetToBottomEdge = iScreenHeight * 0.04;   // Отступ от подписи "Время (мин)" до нижнего края экрана или до подписи "Диаграмма по деталям"
 
+    // Вычисляем отступы в процентном соотношении от высоты экрана
+    int iMinTopOffset = static_cast<int>(iScreenHeight * 0.02);  // 2% от высоты экрана
+    int iMinBottomOffset = static_cast<int>(iScreenHeight * 0.05);  // 5% от высоты экрана
+
     // Расчет доступной высоты для графиков, учитывая новый отступ снизу
-    int availableHeight = iScreenHeight - iScreenHeight * 0.1 - offsetToBottomEdge*2 - offsetToTimeLabel-offsetToXAxisLabels ;
+    int availableHeight = iScreenHeight - iScreenHeight * 0.1 - offsetToBottomEdge*2 - offsetToTimeLabel-offsetToXAxisLabels -iMinBottomOffset;
 
 //    int iMachineHeight = availableHeight * 0.07;
 //    int iJobHeight = availableHeight * 0.07;
@@ -120,12 +124,12 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     // Корректируем высоту баров, чтобы она не выходила за установленные процентные пределы
     iMachineHeight = std::max(minBarHeight, std::min(maxBarHeight, iMachineHeight));
 
-    // Вычисляем отступы в процентном соотношении от высоты экрана
-    int iMinTopOffset = static_cast<int>(iScreenHeight * 0.02);  // 2% от высоты экрана
-    int iMinBottomOffset = static_cast<int>(iScreenHeight * 0.05);  // 5% от высоты экрана
+
 
     int iOffsetYJs = std::max(static_cast<int>(iScreenHeight * 0.1), iMinTopOffset);
-    int iOffsetYMs = iMachineHeight*2 + fMachineRowCount * iMachineHeight + std::max(static_cast<int>(iScreenHeight * 0.05), iMinTopOffset)+offsetToXAxisLabels;
+//    int iOffsetYMs = iMachineHeight*2 + fMachineRowCount * iMachineHeight + std::max(static_cast<int>(iScreenHeight * 0.05), iMinTopOffset)+offsetToXAxisLabels;
+    // Используем iMinBottomOffset для расчета позиции нижнего графика
+    int iOffsetYMs = iMachineHeight * 2 + fMachineRowCount * iMachineHeight + std::max(static_cast<int>(iScreenHeight * 0.05), iMinTopOffset) + offsetToXAxisLabels + iMinBottomOffset;
 
     // Расчет высоты, доступной для графиков, учитывая новый отступ снизу
     // Учет отступов для подписей
@@ -159,7 +163,20 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
 
     // Отрисовка подписей "Время (мин)" с учетом динамического отступа
     pPainter->drawText(timeLabelX, iOffsetYJs + fMachineRowCount * iMachineHeight + labelOffset, "Время (мин)");
-    pPainter->drawText(timeLabelX, iOffsetYMs + fJobRowCount * iMachineHeight + labelOffset, "Время (мин)");
+//    pPainter->drawText(timeLabelX, iOffsetYMs + fJobRowCount * iMachineHeight + labelOffset, "Время (мин)");
+
+
+    // Отрисовка подписей "Время (мин)" с учетом динамического отступа
+    int labelPositionY = iOffsetYMs + fJobRowCount * iMachineHeight + labelOffset;
+    int availableSpaceForLabel = iScreenHeight - labelPositionY;
+
+    // Проверяем, достаточно ли места для отступа снизу
+    if (availableSpaceForLabel < iMinBottomOffset) {
+        labelPositionY = iScreenHeight - iMinBottomOffset;  // Поднимаем подпись вверх, чтобы обеспечить отступ снизу
+    }
+
+    pPainter->drawText(timeLabelX, labelPositionY, "Время (мин)");
+
 
     int timeLabelYBottom =iOffsetYMs + fJobRowCount * iMachineHeight + labelOffset;
     // Убедимся, что подпись не заезжает на график
