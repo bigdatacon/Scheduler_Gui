@@ -14,11 +14,18 @@ struct SOperation {
     int iMachine;
 };
 
+//struct SJobOperation {
+//    int iStart;
+//    int iFinish;
+//    int iJob;
+//    int iMachine;
+//};
+
 struct SJobOperation {
     int iStart;
     int iFinish;
     int iJob;
-    int iMachine;
+    std::vector<int> vMachinesIndexes;
 };
 
 struct SMachineOperation {

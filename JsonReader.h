@@ -15,12 +15,20 @@ struct MSOperation
     int finishTime;
     int setupTime;
 };
+//struct JSOperation
+//{
+// int operationIndex;
+// int machineIndex;
+// int startTime;
+// int finishTime;
+//};
+
 struct JSOperation
 {
- int operationIndex;
- int machineIndex;
- int startTime;
- int finishTime;
+    std::vector<int> vMachinesIndexes;
+    int operationIndex;
+    int startTime;
+    int finishTime;
 };
 
 class JsonReader {
