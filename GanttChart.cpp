@@ -362,7 +362,6 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
 
 }
 
-
 void GanttChart::DrawWorkersTimeChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight) {
     if (!pPainter->isActive()) {
         qWarning("QPainter is not active");
@@ -376,45 +375,49 @@ void GanttChart::DrawWorkersTimeChart(QPainter *pPainter, int iScreenWidth, int 
     }
 
     // Определение максимального значения времени для масштабирования графика
-    int maxTime = 0;
-    for (auto time : workerTime.values()) {
-        if (time > maxTime) {
-            maxTime = time;
-        }
-    }
+    int maxTime = *std::max_element(workerTime.begin(), workerTime.end());
 
     if (maxTime == 0) {
         return; // Если нет данных, выход
     }
 
     int numWorkers = workerTime.size();
-    int barWidth = (iScreenWidth - 2 * (iScreenWidth * 0.05)) / numWorkers; // Расчет ширины бара
+    int barWidth = iScreenWidth / (numWorkers + 2); // Расчет ширины бара с учетом отступов
 
     // Масштабные коэффициенты и отступы, зависящие от размера экрана
-    int marginHorizontal = iScreenWidth * 0.05;
-    int marginVertical = iScreenHeight * 0.05;
-    int labelOffset = iScreenHeight * 0.02;
+    int marginHorizontal = iScreenWidth * 0.1;
+    int marginVertical = iScreenHeight * 0.1;
+    int labelOffset = iScreenHeight * 0.05;
 
     // Динамический размер шрифта
-    int fontSize = iScreenWidth * 0.015;
+    int fontSize = std::min(iScreenWidth, iScreenHeight) * 0.02;
     QFont font = pPainter->font();
     font.setPointSize(fontSize);
     pPainter->setFont(font);
 
-    int xAxisHeight = iScreenHeight * 0.1;
+    int xAxisHeight = iScreenHeight * 0.15;
     int graphTop = marginVertical + labelOffset;
-    int graphBottom = iScreenHeight - xAxisHeight - marginVertical;
+    int graphBottom = iScreenHeight - xAxisHeight;
     int graphHeight = graphBottom - graphTop;
 
     // Отрисовка осей
     pPainter->drawLine(marginHorizontal, graphTop, marginHorizontal, graphBottom); // Y axis
     pPainter->drawLine(marginHorizontal, graphBottom, iScreenWidth - marginHorizontal, graphBottom); // X axis
 
+    // Подпись графика сверху
+    pPainter->drawText(marginHorizontal, marginVertical / 2, iScreenWidth - 2 * marginHorizontal, labelOffset, Qt::AlignCenter, "Время по рабочим");
+
     // Подписи по оси Y (Время в минутах)
     for (int i = 0; i <= maxTime; i += (maxTime / 10)) {
         int y = graphBottom - (graphHeight * i / maxTime);
-        pPainter->drawText(0, y - 5, marginHorizontal - 10, 10, Qt::AlignRight, QString::number(i));
+        pPainter->drawText(0, y - fontSize / 2, marginHorizontal - 10, fontSize, Qt::AlignRight, QString::number(i));
     }
+
+    // Подпись "Время (мин)" слева от оси Y
+    pPainter->drawText(0, marginVertical, marginHorizontal - 10, labelOffset, Qt::AlignRight, "Время (мин)");
+
+    // Подпись "Номер рабочего" под осью X
+    pPainter->drawText(marginHorizontal, iScreenHeight - labelOffset, iScreenWidth - 2 * marginHorizontal, labelOffset, Qt::AlignCenter, "Номер рабочего");
 
     // Подписи и бары по оси X (Рабочие)
     int xPosition = marginHorizontal;
@@ -423,11 +426,78 @@ void GanttChart::DrawWorkersTimeChart(QPainter *pPainter, int iScreenWidth, int 
         int time = i.value();
         int barHeight = graphHeight * time / maxTime;
         QString label = QString("Р%1").arg(machineId);
-        pPainter->drawText(xPosition, graphBottom + 5, barWidth, labelOffset, Qt::AlignCenter, label);
+        pPainter->drawText(xPosition, graphBottom + labelOffset / 2, barWidth, labelOffset, Qt::AlignCenter, label);
         pPainter->fillRect(xPosition, graphBottom - barHeight, barWidth - 5, barHeight, Qt::blue);
         xPosition += barWidth;
     }
 }
+
+
+//void GanttChart::DrawWorkersTimeChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight) {
+//    if (!pPainter->isActive()) {
+//        qWarning("QPainter is not active");
+//        return;
+//    }
+
+//    // Собираем данные о времени работы каждого рабочего
+//    QMap<int, int> workerTime;
+//    for (const auto &op : m_vMsOperations_cont) {
+//        workerTime[op.iMachine] += (op.iFinish - op.iStart);
+//    }
+
+//    // Определение максимального значения времени для масштабирования графика
+//    int maxTime = 0;
+//    for (auto time : workerTime.values()) {
+//        if (time > maxTime) {
+//            maxTime = time;
+//        }
+//    }
+
+//    if (maxTime == 0) {
+//        return; // Если нет данных, выход
+//    }
+
+//    int numWorkers = workerTime.size();
+//    int barWidth = (iScreenWidth - 2 * (iScreenWidth * 0.05)) / numWorkers; // Расчет ширины бара
+
+//    // Масштабные коэффициенты и отступы, зависящие от размера экрана
+//    int marginHorizontal = iScreenWidth * 0.05;
+//    int marginVertical = iScreenHeight * 0.05;
+//    int labelOffset = iScreenHeight * 0.02;
+
+//    // Динамический размер шрифта
+//    int fontSize = iScreenWidth * 0.015;
+//    QFont font = pPainter->font();
+//    font.setPointSize(fontSize);
+//    pPainter->setFont(font);
+
+//    int xAxisHeight = iScreenHeight * 0.1;
+//    int graphTop = marginVertical + labelOffset;
+//    int graphBottom = iScreenHeight - xAxisHeight - marginVertical;
+//    int graphHeight = graphBottom - graphTop;
+
+//    // Отрисовка осей
+//    pPainter->drawLine(marginHorizontal, graphTop, marginHorizontal, graphBottom); // Y axis
+//    pPainter->drawLine(marginHorizontal, graphBottom, iScreenWidth - marginHorizontal, graphBottom); // X axis
+
+//    // Подписи по оси Y (Время в минутах)
+//    for (int i = 0; i <= maxTime; i += (maxTime / 10)) {
+//        int y = graphBottom - (graphHeight * i / maxTime);
+//        pPainter->drawText(0, y - 5, marginHorizontal - 10, 10, Qt::AlignRight, QString::number(i));
+//    }
+
+//    // Подписи и бары по оси X (Рабочие)
+//    int xPosition = marginHorizontal;
+//    for (auto i = workerTime.begin(); i != workerTime.end(); ++i) {
+//        int machineId = i.key();
+//        int time = i.value();
+//        int barHeight = graphHeight * time / maxTime;
+//        QString label = QString("Р%1").arg(machineId);
+//        pPainter->drawText(xPosition, graphBottom + 5, barWidth, labelOffset, Qt::AlignCenter, label);
+//        pPainter->fillRect(xPosition, graphBottom - barHeight, barWidth - 5, barHeight, Qt::blue);
+//        xPosition += barWidth;
+//    }
+//}
 
 
 
