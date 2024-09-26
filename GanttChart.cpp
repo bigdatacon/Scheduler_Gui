@@ -412,16 +412,6 @@ void GanttChart::DrawWorkersTimeChart(QPainter *pPainter, int iScreenWidth, int 
     // Подпись графика сверху
     pPainter->drawText(marginHorizontal, marginVertical / 2, iScreenWidth - 2 * marginHorizontal, labelOffset, Qt::AlignCenter, "Время по рабочим");
 
-//        int labelWidth = fontSize*3.2;  // Ширина области для текста
-//        int labelHeight = fontSize * 3.2;  // Высота области для текста, увеличенная для лучшего помещения
-//        int xOffset = margin - labelWidth;  // Смещение слева для текста
-//        for (int i = 0; i <= maxTime; i += (maxTime / 10)) {
-//            int y = graphBottom - (graphHeight * i / maxTime);
-//            int yOffset = y - labelHeight / 2;  // Центрирование текста по вертикали относительно линии графика
-//            pPainter->drawText(xOffset, yOffset, labelWidth, labelHeight, Qt::AlignRight, QString::number(i));
-//        }
-
-
     // Подписи по оси Y (Время в минутах)
     for (int i = 0; i <= maxTime; i += (maxTime / 10)) {
         int y = graphBottom - (graphHeight * i / maxTime);
@@ -429,7 +419,21 @@ void GanttChart::DrawWorkersTimeChart(QPainter *pPainter, int iScreenWidth, int 
     }
 
     // Подпись "Время (мин)" слева от оси Y
-    pPainter->drawText(0, marginVertical, marginHorizontal - 10, labelOffset, Qt::AlignRight, "Время (мин)");
+//    pPainter->drawText(0, marginVertical, marginHorizontal - 10, labelOffset, Qt::AlignRight, "Время (мин)");
+
+    // Поворачиваем текст "Время (мин)"
+    int textWidth = pPainter->fontMetrics().horizontalAdvance("Время (мин)");
+    int textHeight = fontSize;
+    pPainter->save();
+    // Вычисляем позицию для текста, так чтобы он был по центру и не съезжал за край экрана
+    int textVerticalPosition = (iScreenHeight / 2)+ textWidth/2;
+    int horizontalMargin = iScreenWidth * 0.01; // Небольшой отступ от края экрана, пропорциональный ширине
+
+    pPainter->translate(horizontalMargin, textVerticalPosition);
+    pPainter->rotate(-90);
+    pPainter->drawText(0, 0, textWidth, textHeight, Qt::AlignCenter, "Время (мин)");
+    pPainter->restore();
+
 
     // Подпись "Номер рабочего" под осью X
     pPainter->drawText(marginHorizontal, iScreenHeight - labelOffset, iScreenWidth - 2 * marginHorizontal, labelOffset, Qt::AlignCenter, "Номер рабочего");
@@ -447,64 +451,3 @@ void GanttChart::DrawWorkersTimeChart(QPainter *pPainter, int iScreenWidth, int 
     }
 }
 
-
-//void GanttChart::DrawWorkersTimeChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight) {
-//    if (!pPainter->isActive()) {
-//        qWarning("QPainter is not active");
-//        return;
-//    }
-
-//    QMap<int, int> workerTime;
-//    for (const auto &op : m_vMsOperations_cont) {
-//        workerTime[op.iMachine] += (op.iFinish - op.iStart);
-//    }
-
-//    int maxTime = *std::max_element(workerTime.begin(), workerTime.end());
-//    if (maxTime == 0) return;
-
-//    int numWorkers = workerTime.size();
-//    int margin = std::min(iScreenWidth, iScreenHeight) * 0.05; // Универсальный отступ
-//    int barWidth = (iScreenWidth - 2 * margin) / numWorkers;
-
-//    int fontSize = std::min(iScreenWidth, iScreenHeight) * 0.015;
-//    QFont font = pPainter->font();
-//    font.setPointSize(fontSize);
-//    pPainter->setFont(font);
-
-//    int xAxisHeight = iScreenHeight * 0.15;
-//    int graphTop = margin;
-//    int graphBottom = iScreenHeight - xAxisHeight;
-//    int graphHeight = graphBottom - graphTop;
-
-//    pPainter->drawLine(margin, graphTop, margin, graphBottom);
-//    pPainter->drawLine(margin, graphBottom, iScreenWidth - margin, graphBottom);
-
-//    int labelWidth = fontSize*3.2;  // Ширина области для текста
-//    int labelHeight = fontSize * 3.2;  // Высота области для текста, увеличенная для лучшего помещения
-//    int xOffset = margin - labelWidth;  // Смещение слева для текста
-//    for (int i = 0; i <= maxTime; i += (maxTime / 10)) {
-//        int y = graphBottom - (graphHeight * i / maxTime);
-//        int yOffset = y - labelHeight / 2;  // Центрирование текста по вертикали относительно линии графика
-//        pPainter->drawText(xOffset, yOffset, labelWidth, labelHeight, Qt::AlignRight, QString::number(i));
-//    }
-
-
-//    pPainter->save();
-//    pPainter->translate(10, graphTop + (graphBottom - graphTop) / 2);
-//    pPainter->rotate(-90);
-//    pPainter->drawText(0, 0, xAxisHeight, fontSize, Qt::AlignCenter, "Время (мин)");
-//    pPainter->restore();
-
-//    pPainter->drawText(margin, margin / 2, iScreenWidth - 2 * margin, fontSize, Qt::AlignCenter, "Время по рабочим");
-
-//    int xPosition = margin;
-//    for (auto i = workerTime.begin(); i != workerTime.end(); ++i) {
-//        int machineId = i.key();
-//        int time = i.value();
-//        int barHeight = graphHeight * time / maxTime;
-//        QString label = QString("Р%1").arg(machineId);
-//        pPainter->drawText(xPosition, graphBottom + 10, barWidth, fontSize, Qt::AlignCenter, label);
-//        pPainter->fillRect(xPosition, graphBottom - barHeight, barWidth - 5, barHeight, Qt::blue);
-//        xPosition += barWidth;
-//    }
-//}
