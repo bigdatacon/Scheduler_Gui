@@ -7,12 +7,12 @@
 #include <QColor>
 
 // Определение структуры SOperation для хранения операций
-struct SOperation {
-    int iStart;
-    int iFinish;
-    int iJob;
-    int iMachine;
-};
+//struct SOperation {
+//    int iStart;
+//    int iFinish;
+//    int iJob;
+//    int iMachine;
+//};
 
 //struct SJobOperation {
 //    int iStart;
@@ -51,8 +51,8 @@ public:
     void DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight);
 
 private:
-    std::vector<SOperation> m_vJsOperations;
-    std::vector<SOperation> m_vMsOperations;
+//    std::vector<SOperation> m_vJsOperations;
+//    std::vector<SOperation> m_vMsOperations;
 
     std::vector<SJobOperation> m_vJsOperations_cont;
     std::vector<SMachineOperation> m_vMsOperations_cont;

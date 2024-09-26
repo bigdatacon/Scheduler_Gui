@@ -223,29 +223,6 @@ void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJ
         }
     }
 
-//    // Сериализация данных для js_operations
-//    for (int i = 0; i < js_operations.size(); ++i) {
-//        // Проверяем, пустой ли вектор операций
-//        if (js_operations[i].empty()) {
-//            // Если вектор пуст, добавляем операцию с нулевыми значениями
-//            m_vJsOperations_cont.push_back(SJobOperation{
-//                0,      // Старт по умолчанию
-//                0,      // Финиш по умолчанию
-//                i + 1,  // Индекс работы (индекс +1)
-//                0       // Индекс машины по умолчанию
-//            });
-//        } else {
-//            // Если операции есть, обрабатываем их
-//            for (const auto& op : js_operations[i]) {
-//                m_vJsOperations_cont.push_back(SJobOperation{
-//                    op->startTime,
-//                    op->finishTime,
-//                    i + 1,
-//                    op->machineIndex
-//                });
-//            }
-//        }
-//    }
 
     // Сериализация данных для js_operations
     for (int i = 0; i < js_operations.size(); ++i) {
@@ -289,21 +266,7 @@ void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJ
 
     }
 
-//    std::cout << "Job Operations:\n";
 
-//    for (const auto& op : m_vJsOperations_cont) {
-
-//    std::cout << "Start: " << op.iStart
-
-//    << ", Finish: " << op.iFinish
-
-//    << ", Job: " << op.iJob
-
-//    << ", Machine: " << op.iMachine
-
-//    << '\n';
-
-//    }
 
     std::cout << "Job Operations:\n";
 

@@ -35,6 +35,12 @@ void GanttChart::InitializeColors() {
         QColor(128, 128, 128)// Серый
     };
 
+    // Уменьшение яркости основных цветов на 10%
+    for (auto &color : primaryColors) {
+        color = color.darker(130);  // 110% от исходной яркости, уменьшение на 10%
+        color.setAlpha(154);        // Установить прозрачность на уровне 80% (204 из 255)
+
+    }
     // Счетчик для отслеживания, когда закончатся основные цвета
     int primaryColorIndex = 0;
 
