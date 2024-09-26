@@ -51,6 +51,7 @@ public:
     void DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight);
     void DrawWorkersTimeChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight);
 
+
 private:
 //    std::vector<SOperation> m_vJsOperations;
 //    std::vector<SOperation> m_vMsOperations;

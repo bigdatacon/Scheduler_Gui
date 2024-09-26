@@ -30,7 +30,9 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent)
 
     // Подключаем сигнал нажатия кнопки к слоту
     connect(m_pSolveButton, &QPushButton::clicked, this, &GanttChartWidget::OnSolveButtonClicked_2);
+    connect(m_pShowTimeButton, &QPushButton::clicked, this, &GanttChartWidget::onWorkersTimeButtonClicked);
     connect(m_pShowTimeButton, &QPushButton::clicked, this, &GanttChartWidget::DrawWorkersTimeChart); // Подключаем сигнал к слоту
+
 
 }
 
@@ -108,44 +110,116 @@ void GanttChartWidget::DrawGanttChart() {
     update();  // Обновляем экран
 }
 
-void GanttChartWidget::DrawWorkersTimeChart() {
-    // Подготавливаем изображение
-    m_oChartImage = QImage(size(), QImage::Format_ARGB32);
-    m_oChartImage.fill(Qt::white);
-    QPainter oPainter(&m_oChartImage);
+//void GanttChartWidget::DrawWorkersTimeChart() {
+//    // Подготавливаем изображение
+//    m_oChartImage = QImage(size(), QImage::Format_ARGB32);
+//    m_oChartImage.fill(Qt::white);
+//    QPainter oPainter(&m_oChartImage);
 
-    if (!oPainter.isActive()) {
-        qWarning("QPainter on m_oChartImage is not active");
+//    if (!oPainter.isActive()) {
+//        qWarning("QPainter on m_oChartImage is not active");
+//        return;
+//    }
+
+//    if (m_pGanttChart) {
+//        m_pGanttChart->DrawWorkersTimeChart(&oPainter, width(), height());
+//    }
+
+//    update(); // Обновляем виджет для отображения
+//}
+
+void GanttChartWidget::DrawWorkersTimeChart() {
+    QPainter painter(&m_oWorkersImage);
+    if (!painter.isActive()) {
+        qWarning("QPainter on m_oWorkersImage is not active");
         return;
     }
 
     if (m_pGanttChart) {
-        m_pGanttChart->DrawWorkersTimeChart(&oPainter, width(), height());
+        m_pGanttChart->DrawWorkersTimeChart(&painter, m_oWorkersImage.width(), m_oWorkersImage.height());
     }
 
-    update(); // Обновляем виджет для отображения
+    update();
 }
 
+//void GanttChartWidget::paintEvent(QPaintEvent *event) {
+//    QPainter oPainter(this);
+
+//    // Рисуем сохраненную диаграмму с учетом тулбара
+//    int toolbarHeight = m_pToolBar->height();
+//    oPainter.drawImage(0, toolbarHeight, m_oChartImage);
+//}
 
 void GanttChartWidget::paintEvent(QPaintEvent *event) {
     QPainter oPainter(this);
 
     // Рисуем сохраненную диаграмму с учетом тулбара
     int toolbarHeight = m_pToolBar->height();
-    oPainter.drawImage(0, toolbarHeight, m_oChartImage);
+
+    if (m_bDisplayingWorkersTimeChart) {
+        oPainter.drawImage(0, toolbarHeight, m_oWorkersImage);  // Отрисовываем workers chart
+    } else {
+        oPainter.drawImage(0, toolbarHeight, m_oChartImage);  // Отрисовываем Gantt chart
+    }
 }
 
 
+
+//void GanttChartWidget::resizeEvent(QResizeEvent *event) {
+//    // Получаем высоту тулбара
+//    int toolbarHeight = m_pToolBar->height();
+
+//    // Изменяем размер m_oChartImage с учетом высоты тулбара
+//    m_oChartImage = QImage(event->size().width(), event->size().height() - toolbarHeight, QImage::Format_ARGB32);
+//    m_oChartImage.fill(Qt::white);
+
+//    // Перерисовываем диаграмму
+//    DrawGanttChart();
+//}
+
+//void GanttChartWidget::resizeEvent(QResizeEvent *event) {
+//    int toolbarHeight = m_pToolBar->height();
+//    QImage &targetImage = m_bDisplayingWorkersTimeChart ? m_oWorkersImage : m_oChartImage;
+//    targetImage = QImage(event->size().width(), event->size().height() - toolbarHeight, QImage::Format_ARGB32);
+//    targetImage.fill(Qt::white);
+
+//    if (m_bDisplayingWorkersTimeChart) {
+//        DrawWorkersTimeChart();
+//    } else {
+//        DrawGanttChart();
+//    }
+
+//    update();
+//}
+
 void GanttChartWidget::resizeEvent(QResizeEvent *event) {
-    // Получаем высоту тулбара
     int toolbarHeight = m_pToolBar->height();
 
-    // Изменяем размер m_oChartImage с учетом высоты тулбара
+    // Обновляем размеры изображений для графиков
     m_oChartImage = QImage(event->size().width(), event->size().height() - toolbarHeight, QImage::Format_ARGB32);
+    m_oWorkersImage = QImage(event->size().width(), event->size().height() - toolbarHeight, QImage::Format_ARGB32);
     m_oChartImage.fill(Qt::white);
+    m_oWorkersImage.fill(Qt::white);
 
-    // Перерисовываем диаграмму
-    DrawGanttChart();
+    // Отрисовываем активный график
+    if (m_bDisplayingWorkersTimeChart) {
+        DrawWorkersTimeChart();
+    } else {
+        DrawGanttChart();
+    }
+}
+
+
+
+
+void GanttChartWidget::onWorkersTimeButtonClicked() {
+    m_bDisplayingWorkersTimeChart = !m_bDisplayingWorkersTimeChart;
+    updateChart();
+}
+
+// Update the chart based on the current display flag
+void GanttChartWidget::updateChart() {
+    resizeEvent(new QResizeEvent(size(), size()));
 }
 
 
