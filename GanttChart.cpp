@@ -65,26 +65,6 @@ void GanttChart::InitializeColors() {
     }
 }
 
-
-//void GanttChart::InitializeColors() {
-//    std::random_device rd;
-//    std::mt19937 gen(rd());
-//    std::uniform_int_distribution<> dis(0, 255);
-
-//    // Очистка предыдущих цветов
-//    m_umapJobColors.clear();
-////    m_umapMachineColors.clear();
-
-//    // Создание уникальных цветов для каждого job
-//    for (const auto &sOp : m_vJsOperations_cont) {
-//        if (m_umapJobColors.find(sOp.iJob) == m_umapJobColors.end()) {
-//            m_umapJobColors[sOp.iJob] = QColor(dis(gen), dis(gen), dis(gen));
-//        }
-//    }
-
-//}
-
-
 void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight) {
     // Рассчитываем максимальное значение Finish для ограничения оси X
     int iMaxFinish = 0;

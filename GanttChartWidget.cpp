@@ -110,24 +110,6 @@ void GanttChartWidget::DrawGanttChart() {
     update();  // Обновляем экран
 }
 
-//void GanttChartWidget::DrawWorkersTimeChart() {
-//    // Подготавливаем изображение
-//    m_oChartImage = QImage(size(), QImage::Format_ARGB32);
-//    m_oChartImage.fill(Qt::white);
-//    QPainter oPainter(&m_oChartImage);
-
-//    if (!oPainter.isActive()) {
-//        qWarning("QPainter on m_oChartImage is not active");
-//        return;
-//    }
-
-//    if (m_pGanttChart) {
-//        m_pGanttChart->DrawWorkersTimeChart(&oPainter, width(), height());
-//    }
-
-//    update(); // Обновляем виджет для отображения
-//}
-
 void GanttChartWidget::DrawWorkersTimeChart() {
     QPainter painter(&m_oWorkersImage);
     if (!painter.isActive()) {
@@ -142,13 +124,6 @@ void GanttChartWidget::DrawWorkersTimeChart() {
     update();
 }
 
-//void GanttChartWidget::paintEvent(QPaintEvent *event) {
-//    QPainter oPainter(this);
-
-//    // Рисуем сохраненную диаграмму с учетом тулбара
-//    int toolbarHeight = m_pToolBar->height();
-//    oPainter.drawImage(0, toolbarHeight, m_oChartImage);
-//}
 
 void GanttChartWidget::paintEvent(QPaintEvent *event) {
     QPainter oPainter(this);
@@ -164,33 +139,6 @@ void GanttChartWidget::paintEvent(QPaintEvent *event) {
 }
 
 
-
-//void GanttChartWidget::resizeEvent(QResizeEvent *event) {
-//    // Получаем высоту тулбара
-//    int toolbarHeight = m_pToolBar->height();
-
-//    // Изменяем размер m_oChartImage с учетом высоты тулбара
-//    m_oChartImage = QImage(event->size().width(), event->size().height() - toolbarHeight, QImage::Format_ARGB32);
-//    m_oChartImage.fill(Qt::white);
-
-//    // Перерисовываем диаграмму
-//    DrawGanttChart();
-//}
-
-//void GanttChartWidget::resizeEvent(QResizeEvent *event) {
-//    int toolbarHeight = m_pToolBar->height();
-//    QImage &targetImage = m_bDisplayingWorkersTimeChart ? m_oWorkersImage : m_oChartImage;
-//    targetImage = QImage(event->size().width(), event->size().height() - toolbarHeight, QImage::Format_ARGB32);
-//    targetImage.fill(Qt::white);
-
-//    if (m_bDisplayingWorkersTimeChart) {
-//        DrawWorkersTimeChart();
-//    } else {
-//        DrawGanttChart();
-//    }
-
-//    update();
-//}
 
 void GanttChartWidget::resizeEvent(QResizeEvent *event) {
     int toolbarHeight = m_pToolBar->height();
