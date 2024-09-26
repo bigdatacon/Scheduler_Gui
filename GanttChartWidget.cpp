@@ -6,16 +6,19 @@
 
 GanttChartWidget::GanttChartWidget(QWidget *pParent)
     : QWidget(pParent), m_iDraggedJob(-1), m_iDraggedMachine(-1), m_bJsMode(true) {
-    m_oLogic = new GanttChart();
+    m_pGanttChart = new GanttChart();
     Initialize();
 
-    // Создаем тулбар и кнопку
+    // Создаем тулбар и кнопки
     m_pToolBar = new QToolBar(this);
-
+    //кнопка Запустить солвер из файл
     m_pSolveButton = new QPushButton("Запустить солвер из файла", this);
+    // кнопка для отображения времени по рабочим
+    m_pShowTimeButton = new QPushButton("Отобразить время по рабочим", this);
 
-    // Добавляем кнопку на тулбар
+    // Добавляем кнопки на тулбар
     m_pToolBar->addWidget(m_pSolveButton);
+    m_pToolBar->addWidget(m_pShowTimeButton);
 
     // Создаем вертикальный layout и добавляем тулбар и график в него
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -26,14 +29,14 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent)
     setLayout(layout);  // Устанавливаем layout для виджета
 
     // Подключаем сигнал нажатия кнопки к слоту
-//    connect(m_pSolveButton, &QPushButton::clicked, this, &GanttChartWidget::OnSolveButtonClicked);
     connect(m_pSolveButton, &QPushButton::clicked, this, &GanttChartWidget::OnSolveButtonClicked_2);
+    connect(m_pShowTimeButton, &QPushButton::clicked, this, &GanttChartWidget::DrawWorkersTimeChart); // Подключаем сигнал к слоту
+
 }
 
 
-
 GanttChartWidget::~GanttChartWidget() {
-    delete m_oLogic;
+    delete m_pGanttChart;
 }
 
 void GanttChartWidget::Initialize() {
@@ -65,18 +68,18 @@ void GanttChartWidget::OnSolveButtonClicked_2() {
 
 
 void GanttChartWidget::LoadJsonData(const QString &filename) {
-    if (m_oLogic) {
+    if (m_pGanttChart) {
         std::cout << "This file_name in LoadJsonData: " << filename.toStdString() << std::endl;
-        m_oLogic->LoadJsonData(filename);
+        m_pGanttChart->LoadJsonData(filename);
         DrawGanttChart(); // Перерисовываем диаграмму при загрузке данных
         update();
     }
 }
 
 void GanttChartWidget::LoadJsonData_2(const QString &filename) {
-    if (m_oLogic) {
+    if (m_pGanttChart) {
         std::cout << "This file_name in LoadJsonData: " << filename.toStdString() << std::endl;
-        m_oLogic->LoadJsonData_2(filename);
+        m_pGanttChart->LoadJsonData_2(filename);
         DrawGanttChart(); // Перерисовываем диаграмму при загрузке данных
         update();
     }
@@ -97,12 +100,30 @@ void GanttChartWidget::DrawGanttChart() {
     }
 
     // Передаем размеры виджета в функцию DrawGanttChart
-    if (m_oLogic) {
-        m_oLogic->DrawGanttChart(&oPainter, width(), height());
+    if (m_pGanttChart) {
+        m_pGanttChart->DrawGanttChart(&oPainter, width(), height());
     }
 
     // Обновляем виджет для отображения
     update();  // Обновляем экран
+}
+
+void GanttChartWidget::DrawWorkersTimeChart() {
+    // Подготавливаем изображение
+    m_oChartImage = QImage(size(), QImage::Format_ARGB32);
+    m_oChartImage.fill(Qt::white);
+    QPainter oPainter(&m_oChartImage);
+
+    if (!oPainter.isActive()) {
+        qWarning("QPainter on m_oChartImage is not active");
+        return;
+    }
+
+    if (m_pGanttChart) {
+        m_pGanttChart->DrawWorkersTimeChart(&oPainter, width(), height());
+    }
+
+    update(); // Обновляем виджет для отображения
 }
 
 

@@ -49,6 +49,7 @@ public:
     void LoadJsonData(const QString &sFilename);
     void LoadJsonData_2(const QString &sFilename);
     void DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight);
+    void DrawWorkersTimeChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight);
 
 private:
 //    std::vector<SOperation> m_vJsOperations;

@@ -32,9 +32,10 @@ private slots:
 private:
     void Initialize();
     void DrawGanttChart();
+    void DrawWorkersTimeChart();
     void UpdateBar(int iJob, int iMachine, int iNewStart, int iNewJob);
 
-    GanttChart* m_oLogic;
+    GanttChart* m_pGanttChart;
     QImage m_oChartImage;
     QPoint m_qDragStartPosition;
     int m_iDraggedJob;
@@ -43,6 +44,7 @@ private:
 
     QToolBar* m_pToolBar;  // Добавляем тулбар
     QPushButton* m_pSolveButton;  // Кнопка для запуска солвера
+    QPushButton* m_pShowTimeButton; // кнопка отображения времени по рабочим
 
 };
 

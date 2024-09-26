@@ -31,7 +31,9 @@ HEADERS += \
 
 
 # Если есть формы Qt Designer, включаем их здесь
-FORMS +=
+#FORMS +=
+FORMS += mainwindow.ui
+
 
 # Указываем JSON-файл в разделе ресурсов
 DISTFILES += \
