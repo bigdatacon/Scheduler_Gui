@@ -193,12 +193,13 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     // Корректируем высоту баров, чтобы она не выходила за установленные процентные пределы
     iMachineHeight = std::max(minBarHeight, std::min(maxBarHeight, iMachineHeight));
 
-    int iOffsetYJs = offsetFromVertical;
-    int iOffsetYMs = iMachineHeight * 2 + fMachineRowCount * iMachineHeight + offsetFromVertical*2 ;
+    int iOffsetYJs =  offsetFromVertical*2  ;
+    int iOffsetYMs = iMachineHeight * 2 + fMachineRowCount * iMachineHeight + offsetFromVertical*2 + offsetFromVertical*0.5;
 
     // Подписи графиков
     QFontMetrics oMetrics(pPainter->font());
     int midPointMachine = offsetFromSide + (iScreenWidth - offsetFromSide) / 2 - oMetrics.horizontalAdvance("Диаграмма по рабочим") / 2;
+    int midPointMachineDuration = offsetFromSide + (iScreenWidth - offsetFromSide) / 2 - oMetrics.horizontalAdvance("Длительность") / 2;
     int midPointJob = offsetFromSide + (iScreenWidth - offsetFromSide) / 2 -  oMetrics.horizontalAdvance("Диаграмма по деталям") / 2;
 
     // Устанавливаем шрифт и перо для заголовков
@@ -206,13 +207,14 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     pPainter->setPen(axisPen);
 
     // Отрисовка заголовков графиков
-    pPainter->drawText(midPointMachine, iOffsetYJs - iScreenHeight * 0.01, "Диаграмма по рабочим");
+    pPainter->drawText(midPointMachine, iOffsetYJs- offsetFromVertical, "Диаграмма по рабочим");
     pPainter->drawText(midPointJob, iOffsetYMs - iScreenHeight * 0.01, "Диаграмма по деталям");
 
     // Устанавливаю шрифт  для время мин
     pPainter->setFont(axisLabelFont);
     pPainter->setPen(timeLabelPen);
 
+    pPainter->drawText(midPointMachineDuration, iOffsetYJs - offsetFromVertical*0.5, "Длительность:");
     qDebug() << "iOffsetYJs:" << iOffsetYJs << "iOffsetYMs:" << iOffsetYMs;
     qDebug() << "fMachineRowCount:" << fMachineRowCount << "fJobRowCount:" << fJobRowCount;
 
