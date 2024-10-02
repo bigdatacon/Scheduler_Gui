@@ -104,7 +104,42 @@ std::tuple<int, int, int> GanttChart::calculateMaxValues() {
     return std::make_tuple(iMaxFinish, iMaxMachine, iMaxJob);
 }
 
+
 void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight) {
+    // -------------------------- ОПРЕДЕЛЕНИЕ ШРИФТОВ И ПЁР ----------------------------
+    QFont titleFont;
+    QFont axisLabelFont;
+    QFont dynamicFont;
+    QFont verticalFont;
+
+    int iFontSize = std::max(8, static_cast<int>(iScreenHeight * 0.015));
+
+    // Шрифт для заголовков
+    titleFont.setPointSize(std::max(10, static_cast<int>(iScreenHeight * 0.02)));
+    titleFont.setBold(true);
+
+    // Шрифт для подписей на осях (рабочие/детали)
+    verticalFont.setPointSize(std::max(10, static_cast<int>(iScreenHeight * 0.02)));
+
+    // Шрифт для динамических подписей (на барах)
+    dynamicFont.setPointSize(std::max(8, static_cast<int>(iScreenHeight * 0.01)));
+
+    // Шрифт для подписей осей (цифры)
+    axisLabelFont.setPointSize(iFontSize);
+
+    // Определение перьев для сетки и осей
+    QPen axisPen(Qt::black, 2);    // Для осей и заголовков
+    QPen gridPen(QColor(0, 0, 0, 50));  // Для сетки
+    QPen textPen(Qt::black, 1);    // Для текста
+
+    // Перо для "Время (мин)" (чуть прозрачное и жирное)
+    QPen timeLabelPen(QColor(0, 0, 0, 150));  // Черный с прозрачностью 150
+    timeLabelPen.setWidth(1);                 // Толщина линии
+    timeLabelPen.setStyle(Qt::SolidLine);      // Сплошная линия
+    timeLabelPen.setCapStyle(Qt::SquareCap);   // Стиль линий
+
+    //--------------------------------------------------------------------------//
+
     auto [iMaxFinish_f, iMaxMachine, iMaxJob] = calculateMaxValues();
     int iMaxFinish = iMaxFinish_f;
     int fMachineRowCount = iMaxMachine ;  // Количество строк для машин
@@ -114,9 +149,7 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     QImage m_oChartImage = QImage(iScreenWidth, iScreenHeight, QImage::Format_ARGB32);
     m_oChartImage.fill(Qt::white);
 
-    pPainter->setPen(QPen(Qt::black, 2));
     QFontMetrics oMetrics(pPainter->font());
-//    int iLabelWidth = oMetrics.horizontalAdvance("Рабочие 10000");
     int iLabelWidth = oMetrics.horizontalAdvance("Рабочие");
     int iLabelWidthWithPadding = static_cast<int>(iLabelWidth * 1.2);
 
@@ -158,40 +191,24 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     // Корректируем высоту баров, чтобы она не выходила за установленные процентные пределы
     iMachineHeight = std::max(minBarHeight, std::min(maxBarHeight, iMachineHeight));
 
-
     int iOffsetYJs = std::max(static_cast<int>(iScreenHeight * 0.1), iMinTopOffset);
-//    int iOffsetYMs = iMachineHeight*2 + fMachineRowCount * iMachineHeight + std::max(static_cast<int>(iScreenHeight * 0.05), iMinTopOffset)+offsetToXAxisLabels;
-    // Используем iMinBottomOffset для расчета позиции нижнего графика
     int iOffsetYMs = iMachineHeight * 2 + fMachineRowCount * iMachineHeight + std::max(static_cast<int>(iScreenHeight * 0.05), iMinTopOffset) + offsetToXAxisLabels + iMinBottomOffset+iMinTopOffset;
-
-    // Расчет высоты, доступной для графиков, учитывая новый отступ снизу
-    // Учет отступов для подписей
-    int labelPadding = static_cast<int>(iScreenHeight * 0.02);
-    int iBottomOffset = static_cast<int>(iScreenHeight * 0.1); // 10% от нижнего края экрана
 
     // Подписи графиков
     int midPointMachine = iLabelOffsetX + (iScreenWidth - iLabelOffsetX) / 2 - oMetrics.horizontalAdvance("Диаграмма по рабочим") / 2;
     int midPointJob = iLabelOffsetX + (iScreenWidth - iLabelOffsetX) / 2 - oMetrics.horizontalAdvance("Диаграмма по деталям") / 2;
 
-    int iFontSize = std::max(8, static_cast<int>(iScreenHeight * 0.015));
-    QFont oFont = pPainter->font();
-    oFont.setPointSize(std::max(10, static_cast<int>(iScreenHeight * 0.02)));
-    pPainter->setFont(oFont);
-
-    oFont.setBold(true); // Установка жирного шрифта
-    pPainter->setPen(QPen(Qt::black, 2)); // Жирный и черный контур текста
+    // Устанавливаем шрифт и перо для заголовков
+    pPainter->setFont(titleFont);
+    pPainter->setPen(axisPen);
 
     // Отрисовка заголовков графиков
     pPainter->drawText(midPointMachine, iOffsetYJs - iScreenHeight * 0.01, "Диаграмма по рабочим");
     pPainter->drawText(midPointJob, iOffsetYMs - iScreenHeight * 0.01, "Диаграмма по деталям");
 
-
-    int iFontSize_for_digits = std::max(8, static_cast<int>(iScreenHeight * 0.015));
-    QFont oFont_for_digits = pPainter->font();
-    oFont_for_digits.setPointSize(iFontSize_for_digits);
-    pPainter->setFont(oFont_for_digits);
-    QPen oGridPen(QColor(0, 0, 0, 50));
-    pPainter->setPen(oGridPen);
+    // Устанавливаю шрифт  для время мин
+    pPainter->setFont(axisLabelFont);
+    pPainter->setPen(timeLabelPen);
 
     qDebug() << "iOffsetYJs:" << iOffsetYJs << "iOffsetYMs:" << iOffsetYMs;
     qDebug() << "fMachineRowCount:" << fMachineRowCount << "fJobRowCount:" << fJobRowCount;
@@ -202,7 +219,6 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
 
     // Отрисовка подписей "Время (мин)" с учетом динамического отступа
     pPainter->drawText(timeLabelX, iOffsetYJs + fMachineRowCount * iMachineHeight + labelOffset, "Время (мин)");
-//    pPainter->drawText(timeLabelX, iOffsetYMs + fJobRowCount * iMachineHeight + labelOffset, "Время (мин)");
 
 
     // Отрисовка подписей "Время (мин)" с учетом динамического отступа
@@ -227,79 +243,68 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     int iYPos_workers = iOffsetYJs + (fMachineRowCount-1 + 0.5) * iMachineHeight; // позиция для оси х по рабочим
     int iYPos_details = iOffsetYMs + (fJobRowCount-1 + 0.5) * iMachineHeight; // позиция для оси х по деталям
 
+    // Устанавливаю шрифт  для время мин
+    pPainter->setFont(axisLabelFont);
+
     for (int i = 0; i <= iMaxFinish; i += 10) {
+        pPainter->setPen(gridPen);
         pPainter->drawLine(iLabelOffsetX + i * iScaleFactorX, iOffsetYJs, iLabelOffsetX + i * iScaleFactorX, iYPos_workers);
         pPainter->drawLine(iLabelOffsetX + i * iScaleFactorX, iOffsetYMs, iLabelOffsetX + i * iScaleFactorX, iYPos_details);
-//        pPainter->drawLine(iLabelOffsetX + i * iScaleFactorX, iOffsetYMs, iLabelOffsetX + i * iScaleFactorX, iOffsetYMs + fJobRowCount * iMachineHeight);
-        pPainter->setPen(QPen(Qt::black, 1));
+        pPainter->setPen(textPen);
         pPainter->drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYJs + fMachineRowCount * iMachineHeight +iScreenHeight * 0.01, QString::number(i));
         pPainter->drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYMs + fJobRowCount * iMachineHeight + iScreenHeight * 0.01 , QString::number(i));
-        pPainter->setPen(oGridPen);
     }
 
     for (int i = 0; i < fMachineRowCount; ++i) {
         int iYPos = iOffsetYJs + (i + 0.5) * iMachineHeight;
+        pPainter->setPen(gridPen);
         pPainter->drawLine(iLabelOffsetX, iYPos, iScreenWidth - iOffset1, iYPos);
-        pPainter->setPen(QPen(Qt::black, 1));
+        pPainter->setPen(textPen);
         pPainter->drawText(iLabelBoundX - pPainter->fontMetrics().horizontalAdvance(QString("Р %1").arg(i + 1)), iYPos + 5, QString("Р %1").arg(i + 1));
-        pPainter->setPen(oGridPen);
     }
 
     for (int i = 0; i < fJobRowCount; ++i) {
         int iYPos = iOffsetYMs + (i + 0.5) * iMachineHeight;
+        pPainter->setPen(gridPen);
         pPainter->drawLine(iLabelOffsetX, iYPos, iScreenWidth - iOffset1, iYPos);
-        pPainter->setPen(QPen(Qt::black, 1));
+        pPainter->setPen(textPen);
         pPainter->drawText(iLabelBoundX - pPainter->fontMetrics().horizontalAdvance(QString("Д %1").arg(i + 1)), iYPos + 5, QString("Д %1").arg(i + 1));
-        pPainter->setPen(oGridPen);
+
     }
-
-    // After the grid and bars are drawn, add this code block to create the border
-    // Adjusting the pen to match the Y-axis pen
-    QPen axisPen = QPen(QColor(0, 0, 0, 50));  // Ensure this matches the Y-axis pen
-    pPainter->setPen(axisPen);
-
+    pPainter->setPen(gridPen);
     // Create a border for the top Gantt chart (machine chart)
     pPainter->drawLine(iLabelOffsetX, iOffsetYJs, iScreenWidth - iOffset1, iOffsetYJs);  // Top border
     pPainter->drawLine(iScreenWidth - iOffset1, iOffsetYJs, iScreenWidth - iOffset1, iYPos_workers);  // Right border
-//    pPainter->drawLine(iScreenWidth - iOffset1, iOffsetYJs, iScreenWidth - iOffset1, iOffsetYJs + fMachineRowCount * iMachineHeight);  // Right border
-
     // Create a border for the bottom Gantt chart (job chart)
     pPainter->drawLine(iLabelOffsetX, iOffsetYMs, iScreenWidth - iOffset1, iOffsetYMs);  // Top border for the job chart
     pPainter->drawLine(iScreenWidth - iOffset1, iOffsetYMs, iScreenWidth - iOffset1, iYPos_details);  // Right border for the job chart
 
-
     int distance = iLabelWidth / 2;  // Например, 1/3 от ширины текста
 
-    QFont oVerticalFont;
-//    oVerticalFont.setBold(true); // Установка жирного шрифта
-    oVerticalFont.setPointSize(std::max(10, static_cast<int>(iScreenHeight * 0.02)));
-
-    // Перерисовываем шрифт для "Рабочие"
-    pPainter->setFont(oVerticalFont);
-    pPainter->setPen(QPen(Qt::black, 2)); // Жирный и черный контур текста
-
-    pPainter->save();
     QFontMetrics oMachineMetrics(pPainter->font());
     int iMachineTextHeight = oMachineMetrics.height();
-    int iMachineCenterY = (iOffsetYJs + iOffsetYJs + fMachineRowCount * iMachineHeight) / 2 + iMachineTextHeight / 2 + distance/2;
-//    pPainter->translate(iOffset1 - 10, iMachineCenterY);
-//    pPainter->translate(iOffset1 + distance, iMachineCenterY);
-    pPainter->translate(iOffset1 , iMachineCenterY);
-    pPainter->rotate(-90);
-    pPainter->drawText(0, 0, "Рабочие");
-    pPainter->restore();
 
-    // Перерисовываем шрифт для "Детали"
-    pPainter->setFont(oVerticalFont);
+    // Вертикальная подпись "Рабочие"
+    pPainter->setFont(verticalFont);
+    pPainter->setPen(textPen);
 
     pPainter->save();
-    QFontMetrics oJobMetrics(pPainter->font());
-    int iJobTextHeight = oJobMetrics.height();
-    int iJobCenterY = (iOffsetYMs + iOffsetYMs + fJobRowCount * iMachineHeight) / 2 + iJobTextHeight / 2 + distance/2;
-    pPainter->translate(iOffset1 , iJobCenterY);
+    int iMachineCenterY = (iOffsetYJs + iOffsetYJs + fMachineRowCount * iMachineHeight) / 2 + iMachineTextHeight / 2 + distance / 2;
+    pPainter->translate(iOffset1, iMachineCenterY);
+    pPainter->rotate(-90);
+    pPainter->drawText(0, 0, "Рабочие");
+    pPainter->restore();  // Восстанавливаем исходную систему координат
+
+    // Вертикальная подпись "Детали"
+    pPainter->setFont(verticalFont);
+    pPainter->setPen(textPen);
+
+    pPainter->save();
+    int iJobCenterY = (iOffsetYMs + iOffsetYMs + fJobRowCount * iMachineHeight) / 2 + iMachineTextHeight / 2 + distance / 2;
+    pPainter->translate(iOffset1, iJobCenterY);
     pPainter->rotate(-90);
     pPainter->drawText(0, 0, "Детали");
-    pPainter->restore();
+    pPainter->restore();  // Восстанавливаем исходную систему координат
 
     // Отрисовка баров для операций на графике машин (m_vMsOperations_cont)
     for (const auto &sOp : m_vMsOperations_cont) {
@@ -312,13 +317,9 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
 
         // Уменьшаем ширину и отрисовываем бар
         pPainter->fillRect(oMachineRect, m_umapJobColors[sOp.iJob]);
-        pPainter->setPen(QPen(Qt::black, 1));
+        pPainter->setPen(textPen);
         pPainter->drawRect(oMachineRect);
-
         // Устанавливаем шрифт на основе высоты окна
-        int dynamicFontSize = std::max(8, static_cast<int>(iScreenHeight * 0.01));  // Размер шрифта пропорционален высоте окна
-        QFont dynamicFont = pPainter->font();
-        dynamicFont.setPointSize(dynamicFontSize);  // Привязываем размер шрифта к размеру окна
         pPainter->setFont(dynamicFont);
 
         // Формируем текст для подписи
@@ -339,13 +340,8 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
 
         // Уменьшаем ширину и отрисовываем бар
         pPainter->fillRect(oJobRect, m_umapJobColors[sOp.iJob]);
-        pPainter->setPen(QPen(Qt::black, 1));
+        pPainter->setPen(textPen);
         pPainter->drawRect(oJobRect);
-
-        // Устанавливаем шрифт на основе высоты окна
-        int dynamicFontSize = std::max(8, static_cast<int>(iScreenHeight * 0.01));  // Размер шрифта пропорционален высоте окна
-        QFont dynamicFont = pPainter->font();
-        dynamicFont.setPointSize(dynamicFontSize);  // Привязываем размер шрифта к размеру окна
         pPainter->setFont(dynamicFont);
 
         // Формируем текст для подписи с машинами
@@ -360,8 +356,6 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
         pPainter->drawText(oJobRect, Qt::AlignCenter, labelText);
     }
 }
-
-
 
 //void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight) {
 //    // Рассчитываем максимальное значение Finish для ограничения оси X
