@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <iostream>
 #include <QMap>
+#include <tuple>
 
 void GanttChart::LoadJsonData(const QString &sFilename) {
     JsonReader oReader;
@@ -65,14 +66,7 @@ void GanttChart::InitializeColors() {
     }
 }
 
-
-void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight) {
-    // I Блок с отступами
-
-
-    // II Блок со шрифтами
-
-
+std::tuple<int, int, int> GanttChart::calculateMaxValues() {
     // Рассчитываем максимальное значение Finish для ограничения оси X
     int iMaxFinish = 0;
     for (const auto &op : m_vJsOperations_cont) {
@@ -106,14 +100,15 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
         }
     }
 
-    for (const auto &op : m_vMsOperations_cont) {
-        if (op.iJob > iMaxJob) {
-            iMaxJob = op.iJob;
-        }
-    }
+    // Возвращаем результат в виде кортежа (tuple)
+    return std::make_tuple(iMaxFinish, iMaxMachine, iMaxJob);
+}
 
-    float fMachineRowCount = iMaxMachine ;  // Количество строк для машин
-    float fJobRowCount = iMaxJob ;          // Количество строк для задач
+void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight) {
+    auto [iMaxFinish_f, iMaxMachine, iMaxJob] = calculateMaxValues();
+    int iMaxFinish = iMaxFinish_f;
+    int fMachineRowCount = iMaxMachine ;  // Количество строк для машин
+    int fJobRowCount = iMaxJob ;          // Количество строк для задач
 
     // Перерисовываем изображение с новыми размерами окна
     QImage m_oChartImage = QImage(iScreenWidth, iScreenHeight, QImage::Format_ARGB32);
@@ -146,11 +141,7 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     int iMinBottomOffset = static_cast<int>(iScreenHeight * 0.05);  // 5% от высоты экрана
 
     // Расчет доступной высоты для графиков, учитывая новый отступ снизу
-//    int availableHeight = iScreenHeight - iScreenHeight * 0.1 - offsetToBottomEdge*2 - offsetToTimeLabel-offsetToXAxisLabels -iMinBottomOffset;
     int availableHeight = iScreenHeight - iScreenHeight * 0.1 - offsetToBottomEdge*2 - offsetToTimeLabel-offsetToXAxisLabels -iMinBottomOffset-iMinTopOffset;
-
-//    int iMachineHeight = availableHeight * 0.07;
-//    int iJobHeight = availableHeight * 0.07;
 
     float totalRowCount = fMachineRowCount + fJobRowCount;
     float spacingFactor = 1.1;  // С учетом 10% отступа между барами
@@ -179,15 +170,8 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     int iBottomOffset = static_cast<int>(iScreenHeight * 0.1); // 10% от нижнего края экрана
 
     // Подписи графиков
-//    pPainter->setPen(QPen(Qt::black, 1));
-
     int midPointMachine = iLabelOffsetX + (iScreenWidth - iLabelOffsetX) / 2 - oMetrics.horizontalAdvance("Диаграмма по рабочим") / 2;
     int midPointJob = iLabelOffsetX + (iScreenWidth - iLabelOffsetX) / 2 - oMetrics.horizontalAdvance("Диаграмма по деталям") / 2;
-
-//    int iFontSize = std::max(8, static_cast<int>(iScreenHeight * 0.015));
-//    QFont oFont = pPainter->font();
-//    oFont.setPointSize(iFontSize);
-//    pPainter->setFont(oFont);
 
     int iFontSize = std::max(8, static_cast<int>(iScreenHeight * 0.015));
     QFont oFont = pPainter->font();
@@ -312,8 +296,6 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     QFontMetrics oJobMetrics(pPainter->font());
     int iJobTextHeight = oJobMetrics.height();
     int iJobCenterY = (iOffsetYMs + iOffsetYMs + fJobRowCount * iMachineHeight) / 2 + iJobTextHeight / 2 + distance/2;
-//    pPainter->translate(iOffset1 - 10, iJobCenterY);
-//    pPainter->translate(iOffset1 + distance, iJobCenterY);
     pPainter->translate(iOffset1 , iJobCenterY);
     pPainter->rotate(-90);
     pPainter->drawText(0, 0, "Детали");
@@ -374,7 +356,6 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
                 labelText += ", ";  // Добавляем запятую между номерами машин, кроме последнего
             }
         }
-
         // Отрисовка текста
         pPainter->drawText(oJobRect, Qt::AlignCenter, labelText);
     }
