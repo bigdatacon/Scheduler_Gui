@@ -39,7 +39,7 @@ void GanttChart::InitializeColors() {
     // Уменьшение яркости основных цветов на 10%
     for (auto &color : primaryColors) {
         color = color.darker(130);  // 110% от исходной яркости, уменьшение на 10%
-        color.setAlpha(154);        // Установить прозрачность на уровне 80% (204 из 255)
+//        color.setAlpha(154);        // Установить прозрачность на уровне 80% (204 из 255)
 
     }
     // Счетчик для отслеживания, когда закончатся основные цвета
@@ -222,9 +222,14 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
         pPainter->drawText(timeLabelX, timeLabelYBottom, "Время (мин)");
     }
 
+     // рассчитываю где ось x для верхнего графика
+    int iYPos_workers = iOffsetYJs + (fMachineRowCount-1 + 0.5) * iMachineHeight; // позиция для оси х по рабочим
+    int iYPos_details = iOffsetYMs + (fJobRowCount-1 + 0.5) * iMachineHeight; // позиция для оси х по деталям
+
     for (int i = 0; i <= iMaxFinish; i += 10) {
-        pPainter->drawLine(iLabelOffsetX + i * iScaleFactorX, iOffsetYJs, iLabelOffsetX + i * iScaleFactorX, iOffsetYJs + fMachineRowCount * iMachineHeight);
-        pPainter->drawLine(iLabelOffsetX + i * iScaleFactorX, iOffsetYMs, iLabelOffsetX + i * iScaleFactorX, iOffsetYMs + fJobRowCount * iMachineHeight);
+        pPainter->drawLine(iLabelOffsetX + i * iScaleFactorX, iOffsetYJs, iLabelOffsetX + i * iScaleFactorX, iYPos_workers);
+        pPainter->drawLine(iLabelOffsetX + i * iScaleFactorX, iOffsetYMs, iLabelOffsetX + i * iScaleFactorX, iYPos_details);
+//        pPainter->drawLine(iLabelOffsetX + i * iScaleFactorX, iOffsetYMs, iLabelOffsetX + i * iScaleFactorX, iOffsetYMs + fJobRowCount * iMachineHeight);
         pPainter->setPen(QPen(Qt::black, 1));
         pPainter->drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYJs + fMachineRowCount * iMachineHeight +iScreenHeight * 0.01, QString::number(i));
         pPainter->drawText(iLabelOffsetX + i * iScaleFactorX - 10, iOffsetYMs + fJobRowCount * iMachineHeight + iScreenHeight * 0.01 , QString::number(i));
@@ -246,6 +251,23 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
         pPainter->drawText(iLabelBoundX - pPainter->fontMetrics().horizontalAdvance(QString("Д %1").arg(i + 1)), iYPos + 5, QString("Д %1").arg(i + 1));
         pPainter->setPen(oGridPen);
     }
+
+    // After the grid and bars are drawn, add this code block to create the border
+    // Adjusting the pen to match the Y-axis pen
+    QPen axisPen = QPen(QColor(0, 0, 0, 50));  // Ensure this matches the Y-axis pen
+    pPainter->setPen(axisPen);
+
+    // Create a border for the top Gantt chart (machine chart)
+    pPainter->drawLine(iLabelOffsetX, iOffsetYJs, iScreenWidth - iOffset1, iOffsetYJs);  // Top border
+    pPainter->drawLine(iScreenWidth - iOffset1, iOffsetYJs, iScreenWidth - iOffset1, iYPos_workers);  // Right border
+//    pPainter->drawLine(iScreenWidth - iOffset1, iOffsetYJs, iScreenWidth - iOffset1, iOffsetYJs + fMachineRowCount * iMachineHeight);  // Right border
+
+    // Create a border for the bottom Gantt chart (job chart)
+    pPainter->drawLine(iLabelOffsetX, iOffsetYMs, iScreenWidth - iOffset1, iOffsetYMs);  // Top border for the job chart
+    pPainter->drawLine(iScreenWidth - iOffset1, iOffsetYMs, iScreenWidth - iOffset1, iYPos_details);  // Right border for the job chart
+
+
+
 
     int distance = iLabelWidth / 2;  // Например, 1/3 от ширины текста
 
