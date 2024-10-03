@@ -12,7 +12,7 @@ QString JsonReader::getHigherPath(const QString &currentPath, int levelsUp) {
 }
 
 
-void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJobOperation> &m_vJsOperations_cont, std::vector<SMachineOperation> &m_vMsOperations_cont/*std::vector<SOperation> &vJsOperations, std::vector<SOperation> &vMsOperations*/) {
+void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJobOperation> &m_vJsOperations_cont, std::vector<SMachineOperation> &m_vMsOperations_cont, ScheduleMetrics &m_ScheduleMetrics) {
     std::vector<std::vector<MSOperation*>> ms_operations = {
             {new MSOperation{2, 5, 0, 32 ,0}},
             {new MSOperation{}},
@@ -86,6 +86,13 @@ void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJ
         }
     }
 
+    // Инициализирую структуры
+    m_ScheduleMetrics.iScheduleTime = 100;
+    m_ScheduleMetrics.iScheduleCost = 200;
+    m_ScheduleMetrics.iSumDeviation = 300;
+    m_ScheduleMetrics.iDeltaUtilization = 400;
+    m_ScheduleMetrics.iFreeMachinesCount = 500;
+
 
 
     std::cout << "Machine Operations:\n";
@@ -126,7 +133,7 @@ void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJ
 
 }
 
-void JsonReader::ReadOperationsFromFile_2(const QString &sFilename, std::vector<SJobOperation> &m_vJsOperations_cont, std::vector<SMachineOperation> &m_vMsOperations_cont/*std::vector<SOperation> &vJsOperations, std::vector<SOperation> &vMsOperations*/) {
+void JsonReader::ReadOperationsFromFile_2(const QString &sFilename, std::vector<SJobOperation> &m_vJsOperations_cont, std::vector<SMachineOperation> &m_vMsOperations_cont, ScheduleMetrics &m_ScheduleMetrics) {
     m_vMsOperations_cont.clear();
     m_vJsOperations_cont.clear();
 
@@ -195,5 +202,11 @@ void JsonReader::ReadOperationsFromFile_2(const QString &sFilename, std::vector<
         }
     }
 
+    // Инициализирую структуры
+    m_ScheduleMetrics.iScheduleTime = 100;
+    m_ScheduleMetrics.iScheduleCost = 200;
+    m_ScheduleMetrics.iSumDeviation = 300;
+    m_ScheduleMetrics.iDeltaUtilization = 400;
+    m_ScheduleMetrics.iFreeMachinesCount = 500;
 
 }

@@ -34,8 +34,8 @@ struct JSOperation
 class JsonReader {
 public:
     QString getHigherPath(const QString &currentPath, int levelsUp) ;
-    void ReadOperationsFromFile(const QString &sFilename,std::vector<SJobOperation> &vJsOperations_cont, std::vector<SMachineOperation> &vMsOperations_cont /*std::vector<SOperation> &vJsOperations, std::vector<SOperation> &vMsOperations*/);
-    void ReadOperationsFromFile_2(const QString &sFilename,std::vector<SJobOperation> &vJsOperations_cont, std::vector<SMachineOperation> &vMsOperations_cont /*std::vector<SOperation> &vJsOperations, std::vector<SOperation> &vMsOperations*/);
+    void ReadOperationsFromFile(const QString &sFilename,std::vector<SJobOperation> &vJsOperations_cont, std::vector<SMachineOperation> &vMsOperations_cont , ScheduleMetrics &m_ScheduleMetrics);
+    void ReadOperationsFromFile_2(const QString &sFilename,std::vector<SJobOperation> &vJsOperations_cont, std::vector<SMachineOperation> &vMsOperations_cont , ScheduleMetrics &m_ScheduleMetrics);
 
 };
 
