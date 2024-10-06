@@ -46,7 +46,9 @@ void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJ
                 0,      // Старт по умолчанию
                 0,      // Финиш по умолчанию
                 0,      // Индекс работы по умолчанию
-                i + 1   // Машина (индекс +1)
+                i + 1,   // Машина (индекс +1)
+                QRect(),    // Пустой QRect
+                false       // Не выделен по умолчанию
             });
         } else {
             // Если операции есть, обрабатываем их
@@ -55,7 +57,9 @@ void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJ
                     op->startTime,
                     op->finishTime,
                     op->jobIndex,
-                    i + 1
+                    i + 1,
+                    QRect(),    // Пустой QRect
+                    false       // Не выделен по умолчанию
                 });
             }
         }
@@ -71,7 +75,9 @@ void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJ
                 0,      // Старт по умолчанию
                 0,      // Финиш по умолчанию
                 i + 1,  // Индекс работы (индекс +1)
-                {}      // Пустой вектор машин
+                {},      // Пустой вектор машин
+                QRect(),    // Пустой QRect
+                false       // Не выделен по умолчанию
             });
         } else {
             // Если операции есть, обрабатываем их
@@ -80,7 +86,9 @@ void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJ
                     op->startTime,
                     op->finishTime,
                     i + 1,
-                    op->vMachinesIndexes  // Переносим вектор индексов машин
+                    op->vMachinesIndexes,  // Переносим вектор индексов машин
+                    QRect(),    // Пустой QRect
+                    false       // Не выделен по умолчанию
                 });
             }
         }
@@ -163,7 +171,9 @@ void JsonReader::ReadOperationsFromFile_2(const QString &sFilename, std::vector<
                 0,      // Старт по умолчанию
                 0,      // Финиш по умолчанию
                 0,      // Индекс работы по умолчанию
-                i + 1   // Машина (индекс +1)
+                i + 1,   // Машина (индекс +1)
+                QRect(),    // Пустой QRect
+                false       // Не выделен по умолчанию
             });
         } else {
             // Если операции есть, обрабатываем их
@@ -172,7 +182,9 @@ void JsonReader::ReadOperationsFromFile_2(const QString &sFilename, std::vector<
                     op->startTime,
                     op->finishTime,
                     op->jobIndex,
-                    i + 1
+                    i + 1,   // Машина (индекс +1)
+                    QRect(),    // Пустой QRect
+                    false       // Не выделен по умолчанию
                 });
             }
         }
@@ -187,7 +199,9 @@ void JsonReader::ReadOperationsFromFile_2(const QString &sFilename, std::vector<
                 0,      // Старт по умолчанию
                 0,      // Финиш по умолчанию
                 i + 1,  // Индекс работы (индекс +1)
-                {}      // Пустой вектор машин
+                {},      // Пустой вектор машин
+                QRect(),    // Пустой QRect
+                false       // Не выделен по умолчанию
             });
         } else {
             // Если операции есть, обрабатываем их
@@ -196,7 +210,9 @@ void JsonReader::ReadOperationsFromFile_2(const QString &sFilename, std::vector<
                     op->startTime,
                     op->finishTime,
                     i + 1,
-                    op->vMachinesIndexes  // Переносим вектор индексов машин
+                    op->vMachinesIndexes,  // Переносим вектор индексов машин
+                    QRect(),    // Пустой QRect
+                    false       // Не выделен по умолчанию
                 });
             }
         }

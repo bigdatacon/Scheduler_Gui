@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <iostream>
 #include <QMessageBox>
+#include <QDebug> // Подключите для использования qDebug
 
 GanttChartWidget::GanttChartWidget(QWidget *pParent)
     : QWidget(pParent), m_iDraggedJob(-1), m_iDraggedMachine(-1), m_bJsMode(true) {
@@ -125,16 +126,32 @@ void GanttChartWidget::DrawWorkersTimeChart() {
 }
 
 
+//void GanttChartWidget::paintEvent(QPaintEvent *event) {
+//    QPainter oPainter(this);
+
+//    // Рисуем сохраненную диаграмму с учетом тулбара
+//    int toolbarHeight = m_pToolBar->height();
+
+//    if (m_bDisplayingWorkersTimeChart) {
+//        oPainter.drawImage(0, toolbarHeight, m_oWorkersImage);  // Отрисовываем workers chart
+//    } else {
+//        oPainter.drawImage(0, toolbarHeight, m_oChartImage);  // Отрисовываем Gantt chart
+//    }
+//}
+
 void GanttChartWidget::paintEvent(QPaintEvent *event) {
     QPainter oPainter(this);
 
-    // Рисуем сохраненную диаграмму с учетом тулбара
+    // Рисуем с учетом высоты тулбара
     int toolbarHeight = m_pToolBar->height();
+    oPainter.translate(0, toolbarHeight); // Смещаем систему координат
 
     if (m_bDisplayingWorkersTimeChart) {
-        oPainter.drawImage(0, toolbarHeight, m_oWorkersImage);  // Отрисовываем workers chart
+        // Отрисовываем workers chart
+        m_pGanttChart->DrawWorkersTimeChart(&oPainter, width(), height() - toolbarHeight);
     } else {
-        oPainter.drawImage(0, toolbarHeight, m_oChartImage);  // Отрисовываем Gantt chart
+        // Отрисовываем Gantt chart
+        m_pGanttChart->DrawGanttChart(&oPainter, width(), height() - toolbarHeight);
     }
 }
 
@@ -172,10 +189,78 @@ void GanttChartWidget::updateChart() {
 
 
 
-
 void GanttChartWidget::mousePressEvent(QMouseEvent *event) {
-    // Логика по кликам мыши и взаимодействию с диаграммой
+    if (event->button() == Qt::LeftButton) {
+        QPoint clickPos = event->pos();
+        bool barClicked = false;
+
+        // Проверяем, что объект GanttChart доступен
+        if (!m_pGanttChart) {
+            qDebug() << "m_pGanttChart не инициализирован";
+            return;
+        }
+
+        // Используем геттеры для доступа к операциям
+        auto &msOperations = m_pGanttChart->getMsOperations();
+        auto &jsOperations = m_pGanttChart->getJsOperations();
+
+        // Логируем координаты клика
+        qDebug() << "Координаты клика: " << clickPos;
+
+        // Проходим по всем барам на нижнем графике
+        for (auto &sOp : jsOperations) {
+            qDebug() << "Проверяем бар: Д" << sOp.iJob << ", QRect:" << sOp.rect;
+
+            if (sOp.rect.contains(clickPos)) {
+                qDebug() << "Клик по бару: Д" << sOp.iJob;
+
+                // Снимаем выделение со всех баров перед установкой выделения на нужный
+                for (auto &jobOp : jsOperations) {
+                    jobOp.bHighlighted = false;
+                }
+                for (auto &machineOp : msOperations) {
+                    machineOp.bHighlighted = false;
+                }
+
+                // Бар найден — выделяем его
+                sOp.bHighlighted = true;
+
+                // Также находим все связанные бары на верхнем графике и выделяем их
+                for (auto &machineIndex : sOp.vMachinesIndexes) {
+                    for (auto &mOp : msOperations) {
+                        if (mOp.iMachine == machineIndex && mOp.iJob == sOp.iJob) {
+                            mOp.bHighlighted = true;
+                            qDebug() << "Выделен бар на верхнем графике: Машина" << mOp.iMachine;
+                        }
+                    }
+                }
+
+                barClicked = true;
+                break; // Прекращаем поиск, так как нашли нужный бар
+            }
+        }
+
+        if (!barClicked) {
+            qDebug() << "Клик вне баров, снятие выделения";
+
+            // Снимаем выделение со всех баров, если кликнули вне какого-либо из них
+            for (auto &jobOp : jsOperations) {
+                jobOp.bHighlighted = false;
+            }
+            for (auto &machineOp : msOperations) {
+                machineOp.bHighlighted = false;
+            }
+        }
+
+        // Обновляем виджет для перерисовки с выделенными элементами
+        update();
+        qDebug() << "Перерисовка диаграммы";
+    }
 }
+
+
+
+
 
 void GanttChartWidget::mouseMoveEvent(QMouseEvent *event) {
     // Логика по перетаскиванию баров

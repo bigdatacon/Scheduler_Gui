@@ -335,8 +335,9 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     pPainter->drawText(0, 0, "Детали");
     pPainter->restore();  // Восстанавливаем исходную систему координат
 
+
     // Отрисовка баров для операций на графике машин (m_vMsOperations_cont)
-    for (const auto &sOp : m_vMsOperations_cont) {
+    for (auto &sOp : m_vMsOperations_cont) {
         int iBarStartX = ioffsetFromSide + sOp.iStart * iScaleFactorX;
         int iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
         int iBarCenterY = iOffsetYJs + (sOp.iMachine - 1) * iMachineHeight + iMachineHeight / 2;
@@ -344,22 +345,28 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
         // Уменьшаем высоту бара до 50% от высоты строки машины
         QRect oMachineRect(iBarStartX, iBarCenterY - iMachineHeight * 0.25, iBarWidth, iMachineHeight * 0.5);
 
-        // Уменьшаем ширину и отрисовываем бар
-        pPainter->fillRect(oMachineRect, m_umapJobColors[sOp.iJob]);
-        pPainter->setPen(textPen);
+        // Сохраняем прямоугольник в структуре операции
+        sOp.rect = oMachineRect;
+
+        // Если бар выделен, изменяем цвет и толщину пера
+        if (sOp.bHighlighted) {
+            pPainter->setPen(QPen(Qt::black, 3)); // Черный жирный контур
+            pPainter->fillRect(oMachineRect, Qt::yellow); // Желтая заливка
+        } else {
+            pPainter->setPen(textPen);
+            pPainter->fillRect(oMachineRect, m_umapJobColors[sOp.iJob]);
+        }
+
         pPainter->drawRect(oMachineRect);
-        // Устанавливаем шрифт на основе высоты окна
         pPainter->setFont(dynamicFont);
 
         // Формируем текст для подписи
-        QString labelText;
-        labelText = QString("Д %1").arg(sOp.iJob);  // Полная подпись для машины
-        // Отрисовка текста
+        QString labelText = QString("Д %1").arg(sOp.iJob);
         pPainter->drawText(oMachineRect, Qt::AlignCenter, labelText);
     }
 
     // Отрисовка баров для операций на графике задач (m_vJsOperations_cont)
-    for (const auto &sOp : m_vJsOperations_cont) {
+    for (auto &sOp : m_vJsOperations_cont) {
         int iBarStartX = ioffsetFromSide + sOp.iStart * iScaleFactorX;
         int iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
         int iBarCenterY = iOffsetYMs + (sOp.iJob - 1) * iMachineHeight + iMachineHeight / 2;
@@ -367,9 +374,18 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
         // Уменьшаем высоту бара до 50% от высоты строки задачи
         QRect oJobRect(iBarStartX, iBarCenterY - iMachineHeight * 0.25, iBarWidth, iMachineHeight * 0.5);
 
-        // Уменьшаем ширину и отрисовываем бар
-        pPainter->fillRect(oJobRect, m_umapJobColors[sOp.iJob]);
-        pPainter->setPen(textPen);
+        // Сохраняем прямоугольник в структуре операции
+        sOp.rect = oJobRect;
+
+        // Если бар выделен, изменяем цвет и толщину пера
+        if (sOp.bHighlighted) {
+            pPainter->setPen(QPen(Qt::black, 3)); // Черный жирный контур
+            pPainter->fillRect(oJobRect, Qt::yellow); // Желтая заливка
+        } else {
+            pPainter->setPen(textPen);
+            pPainter->fillRect(oJobRect, m_umapJobColors[sOp.iJob]);
+        }
+
         pPainter->drawRect(oJobRect);
         pPainter->setFont(dynamicFont);
 
@@ -381,9 +397,61 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
                 labelText += ", ";  // Добавляем запятую между номерами машин, кроме последнего
             }
         }
-        // Отрисовка текста
+
         pPainter->drawText(oJobRect, Qt::AlignCenter, labelText);
     }
+
+
+
+//    // Отрисовка баров для операций на графике машин (m_vMsOperations_cont)
+//    for (const auto &sOp : m_vMsOperations_cont) {
+//        int iBarStartX = ioffsetFromSide + sOp.iStart * iScaleFactorX;
+//        int iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
+//        int iBarCenterY = iOffsetYJs + (sOp.iMachine - 1) * iMachineHeight + iMachineHeight / 2;
+
+//        // Уменьшаем высоту бара до 50% от высоты строки машины
+//        QRect oMachineRect(iBarStartX, iBarCenterY - iMachineHeight * 0.25, iBarWidth, iMachineHeight * 0.5);
+
+//        // Уменьшаем ширину и отрисовываем бар
+//        pPainter->fillRect(oMachineRect, m_umapJobColors[sOp.iJob]);
+//        pPainter->setPen(textPen);
+//        pPainter->drawRect(oMachineRect);
+//        // Устанавливаем шрифт на основе высоты окна
+//        pPainter->setFont(dynamicFont);
+
+//        // Формируем текст для подписи
+//        QString labelText;
+//        labelText = QString("Д %1").arg(sOp.iJob);  // Полная подпись для машины
+//        // Отрисовка текста
+//        pPainter->drawText(oMachineRect, Qt::AlignCenter, labelText);
+//    }
+
+//    // Отрисовка баров для операций на графике задач (m_vJsOperations_cont)
+//    for (const auto &sOp : m_vJsOperations_cont) {
+//        int iBarStartX = ioffsetFromSide + sOp.iStart * iScaleFactorX;
+//        int iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
+//        int iBarCenterY = iOffsetYMs + (sOp.iJob - 1) * iMachineHeight + iMachineHeight / 2;
+
+//        // Уменьшаем высоту бара до 50% от высоты строки задачи
+//        QRect oJobRect(iBarStartX, iBarCenterY - iMachineHeight * 0.25, iBarWidth, iMachineHeight * 0.5);
+
+//        // Уменьшаем ширину и отрисовываем бар
+//        pPainter->fillRect(oJobRect, m_umapJobColors[sOp.iJob]);
+//        pPainter->setPen(textPen);
+//        pPainter->drawRect(oJobRect);
+//        pPainter->setFont(dynamicFont);
+
+//        // Формируем текст для подписи с машинами
+//        QString labelText = "Р ";
+//        for (size_t i = 0; i < sOp.vMachinesIndexes.size(); ++i) {
+//            labelText += QString::number(sOp.vMachinesIndexes[i]);
+//            if (i != sOp.vMachinesIndexes.size() - 1) {
+//                labelText += ", ";  // Добавляем запятую между номерами машин, кроме последнего
+//            }
+//        }
+//        // Отрисовка текста
+//        pPainter->drawText(oJobRect, Qt::AlignCenter, labelText);
+//    }
 }
 
 

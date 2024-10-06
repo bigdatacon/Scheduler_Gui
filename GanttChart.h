@@ -26,6 +26,8 @@ struct SJobOperation {
     int iFinish;
     int iJob;
     std::vector<int> vMachinesIndexes;
+    QRect rect; // Координаты прямоугольника для отрисовки
+    bool bHighlighted = false; // Состояние выделения
 };
 
 struct SMachineOperation {
@@ -33,6 +35,8 @@ struct SMachineOperation {
     int iFinish;
     int iJob;
     int iMachine;
+    QRect rect; // Координаты прямоугольника для отрисовки
+    bool bHighlighted = false; // Состояние выделения
 };
 
 
@@ -61,6 +65,9 @@ public:
     std::tuple<int, int, int> calculateMaxValues();
     void DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight);
     void DrawWorkersTimeChart(QPainter *pPainter, int iScreenWidth, int iScreenHeight);
+
+    std::vector<SJobOperation>& getJsOperations() { return m_vJsOperations_cont; }
+    std::vector<SMachineOperation>& getMsOperations() { return m_vMsOperations_cont; }
 
 
 private:
