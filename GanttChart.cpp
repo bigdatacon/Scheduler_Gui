@@ -5,6 +5,7 @@
 #include <iostream>
 #include <QMap>
 #include <tuple>
+#include <set>
 
 void GanttChart::LoadJsonData(const QString &sFilename) {
     JsonReader oReader;
@@ -284,22 +285,79 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     }
 
 
+    // 1. Сохраняем информацию о выделенных машинах
+    std::set<int> highlightedMachines;  // Набор для хранения выделенных машин
+    highlightedMachines.clear();  // Очищаем набор выделенных машин
+    std::set<int> highlightedJobs;  // Набор для хранения выделенных деталей
+    highlightedJobs.clear();  // Очищаем набор выделенных деталей
+    for (auto &sOp : m_vMsOperations_cont) {
+        if (sOp.bHighlighted) {
+            highlightedMachines.insert(sOp.iMachine);  // Добавляем выделенную машину в набор
+             highlightedJobs.insert(sOp.iJob);  // Добавляем выделенную деталь в набор
+        }
+    }
+
+    // 2. Отрисовка подписей для машин
     for (int i = 0; i < fMachineRowCount; ++i) {
         int iYPos = iOffsetYJs + (i + 0.5) * iMachineHeight;
         pPainter->setPen(gridPen);
         pPainter->drawLine(ioffsetFromSide, iYPos, iScreenWidth - ioffsetFromSide, iYPos);
-        pPainter->setPen(textPen);
+
+        // Проверяем, выделена ли текущая машина
+        if (highlightedMachines.count(i + 1)) {
+            QFont boldFont = pPainter->font();
+            boldFont.setBold(true);  // Устанавливаем жирный шрифт
+            pPainter->setFont(boldFont);
+            pPainter->setPen(Qt::black);  // Устанавливаем черный цвет текста
+        } else {
+            pPainter->setFont(verticalFont);  // Стандартный шрифт
+            pPainter->setPen(textPen);  // Стандартный цвет текста
+        }
+
+        // Отрисовка подписи
         pPainter->drawText(ioffsetFromSide - pPainter->fontMetrics().horizontalAdvance(QString("Р %1").arg(i + 1)), iYPos + 5, QString("Р %1").arg(i + 1));
     }
 
+    // 2. Отрисовка подписей для деталей
     for (int i = 0; i < fJobRowCount; ++i) {
         int iYPos = iOffsetYMs + (i + 0.5) * iMachineHeight;
         pPainter->setPen(gridPen);
         pPainter->drawLine(ioffsetFromSide, iYPos, iScreenWidth - ioffsetFromSide, iYPos);
-        pPainter->setPen(textPen);
+
+        // Проверяем, выделена ли текущая деталь
+        if (highlightedJobs.count(i + 1)) {
+            QFont boldFont = pPainter->font();
+            boldFont.setBold(true);  // Устанавливаем жирный шрифт
+            pPainter->setFont(boldFont);
+            pPainter->setPen(Qt::black);  // Устанавливаем черный цвет текста
+        } else {
+            pPainter->setFont(verticalFont);  // Стандартный шрифт
+            pPainter->setPen(textPen);  // Стандартный цвет текста
+        }
+
+        // Отрисовка подписи
         pPainter->drawText(ioffsetFromSide - pPainter->fontMetrics().horizontalAdvance(QString("Д %1").arg(i + 1)), iYPos + 5, QString("Д %1").arg(i + 1));
 
     }
+
+
+//    for (int i = 0; i < fMachineRowCount; ++i) {
+//        int iYPos = iOffsetYJs + (i + 0.5) * iMachineHeight;
+//        pPainter->setPen(gridPen);
+//        pPainter->drawLine(ioffsetFromSide, iYPos, iScreenWidth - ioffsetFromSide, iYPos);
+//        pPainter->setPen(textPen);
+//        pPainter->drawText(ioffsetFromSide - pPainter->fontMetrics().horizontalAdvance(QString("Р %1").arg(i + 1)), iYPos + 5, QString("Р %1").arg(i + 1));
+//    }
+
+//    for (int i = 0; i < fJobRowCount; ++i) {
+//        int iYPos = iOffsetYMs + (i + 0.5) * iMachineHeight;
+//        pPainter->setPen(gridPen);
+//        pPainter->drawLine(ioffsetFromSide, iYPos, iScreenWidth - ioffsetFromSide, iYPos);
+//        pPainter->setPen(textPen);
+//        pPainter->drawText(ioffsetFromSide - pPainter->fontMetrics().horizontalAdvance(QString("Д %1").arg(i + 1)), iYPos + 5, QString("Д %1").arg(i + 1));
+//    }
+
+
     pPainter->setPen(gridPen);
     // Create a border for the top Gantt chart (machine chart)
     pPainter->drawLine(ioffsetFromSide, iOffsetYJs, iScreenWidth - ioffsetFromSide, iOffsetYJs);  // Top border
@@ -381,13 +439,25 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
         if (sOp.bHighlighted) {
             pPainter->setPen(QPen(Qt::black, 3)); // Черный жирный контур
             pPainter->fillRect(oJobRect, Qt::yellow); // Желтая заливка
+
         } else {
             pPainter->setPen(textPen);
             pPainter->fillRect(oJobRect, m_umapJobColors[sOp.iJob]);
+            // обычный шрифт для жирной подписи по оси y
+
         }
 
-        pPainter->drawRect(oJobRect);
-        pPainter->setFont(dynamicFont);
+        if (sOp.bHighlighted) {
+            pPainter->drawRect(oJobRect);
+            pPainter->setFont(dynamicFont);
+            dynamicFont.setBold(true);  // Делаем шрифт жирным
+            pPainter->setPen(Qt::black); // Черный цвет текста
+        }
+        else {
+            pPainter->drawRect(oJobRect);
+            pPainter->setFont(dynamicFont);
+        }
+
 
         // Формируем текст для подписи с машинами
         QString labelText = "Р ";
