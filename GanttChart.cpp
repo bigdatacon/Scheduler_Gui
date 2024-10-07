@@ -293,7 +293,7 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     for (auto &sOp : m_vMsOperations_cont) {
         if (sOp.bHighlighted) {
             highlightedMachines.insert(sOp.iMachine);  // Добавляем выделенную машину в набор
-             highlightedJobs.insert(sOp.iJob);  // Добавляем выделенную деталь в набор
+            highlightedJobs.insert(sOp.iJob);  // Добавляем выделенную деталь в набор
         }
     }
 
@@ -415,8 +415,20 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
             pPainter->fillRect(oMachineRect, m_umapJobColors[sOp.iJob]);
         }
 
-        pPainter->drawRect(oMachineRect);
-        pPainter->setFont(dynamicFont);
+
+        if (sOp.bHighlighted) {
+            pPainter->drawRect(oMachineRect);
+            pPainter->setFont(dynamicFont);
+            dynamicFont.setBold(true);  // Делаем шрифт жирным
+            pPainter->setPen(Qt::black); // Черный цвет текста
+        }
+        else {
+            pPainter->drawRect(oMachineRect);
+            pPainter->setFont(dynamicFont);
+        }
+
+//        pPainter->drawRect(oMachineRect);
+//        pPainter->setFont(dynamicFont);
 
         // Формируем текст для подписи
         QString labelText = QString("Д %1").arg(sOp.iJob);

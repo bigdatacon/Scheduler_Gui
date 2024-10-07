@@ -26,6 +26,8 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
+    void handleRightClick(QPoint clickPos, std::vector<SJobOperation> &jsOperations, std::vector<SMachineOperation> &msOperations);
+
     void updateChart();
     void onWorkersTimeButtonClicked();
 
