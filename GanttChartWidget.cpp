@@ -144,7 +144,7 @@ void GanttChartWidget::paintEvent(QPaintEvent *event) {
 
     // Рисуем с учетом высоты тулбара
     int toolbarHeight = m_pToolBar->height();
-    oPainter.translate(0, toolbarHeight); // Смещаем систему координат
+//    oPainter.translate(0, toolbarHeight); // Смещаем систему координат
 
     if (m_bDisplayingWorkersTimeChart) {
         // Отрисовываем workers chart
