@@ -51,16 +51,29 @@ void GanttChartWidget::Initialize() {
 void GanttChartWidget::OnSolveButtonClicked() {
     // Здесь можно поместить логику для запуска солвера из файла
     QString filename = QFileDialog::getOpenFileName(this, "Выберите файл для солвера", "", "JSON Files (*.json);;All Files (*)");
+
     if (!filename.isEmpty()) {
-        // Показываем новое название файла
-        QMessageBox::information(this, "Файл выбран", "Вы выбрали файл: " + filename);
+        // Создаем немодальное окно с информацией о выбранном файле
+        QMessageBox *msgBox = new QMessageBox(this);
+        msgBox->setText("Файл выбран");
+        msgBox->setInformativeText("Вы выбрали файл: " + filename);
+        msgBox->setStandardButtons(QMessageBox::Ok);
+        msgBox->setModal(false); // Делаем окно немодальным
+        msgBox->show();
+
+        // Загружаем данные из файла
         LoadJsonData(filename);
+    } else {
+        // Создаем немодальное предупреждение о том, что файл не выбран
+        QMessageBox *msgBox = new QMessageBox(this);
+        msgBox->setText("Нет файла");
+        msgBox->setInformativeText("Ничего не получено");
+        msgBox->setStandardButtons(QMessageBox::Ok);
+        msgBox->setModal(false); // Делаем окно немодальным
+        msgBox->show();
     }
-    else {
-           // Показываем сообщение, что ничего не было выбрано
-           QMessageBox::warning(this, "Нет файла", "Ничего не получено");
-       }
 }
+
 
 
 void GanttChartWidget::OnSolveButtonClicked_2() {
@@ -227,7 +240,7 @@ void GanttChartWidget::mousePressEvent(QMouseEvent *event) {
                 // Также находим все связанные бары на верхнем графике и выделяем их
                 for (auto &machineIndex : sOp.vMachinesIndexes) {
                     for (auto &mOp : msOperations) {
-                        if (mOp.iMachine == machineIndex && mOp.iJob == sOp.iJob) {
+                        if (mOp.iMachine == machineIndex && mOp.iJob == sOp.iJob &&  sOp.iStart == mOp.iStart && sOp.iFinish == mOp.iFinish) {
                             mOp.bHighlighted = true;
                             qDebug() << "Выделен бар на верхнем графике: Машина" << mOp.iMachine;
                         }
@@ -273,7 +286,7 @@ void GanttChartWidget::mousePressEvent(QMouseEvent *event) {
                 // Аналогично, выделяем связанные бары на нижнем графике
                 for (auto &sOp : jsOperations) {
                     if (sOp.iJob == mOp.iJob && (std::find(sOp.vMachinesIndexes.begin(), sOp.vMachinesIndexes.end(), mOp.iMachine) != sOp.vMachinesIndexes.end())
-//                            &&  sOp.iStart == mOp.iStart && sOp.iFinish == mOp.iFinish
+                            &&  sOp.iStart == mOp.iStart && sOp.iFinish == mOp.iFinish
                             ) {
                         sOp.bHighlighted = true;
                         qDebug() << "Выделен бар на нижнем графике: Д" << sOp.iJob;
@@ -306,6 +319,7 @@ void GanttChartWidget::mousePressEvent(QMouseEvent *event) {
     update();
 }
 
+
 void GanttChartWidget::handleRightClick(QPoint clickPos, std::vector<SJobOperation> &jsOperations, std::vector<SMachineOperation> &msOperations) {
     // Проверка на клики по нижнему графику
     for (auto &sOp : jsOperations) {
@@ -326,8 +340,14 @@ void GanttChartWidget::handleRightClick(QPoint clickPos, std::vector<SJobOperati
                 info.chop(2);
             }
 
-            // Показываем всплывающее окно с информацией о баре
-            QMessageBox::information(this, "Информация о детали", info);
+            // Создаем немодальное окно с информацией
+            QMessageBox *msgBox = new QMessageBox(this);
+            msgBox->setText("Информация о детали");
+            msgBox->setInformativeText(info);
+            msgBox->setStandardButtons(QMessageBox::Ok);
+            msgBox->setModal(false); // Делаем окно немодальным
+            msgBox->show();
+
             return; // Завершаем выполнение функции после обработки
         }
     }
@@ -344,12 +364,65 @@ void GanttChartWidget::handleRightClick(QPoint clickPos, std::vector<SJobOperati
                             .arg(mOp.iFinish)
                             .arg(mOp.iJob);
 
-            // Показываем всплывающее окно с информацией о баре
-            QMessageBox::information(this, "Информация о машине", info);
+            // Создаем немодальное окно с информацией
+            QMessageBox *msgBox = new QMessageBox(this);
+            msgBox->setText("Информация о машине");
+            msgBox->setInformativeText(info);
+            msgBox->setStandardButtons(QMessageBox::Ok);
+            msgBox->setModal(false); // Делаем окно немодальным
+            msgBox->show();
+
             return; // Завершаем выполнение функции после обработки
         }
     }
 }
+
+
+
+//void GanttChartWidget::handleRightClick(QPoint clickPos, std::vector<SJobOperation> &jsOperations, std::vector<SMachineOperation> &msOperations) {
+//    // Проверка на клики по нижнему графику
+//    for (auto &sOp : jsOperations) {
+//        if (sOp.rect.contains(clickPos)) {
+//            qDebug() << "Правый клик по бару: Д" << sOp.iJob;
+
+//            // Формируем текст для отображения информации о баре
+//            QString info = QString("Деталь: %1\nНачало: %2\nКонец: %3\nМашины: ")
+//                            .arg(sOp.iJob)
+//                            .arg(sOp.iStart)
+//                            .arg(sOp.iFinish);
+
+//            // Добавляем индексы машин
+//            for (int machineIndex : sOp.vMachinesIndexes) {
+//                info.append(QString("%1, ").arg(machineIndex));
+//            }
+//            if (!sOp.vMachinesIndexes.empty()) {
+//                info.chop(2);
+//            }
+
+//            // Показываем всплывающее окно с информацией о баре
+//            QMessageBox::information(this, "Информация о детали", info);
+//            return; // Завершаем выполнение функции после обработки
+//        }
+//    }
+
+//    // Проверка на клики по верхнему графику
+//    for (auto &mOp : msOperations) {
+//        if (mOp.rect.contains(clickPos)) {
+//            qDebug() << "Правый клик по бару на верхнем графике: Машина" << mOp.iMachine;
+
+//            // Формируем текст для отображения информации о баре
+//            QString info = QString("Машина: %1\nНачало: %2\nКонец: %3\nРабота: %4")
+//                            .arg(mOp.iMachine)
+//                            .arg(mOp.iStart)
+//                            .arg(mOp.iFinish)
+//                            .arg(mOp.iJob);
+
+//            // Показываем всплывающее окно с информацией о баре
+//            QMessageBox::information(this, "Информация о машине", info);
+//            return; // Завершаем выполнение функции после обработки
+//        }
+//    }
+//}
 
 
 
