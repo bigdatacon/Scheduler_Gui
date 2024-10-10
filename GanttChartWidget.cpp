@@ -4,6 +4,7 @@
 #include <iostream>
 #include <QMessageBox>
 #include <QDebug> // Подключите для использования qDebug
+#include <QLabel>
 
 GanttChartWidget::GanttChartWidget(QWidget *pParent)
     : QWidget(pParent), m_iDraggedJob(-1), m_iDraggedMachine(-1), m_bJsMode(true) {
@@ -341,12 +342,30 @@ void GanttChartWidget::handleRightClick(QPoint clickPos, std::vector<SJobOperati
             }
 
             // Создаем немодальное окно с информацией
-            QMessageBox *msgBox = new QMessageBox(this);
-            msgBox->setText("Информация о детали");
-            msgBox->setInformativeText(info);
-            msgBox->setStandardButtons(QMessageBox::Ok);
-            msgBox->setModal(false); // Делаем окно немодальным
-            msgBox->show();
+//            QMessageBox *msgBox = new QMessageBox(this);
+//            msgBox->setText("Информация о детали");
+//            msgBox->setInformativeText(info);
+////            msgBox->setStandardButtons(QMessageBox::Ok);
+//            msgBox->setModal(false); // Делаем окно немодальным
+//            msgBox->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint); // Устанавливаем флаги для закрытия при клике вне окна
+//            msgBox->show();
+
+            // Создаем немодальное окно с информацией
+            QDialog *dialog = new QDialog(this);
+            dialog->setWindowTitle("Информация о детали");
+            dialog->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint); // Устанавливаем флаг для закрытия при клике вне окна
+            dialog->setAttribute(Qt::WA_DeleteOnClose); // Удаляем виджет при закрытии
+
+            // Создаем QLabel для отображения информации
+            QVBoxLayout *layout = new QVBoxLayout();
+            QLabel *infoLabel = new QLabel(info, dialog);
+            layout->addWidget(infoLabel);
+            dialog->setLayout(layout);
+
+            // Показываем диалог
+            dialog->show();
+
+
 
             return; // Завершаем выполнение функции после обработки
         }
@@ -365,12 +384,30 @@ void GanttChartWidget::handleRightClick(QPoint clickPos, std::vector<SJobOperati
                             .arg(mOp.iJob);
 
             // Создаем немодальное окно с информацией
-            QMessageBox *msgBox = new QMessageBox(this);
-            msgBox->setText("Информация о машине");
-            msgBox->setInformativeText(info);
-            msgBox->setStandardButtons(QMessageBox::Ok);
-            msgBox->setModal(false); // Делаем окно немодальным
-            msgBox->show();
+//            QMessageBox *msgBox = new QMessageBox(this);
+//            msgBox->setText("Информация о машине");
+//            msgBox->setInformativeText(info);
+////            msgBox->setStandardButtons(QMessageBox::Ok);
+//            msgBox->setModal(false); // Делаем окно немодальным
+//            msgBox->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint); // Устанавливаем флаги для закрытия при клике вне окн
+//            msgBox->show();
+
+
+            // Создаем немодальное окно с информацией
+            QDialog *dialog = new QDialog(this);
+            dialog->setWindowTitle("Информация о детали");
+            dialog->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint); // Устанавливаем флаг для закрытия при клике вне окна
+            dialog->setAttribute(Qt::WA_DeleteOnClose); // Удаляем виджет при закрытии
+
+            // Создаем QLabel для отображения информации
+            QVBoxLayout *layout = new QVBoxLayout();
+            QLabel *infoLabel = new QLabel(info, dialog);
+            layout->addWidget(infoLabel);
+            dialog->setLayout(layout);
+
+            // Показываем диалог
+            dialog->show();
+
 
             return; // Завершаем выполнение функции после обработки
         }
@@ -384,6 +421,7 @@ void GanttChartWidget::handleRightClick(QPoint clickPos, std::vector<SJobOperati
 //    for (auto &sOp : jsOperations) {
 //        if (sOp.rect.contains(clickPos)) {
 //            qDebug() << "Правый клик по бару: Д" << sOp.iJob;
+
 
 //            // Формируем текст для отображения информации о баре
 //            QString info = QString("Деталь: %1\nНачало: %2\nКонец: %3\nМашины: ")
