@@ -419,14 +419,23 @@ void GanttChartWidget::handleRightClick(QPoint clickPos, std::vector<SJobOperati
 }
 
 void GanttChartWidget::OnShowScheduleMetricsClicked() {
+    // Инициализация данных структуры ScheduleMetrics
+    m_ScheduleMetrics.iScheduleTime = 100;
+    m_ScheduleMetrics.iScheduleCost = 200;
+    m_ScheduleMetrics.iSumDeviation = 300;
+    m_ScheduleMetrics.iDeltaUtilization = 400;
+    m_ScheduleMetrics.iFreeMachinesCount = 500;
     // Создаем новое диалоговое окно для отображения данных
     QDialog* dialog = new QDialog(this);
     dialog->setWindowTitle("Метрики расписания");
-    dialog->resize(600, 400);  // Устанавливаем размер окна
+//    dialog->resize(1000, 800);  // Устанавливаем размер окна
 
     // Создаем текстовое поле для отображения данных
     QTextEdit* textEdit = new QTextEdit(dialog);
     textEdit->setReadOnly(true);  // Делаем поле только для чтения
+
+    // Отключаем перенос строк
+    textEdit->setWordWrapMode(QTextOption::NoWrap);
 
     // Добавляем текст
     QString dataText;
