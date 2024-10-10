@@ -24,7 +24,7 @@ void GanttChart::InitializeColors() {
     // Очистка предыдущих цветов
     m_umapJobColors.clear();
 
-    // Набор основных цветов, которые будут сильно отличаться друг от друга
+    // Набор основных цветов
     std::vector<QColor> primaryColors = {
         QColor(255, 0, 0),   // Красный
         QColor(0, 255, 0),   // Зеленый
@@ -38,16 +38,28 @@ void GanttChart::InitializeColors() {
         QColor(128, 128, 128)// Серый
     };
 
-    // Уменьшение яркости основных цветов на 10%
+    // Применение к каждому цвету уменьшения насыщенности
     for (auto &color : primaryColors) {
-        color = color.darker(130);  // 110% от исходной яркости, уменьшение на 10%
-//        color.setAlpha(154);        // Установить прозрачность на уровне 80% (204 из 255)
+        int h, s, v;
+        color.getHsv(&h, &s, &v);  // Получаем текущие значения Hue, Saturation, Value
 
+        // Уменьшаем насыщенность до 70% от исходной
+        s = std::min(255, (int)(s * 0.7));  // 70% от исходной насыщенности
+
+        // Уменьшаем яркость до 90% от исходной
+        v = std::min(255, (int)(v * 0.9));  // 90% от исходной яркости
+
+        // Применяем изменения обратно в цвет
+        color.setHsv(h, s, v);
+
+        // Устанавливаем непрозрачность на уровне 90%
+        color.setAlpha(230);  // Прозрачность 90% (230 из 255)
     }
+
     // Счетчик для отслеживания, когда закончатся основные цвета
     int primaryColorIndex = 0;
 
-    // Генератор для случайных полутонов
+    // Генератор для случайных цветов
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 255);
@@ -56,16 +68,73 @@ void GanttChart::InitializeColors() {
     for (const auto &sOp : m_vJsOperations_cont) {
         if (m_umapJobColors.find(sOp.iJob) == m_umapJobColors.end()) {
             if (primaryColorIndex < primaryColors.size()) {
-                // Если основные цвета еще остались
+                // Используем основные цвета
                 m_umapJobColors[sOp.iJob] = primaryColors[primaryColorIndex];
                 primaryColorIndex++;
             } else {
                 // Если основные цвета закончились, генерируем случайные полутона
-                m_umapJobColors[sOp.iJob] = QColor(dis(gen), dis(gen), dis(gen));
+                QColor randomColor(dis(gen), dis(gen), dis(gen));
+
+                // Уменьшаем насыщенность случайных цветов
+                int h, s, v;
+                randomColor.getHsv(&h, &s, &v);
+                s = std::min(255, (int)(s * 0.7));  // Уменьшаем насыщенность
+                v = std::min(255, (int)(v * 0.9));  // Уменьшаем яркость
+                randomColor.setHsv(h, s, v);
+                randomColor.setAlpha(230);  // Устанавливаем непрозрачность
+
+                m_umapJobColors[sOp.iJob] = randomColor;
             }
         }
     }
 }
+
+//void GanttChart::InitializeColors() {
+//    // Очистка предыдущих цветов
+//    m_umapJobColors.clear();
+
+//    // Набор основных цветов, которые будут сильно отличаться друг от друга
+//    std::vector<QColor> primaryColors = {
+//        QColor(255, 0, 0),   // Красный
+//        QColor(0, 255, 0),   // Зеленый
+//        QColor(0, 0, 255),   // Синий
+//        QColor(255, 255, 0), // Желтый
+//        QColor(255, 0, 255), // Пурпурный
+//        QColor(0, 255, 255), // Голубой
+//        QColor(128, 0, 128), // Фиолетовый
+//        QColor(255, 165, 0), // Оранжевый
+//        QColor(0, 128, 0),   // Темно-зеленый
+//        QColor(128, 128, 128)// Серый
+//    };
+
+//    // Уменьшение яркости основных цветов на 10%
+//    for (auto &color : primaryColors) {
+//        color = color.darker(130);  // 110% от исходной яркости, уменьшение на 10%
+////        color.setAlpha(154);        // Установить прозрачность на уровне 80% (204 из 255)
+
+//    }
+//    // Счетчик для отслеживания, когда закончатся основные цвета
+//    int primaryColorIndex = 0;
+
+//    // Генератор для случайных полутонов
+//    std::random_device rd;
+//    std::mt19937 gen(rd());
+//    std::uniform_int_distribution<> dis(0, 255);
+
+//    // Создание уникальных цветов для каждого job
+//    for (const auto &sOp : m_vJsOperations_cont) {
+//        if (m_umapJobColors.find(sOp.iJob) == m_umapJobColors.end()) {
+//            if (primaryColorIndex < primaryColors.size()) {
+//                // Если основные цвета еще остались
+//                m_umapJobColors[sOp.iJob] = primaryColors[primaryColorIndex];
+//                primaryColorIndex++;
+//            } else {
+//                // Если основные цвета закончились, генерируем случайные полутона
+//                m_umapJobColors[sOp.iJob] = QColor(dis(gen), dis(gen), dis(gen));
+//            }
+//        }
+//    }
+//}
 
 std::tuple<int, int, int> GanttChart::calculateMaxValues() {
     // Рассчитываем максимальное значение Finish для ограничения оси X
