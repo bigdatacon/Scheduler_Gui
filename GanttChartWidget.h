@@ -6,9 +6,11 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include "GanttChart.h"
-
 #include <QToolBar>
 #include <QPushButton>  // Добавляем этот include для кнопки
+#include <QTextEdit>  // Добавляем для текстового поля
+#include <QDialog>    // Для диалогового окна
+
 
 
 class GanttChartWidget : public QWidget {
@@ -34,6 +36,8 @@ protected:
 private slots:
     void OnSolveButtonClicked();  // Обработчик для нажатия кнопки
     void OnSolveButtonClicked_2();  // Обработчик для нажатия кнопки
+    void OnShowScheduleMetricsClicked();  // Новый слот для открытия окна с данными
+
 
 private:
     void Initialize();
@@ -55,9 +59,9 @@ private:
     QPushButton* m_pShowTimeButton; // кнопка отображения времени по рабочим
 
     bool m_bDisplayingWorkersTimeChart = false; // Flag to track which chart to display
-
-
-
+    // Добавляем кнопку для отображения метрик расписания
+    QPushButton* m_pShowMetricsButton;
+    ScheduleMetrics m_ScheduleMetrics;  // Добавляем объект структуры
 
 };
 

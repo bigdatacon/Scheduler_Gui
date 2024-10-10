@@ -6,6 +6,8 @@
 #include <QDebug> // Подключите для использования qDebug
 #include <QLabel>
 
+
+
 GanttChartWidget::GanttChartWidget(QWidget *pParent)
     : QWidget(pParent), m_iDraggedJob(-1), m_iDraggedMachine(-1), m_bJsMode(true) {
     m_pGanttChart = new GanttChart();
@@ -17,10 +19,12 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent)
     m_pSolveButton = new QPushButton("Запустить солвер из файла", this);
     // кнопка для отображения времени по рабочим
     m_pShowTimeButton = new QPushButton("Отобразить время по рабочим", this);
+    m_pShowMetricsButton = new QPushButton("Отобразить метрики расписания", this);  // Новая кнопка
 
     // Добавляем кнопки на тулбар
     m_pToolBar->addWidget(m_pSolveButton);
     m_pToolBar->addWidget(m_pShowTimeButton);
+    m_pToolBar->addWidget(m_pShowMetricsButton);  // Добавляем кнопку метрик
 
     // Создаем вертикальный layout и добавляем тулбар и график в него
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -34,7 +38,7 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent)
     connect(m_pSolveButton, &QPushButton::clicked, this, &GanttChartWidget::OnSolveButtonClicked_2);
     connect(m_pShowTimeButton, &QPushButton::clicked, this, &GanttChartWidget::onWorkersTimeButtonClicked);
     connect(m_pShowTimeButton, &QPushButton::clicked, this, &GanttChartWidget::DrawWorkersTimeChart); // Подключаем сигнал к слоту
-
+    connect(m_pShowMetricsButton, &QPushButton::clicked, this, &GanttChartWidget::OnShowScheduleMetricsClicked);  // Подключаем кнопку метрик
 
 }
 
@@ -414,243 +418,41 @@ void GanttChartWidget::handleRightClick(QPoint clickPos, std::vector<SJobOperati
     }
 }
 
+void GanttChartWidget::OnShowScheduleMetricsClicked() {
+    // Создаем новое диалоговое окно для отображения данных
+    QDialog* dialog = new QDialog(this);
+    dialog->setWindowTitle("Метрики расписания");
+    dialog->resize(600, 400);  // Устанавливаем размер окна
 
+    // Создаем текстовое поле для отображения данных
+    QTextEdit* textEdit = new QTextEdit(dialog);
+    textEdit->setReadOnly(true);  // Делаем поле только для чтения
 
-//void GanttChartWidget::handleRightClick(QPoint clickPos, std::vector<SJobOperation> &jsOperations, std::vector<SMachineOperation> &msOperations) {
-//    // Проверка на клики по нижнему графику
-//    for (auto &sOp : jsOperations) {
-//        if (sOp.rect.contains(clickPos)) {
-//            qDebug() << "Правый клик по бару: Д" << sOp.iJob;
+    // Добавляем текст
+    QString dataText;
+    for (int i = 0; i < 1000; ++i) {
+        dataText += QString("Строка %1: Время = %2, Стоимость = %3, Отклонение = %4, Утилизация = %5, Свободные машины = %6\n")
+                        .arg(i + 1)
+                        .arg(m_ScheduleMetrics.iScheduleTime)
+                        .arg(m_ScheduleMetrics.iScheduleCost)
+                        .arg(m_ScheduleMetrics.iSumDeviation)
+                        .arg(m_ScheduleMetrics.iDeltaUtilization)
+                        .arg(m_ScheduleMetrics.iFreeMachinesCount);
+    }
+    textEdit->setText(dataText);
 
+    // Добавляем вертикальную и горизонтальную полосу прокрутки
+    textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    textEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
-//            // Формируем текст для отображения информации о баре
-//            QString info = QString("Деталь: %1\nНачало: %2\nКонец: %3\nМашины: ")
-//                            .arg(sOp.iJob)
-//                            .arg(sOp.iStart)
-//                            .arg(sOp.iFinish);
+    // Устанавливаем layout в диалоговом окне
+    QVBoxLayout* dialogLayout = new QVBoxLayout(dialog);
+    dialogLayout->addWidget(textEdit);
+    dialog->setLayout(dialogLayout);
 
-//            // Добавляем индексы машин
-//            for (int machineIndex : sOp.vMachinesIndexes) {
-//                info.append(QString("%1, ").arg(machineIndex));
-//            }
-//            if (!sOp.vMachinesIndexes.empty()) {
-//                info.chop(2);
-//            }
-
-//            // Показываем всплывающее окно с информацией о баре
-//            QMessageBox::information(this, "Информация о детали", info);
-//            return; // Завершаем выполнение функции после обработки
-//        }
-//    }
-
-//    // Проверка на клики по верхнему графику
-//    for (auto &mOp : msOperations) {
-//        if (mOp.rect.contains(clickPos)) {
-//            qDebug() << "Правый клик по бару на верхнем графике: Машина" << mOp.iMachine;
-
-//            // Формируем текст для отображения информации о баре
-//            QString info = QString("Машина: %1\nНачало: %2\nКонец: %3\nРабота: %4")
-//                            .arg(mOp.iMachine)
-//                            .arg(mOp.iStart)
-//                            .arg(mOp.iFinish)
-//                            .arg(mOp.iJob);
-
-//            // Показываем всплывающее окно с информацией о баре
-//            QMessageBox::information(this, "Информация о машине", info);
-//            return; // Завершаем выполнение функции после обработки
-//        }
-//    }
-//}
-
-
-
-
-//void GanttChartWidget::mousePressEvent(QMouseEvent *event) {
-//    if (event->button() == Qt::LeftButton) {
-//        QPoint clickPos = event->pos();
-//        bool barClicked = false;
-
-//        // Проверяем, что объект GanttChart доступен
-//        if (!m_pGanttChart) {
-//            qDebug() << "m_pGanttChart не инициализирован";
-//            return;
-//        }
-
-//        // Используем геттеры для доступа к операциям
-//        auto &msOperations = m_pGanttChart->getMsOperations();
-//        auto &jsOperations = m_pGanttChart->getJsOperations();
-
-//        // Логируем координаты клика
-//        qDebug() << "Координаты клика: " << clickPos;
-
-//        // --- Логика для кликов по нижнему графику (jsOperations) ---
-//        for (auto &sOp : jsOperations) {
-//            qDebug() << "Проверяем бар: Д" << sOp.iJob << ", QRect:" << sOp.rect;
-
-//            if (sOp.rect.contains(clickPos)) {
-//                qDebug() << "Клик по бару: Д" << sOp.iJob;
-
-//                // Снимаем выделение со всех баров перед установкой выделения на нужный
-//                for (auto &jobOp : jsOperations) {
-//                    jobOp.bHighlighted = false;
-//                }
-//                for (auto &machineOp : msOperations) {
-//                    machineOp.bHighlighted = false;
-//                }
-
-//                // Бар найден — выделяем его
-//                sOp.bHighlighted = true;
-
-//                // Также находим все связанные бары на верхнем графике и выделяем их
-//                for (auto &machineIndex : sOp.vMachinesIndexes) {
-//                    for (auto &mOp : msOperations) {
-//                        if (mOp.iMachine == machineIndex && mOp.iJob == sOp.iJob) {
-//                            mOp.bHighlighted = true;
-//                            qDebug() << "Выделен бар на верхнем графике: Машина" << mOp.iMachine;
-//                        }
-//                    }
-//                }
-
-//                barClicked = true;
-//                break; // Прекращаем поиск, так как нашли нужный бар
-//            }
-//        }
-
-//        // --- Логика для кликов по верхнему графику (msOperations) ---
-//        if (!barClicked) { // Если не кликнули по нижнему графику, проверяем верхний
-//            for (auto &mOp : msOperations) {
-//                qDebug() << "Проверяем бар на верхнем графике: Машина" << mOp.iMachine << ", QRect:" << mOp.rect;
-
-//                if (mOp.rect.contains(clickPos)) {
-//                    qDebug() << "Клик по бару на верхнем графике: Машина" << mOp.iMachine;
-
-//                    // Снимаем выделение со всех баров
-//                    for (auto &jobOp : jsOperations) {
-//                        jobOp.bHighlighted = false;
-//                    }
-//                    for (auto &machineOp : msOperations) {
-//                        machineOp.bHighlighted = false;
-//                    }
-
-//                    // Выделяем кликнутый бар на верхнем графике
-//                    mOp.bHighlighted = true;
-
-//                    // Теперь находим все связанные бары по совпадению iJob, iStart и iFinish
-//                    for (auto &mRelatedOp : msOperations) {
-//                        if (mRelatedOp.iJob == mOp.iJob && mRelatedOp.iStart == mOp.iStart && mRelatedOp.iFinish == mOp.iFinish) {
-//                            mRelatedOp.bHighlighted = true;
-//                            qDebug() << "Выделен связанный бар: Машина" << mRelatedOp.iMachine
-//                                     << " для задания Д" << mRelatedOp.iJob
-//                                     << " с началом " << mRelatedOp.iStart
-//                                     << " и окончанием " << mRelatedOp.iFinish;
-//                        }
-//                    }
-
-//                    // Аналогично, выделяем связанные бары на нижнем графике
-//                    for (auto &sOp : jsOperations) {
-//                        if (sOp.iJob == mOp.iJob && (std::find(sOp.vMachinesIndexes.begin(), sOp.vMachinesIndexes.end(), mOp.iMachine) != sOp.vMachinesIndexes.end())
-////                            &&  sOp.iStart == mOp.iStart && sOp.iFinish == mOp.iFinish
-//                                ) {
-//                            sOp.bHighlighted = true;
-//                            qDebug() << "Выделен бар на нижнем графике: Д" << sOp.iJob;
-//                        }
-//                    }
-
-//                    barClicked = true;
-//                    break; // Прекращаем поиск
-//                }
-//            }
-//        }
-
-//        if (!barClicked) {
-//            qDebug() << "Клик вне баров, снятие выделения";
-
-//            // Снимаем выделение со всех баров, если кликнули вне какого-либо из них
-//            for (auto &jobOp : jsOperations) {
-//                jobOp.bHighlighted = false;
-//            }
-//            for (auto &machineOp : msOperations) {
-//                machineOp.bHighlighted = false;
-//            }
-//        }
-
-//        // Обновляем виджет для перерисовки с выделенными элементами
-//        update();
-//        qDebug() << "Перерисовка диаграммы";
-//    }
-//}
-
-
-//void GanttChartWidget::mousePressEvent(QMouseEvent *event) {
-//    if (event->button() == Qt::LeftButton) {
-//        QPoint clickPos = event->pos();
-//        bool barClicked = false;
-
-//        // Проверяем, что объект GanttChart доступен
-//        if (!m_pGanttChart) {
-//            qDebug() << "m_pGanttChart не инициализирован";
-//            return;
-//        }
-
-//        // Используем геттеры для доступа к операциям
-//        auto &msOperations = m_pGanttChart->getMsOperations();
-//        auto &jsOperations = m_pGanttChart->getJsOperations();
-
-//        // Логируем координаты клика
-//        qDebug() << "Координаты клика: " << clickPos;
-
-//        // Проходим по всем барам на нижнем графике
-//        for (auto &sOp : jsOperations) {
-//            qDebug() << "Проверяем бар: Д" << sOp.iJob << ", QRect:" << sOp.rect;
-
-//            if (sOp.rect.contains(clickPos)) {
-//                qDebug() << "Клик по бару: Д" << sOp.iJob;
-
-//                // Снимаем выделение со всех баров перед установкой выделения на нужный
-//                for (auto &jobOp : jsOperations) {
-//                    jobOp.bHighlighted = false;
-//                }
-//                for (auto &machineOp : msOperations) {
-//                    machineOp.bHighlighted = false;
-//                }
-
-//                // Бар найден — выделяем его
-//                sOp.bHighlighted = true;
-
-//                // Также находим все связанные бары на верхнем графике и выделяем их
-//                for (auto &machineIndex : sOp.vMachinesIndexes) {
-//                    for (auto &mOp : msOperations) {
-//                        if (mOp.iMachine == machineIndex && mOp.iJob == sOp.iJob) {
-//                            mOp.bHighlighted = true;
-//                            qDebug() << "Выделен бар на верхнем графике: Машина" << mOp.iMachine;
-//                        }
-//                    }
-//                }
-
-//                barClicked = true;
-//                break; // Прекращаем поиск, так как нашли нужный бар
-//            }
-//        }
-
-//        if (!barClicked) {
-//            qDebug() << "Клик вне баров, снятие выделения";
-
-//            // Снимаем выделение со всех баров, если кликнули вне какого-либо из них
-//            for (auto &jobOp : jsOperations) {
-//                jobOp.bHighlighted = false;
-//            }
-//            for (auto &machineOp : msOperations) {
-//                machineOp.bHighlighted = false;
-//            }
-//        }
-
-//        // Обновляем виджет для перерисовки с выделенными элементами
-//        update();
-//        qDebug() << "Перерисовка диаграммы";
-//    }
-//}
-
-
+    // Показываем диалог
+    dialog->exec();
+}
 
 
 
