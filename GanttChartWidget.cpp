@@ -5,6 +5,8 @@
 #include <QMessageBox>
 #include <QDebug> // Подключите для использования qDebug
 #include <QLabel>
+#include <QApplication>
+#include <QDesktopWidget>  // для доступа к информации о размерах экрана
 
 
 
@@ -333,10 +335,15 @@ void GanttChartWidget::mousePressEvent(QMouseEvent *event) {
 }
 
 // Функция для отображения диалога с информацией из SJobOperation
+
 void GanttChartWidget::showJobOperationDialog(const SJobOperation& sOp, const QString& relatedMachineInfo) {
     QDialog* dialog = new QDialog(this);
     dialog->setWindowTitle("Информация о Job операции");
 
+    // Устанавливаем прозрачность окна на 50%
+    dialog->setWindowOpacity(0.5);
+
+    // Создаем текстовое поле для отображения
     QTextEdit* textEdit = new QTextEdit(dialog);
     textEdit->setReadOnly(true);
 
@@ -354,7 +361,21 @@ void GanttChartWidget::showJobOperationDialog(const SJobOperation& sOp, const QS
     layout->addWidget(textEdit);
     dialog->setLayout(layout);
 
-    dialog->exec();
+    // Размещаем окно в правом верхнем углу относительно окна графика
+    const int offsetX = 20; // Отступ от правого края окна графика
+    const int offsetY = 20; // Отступ от верхнего края окна графика
+    QRect chartGeometry = this->geometry(); // Геометрия окна с графиком
+    dialog->move(chartGeometry.right() - dialog->width() - offsetX, chartGeometry.top() + offsetY);
+
+    // Открываем окно немодально, чтобы другие элементы оставались активными
+    dialog->show();
+
+    // Закрываем окно при клике вне него
+    connect(qApp, &QApplication::focusChanged, dialog, [dialog](QWidget *old, QWidget *now) {
+        if (now != dialog && !dialog->isAncestorOf(now)) {
+            dialog->close();  // Закрываем окно, если клик вне его
+        }
+    });
 }
 
 // Функция для отображения диалога с информацией из SMachineOperation
@@ -362,6 +383,10 @@ void GanttChartWidget::showMachineOperationDialog(const SMachineOperation& mOp) 
     QDialog* dialog = new QDialog(this);
     dialog->setWindowTitle("Информация о Machine операции");
 
+    // Устанавливаем прозрачность окна на 50%
+    dialog->setWindowOpacity(0.5);
+
+    // Создаем текстовое поле для отображения
     QTextEdit* textEdit = new QTextEdit(dialog);
     textEdit->setReadOnly(true);
 
@@ -379,8 +404,42 @@ void GanttChartWidget::showMachineOperationDialog(const SMachineOperation& mOp) 
     layout->addWidget(textEdit);
     dialog->setLayout(layout);
 
-    dialog->exec();
+    // Размещаем окно в правом верхнем углу относительно окна графика
+    const int offsetX = 20; // Отступ от правого края окна графика
+    const int offsetY = 20; // Отступ от верхнего края окна графика
+    QRect chartGeometry = this->geometry(); // Геометрия окна с графиком
+    dialog->move(chartGeometry.right() - dialog->width() - offsetX, chartGeometry.top() + offsetY);
+
+    // Открываем окно немодально, чтобы другие элементы оставались активными
+    dialog->show();
+
+    // Закрываем окно при клике вне него
+    connect(qApp, &QApplication::focusChanged, dialog, [dialog](QWidget *old, QWidget *now) {
+        if (now != dialog && !dialog->isAncestorOf(now)) {
+            dialog->close();  // Закрываем окно, если клик вне его
+        }
+    });
 }
+
+bool GanttChartWidget::eventFilter(QObject *obj, QEvent *event) {
+    static QPoint dragPosition;
+
+    if (event->type() == QEvent::MouseButtonPress) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+        if (mouseEvent->button() == Qt::LeftButton) {
+            dragPosition = mouseEvent->globalPos() - static_cast<QWidget *>(obj)->frameGeometry().topLeft();
+            return true;
+        }
+    } else if (event->type() == QEvent::MouseMove) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+        if (mouseEvent->buttons() & Qt::LeftButton) {
+            static_cast<QWidget *>(obj)->move(mouseEvent->globalPos() - dragPosition);
+            return true;
+        }
+    }
+    return QObject::eventFilter(obj, event);
+}
+
 
 
 //void GanttChartWidget::mousePressEvent(QMouseEvent *event) {

@@ -35,11 +35,13 @@ protected:
 
     void showJobOperationDialog(const SJobOperation& sOp, const QString& relatedMachineInfo);
     void showMachineOperationDialog(const SMachineOperation& mOp);
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private slots:
     void OnSolveButtonClicked();  // Обработчик для нажатия кнопки
     void OnSolveButtonClicked_2();  // Обработчик для нажатия кнопки
     void OnShowScheduleMetricsClicked();  // Новый слот для открытия окна с данными
+
 
 
 private:
