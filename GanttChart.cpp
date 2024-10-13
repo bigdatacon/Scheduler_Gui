@@ -548,14 +548,14 @@ void GanttChart::DrawWorkersTimeChart(QPainter *pPainter, int iScreenWidth, int 
     int barWidth = (iScreenWidth - 20 * margin) / (numWorkers * 1.6);
 
     // Масштабные коэффициенты и отступы
-    int marginHorizontal = iScreenWidth * 0.1;
-    int marginVertical = iScreenHeight * 0.1;
-    int labelOffset = iScreenHeight * 0.05;
+    int marginHorizontal = std::max(static_cast<int>(iScreenWidth * 0.1), 30);
+    int marginVertical = std::max(static_cast<int>(iScreenHeight * 0.1), 50);
+    int labelOffset = std::max(static_cast<int>(iScreenHeight * 0.05), 20);
 
     // Динамический размер шрифта
-//    int fontSize = std::min(iScreenWidth, iScreenHeight) * 0.02;d
-//    int fontSize = std::min(iScreenWidth, barWidth) * 0.2;
-    int fontSize = barWidth * 0.15;
+//    int fontSize =barWidth* 0.15;
+    int fontSize = std::min(barWidth * 0.15, iScreenHeight * 0.02);
+
 
     QFont font = pPainter->font();
     font.setPointSize(fontSize);
@@ -674,7 +674,6 @@ void GanttChart::DrawWorkersTimeChart(QPainter *pPainter, int iScreenWidth, int 
 
             pPainter->drawText(xPosition, yPosition + marginVertical * 0.1, barWidth / 2 - 2, textHeight, Qt::AlignCenter, QString::number(time));
         }
-
 
         // Рисуем красный бар для количества операций рядом, с делением на части
         int segmentHeight = barHeightJob / std::max(1, jobCount);
