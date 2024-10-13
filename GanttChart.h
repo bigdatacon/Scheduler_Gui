@@ -35,6 +35,7 @@ struct SMachineOperation {
     int iFinish;
     int iJob;
     int iMachine;
+    int iSetuptime;
     QRect rect; // Координаты прямоугольника для отрисовки
     bool bHighlighted = false; // Состояние выделения
 };

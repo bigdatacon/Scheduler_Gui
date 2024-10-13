@@ -14,18 +14,18 @@ QString JsonReader::getHigherPath(const QString &currentPath, int levelsUp) {
 
 void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJobOperation> &m_vJsOperations_cont, std::vector<SMachineOperation> &m_vMsOperations_cont, ScheduleMetrics &m_ScheduleMetrics) {
     std::vector<std::vector<MSOperation*>> ms_operations = {
-            {new MSOperation{2, 5, 0, 32 ,0}},
+            {new MSOperation{2, 5, 0, 32 ,10}},
             {new MSOperation{}},
-            {new MSOperation{3, 1, 40, 71, 0},  new MSOperation{2, 9, 72, 103, 0}},
-            {new MSOperation{1, 6, 0, 28 ,0}},
-            {new MSOperation{1, 2, 28, 33 ,0}},
-            {new MSOperation{3, 10, 0, 40 ,0}},
-            {new MSOperation{3, 3, 71, 99 ,0}},
-            {new MSOperation{1, 6, 0, 28 ,0}},
-            {new MSOperation{1, 7, 33, 65 ,0}},
+            {new MSOperation{3, 1, 40, 71, 12},  new MSOperation{2, 9, 72, 103, 13}},
+            {new MSOperation{1, 6, 0, 28 ,23}},
+            {new MSOperation{1, 2, 28, 33 ,3}},
+            {new MSOperation{3, 10, 0, 40 ,7}},
+            {new MSOperation{3, 3, 71, 99 ,4}},
+            {new MSOperation{1, 6, 0, 28 ,2}},
+            {new MSOperation{1, 7, 33, 65 ,10}},
             {new MSOperation{}},
-            {new MSOperation{1, 6, 0, 28 ,0}},
-            {new MSOperation{2, 8, 32, 72, 0},  new MSOperation{1, 4, 72, 134, 0}}
+            {new MSOperation{1, 6, 0, 28 ,9}},
+            {new MSOperation{2, 8, 32, 72, 11},  new MSOperation{1, 4, 72, 134, 22}}
     };
     std::vector<std::vector<JSOperation*>> js_operations = {
         {new JSOperation{{4, 8, 11}, 6, 0, 28}, new JSOperation{{5}, 2, 28, 33}, new JSOperation{{9}, 7, 33, 65}, new JSOperation{{12}, 4, 72, 134}},
@@ -47,6 +47,7 @@ void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJ
                 0,      // Финиш по умолчанию
                 0,      // Индекс работы по умолчанию
                 i + 1,   // Машина (индекс +1)
+                0,
                 QRect(),    // Пустой QRect
                 false       // Не выделен по умолчанию
             });
@@ -58,6 +59,7 @@ void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJ
                     op->finishTime,
                     op->jobIndex,
                     i + 1,
+                    op->setupTime,
                     QRect(),    // Пустой QRect
                     false       // Не выделен по умолчанию
                 });
@@ -147,9 +149,9 @@ void JsonReader::ReadOperationsFromFile_2(const QString &sFilename, std::vector<
 
 
     std::vector<std::vector<MSOperation*>> ms_operations = {
-            {new MSOperation{1, 1, 71, 102, 0}, new MSOperation{1, 1, 169, 204, 0}}, // +1 к первому значению
-            {new MSOperation{1, 2, 102, 129, 0}, new MSOperation{1, 2, 129, 169, 0}},
-            {new MSOperation{3, 4, 0, 38, 0}, new MSOperation{1, 4, 38, 71, 0}, new MSOperation{2, 4, 71, 109, 0}, new MSOperation{3, 4, 109, 173, 0}},
+            {new MSOperation{1, 1, 71, 102, 3}, new MSOperation{1, 1, 169, 204, 4}}, // +1 к первому значению
+            {new MSOperation{1, 2, 102, 129, 5}, new MSOperation{1, 2, 129, 169, 6}},
+            {new MSOperation{3, 4, 0, 38, 7}, new MSOperation{1, 4, 38, 71, 8}, new MSOperation{2, 4, 71, 109, 9}, new MSOperation{3, 4, 109, 173, 10}},
             {new MSOperation{3, 5, 65, 107, 0}},
             {new MSOperation{2, 6, 14, 35, 0}, new MSOperation{3, 6, 38, 65, 0}, new MSOperation{3, 6, 227, 254, 0}},
             {new MSOperation{2, 7, 0, 14, 0}},
@@ -172,6 +174,7 @@ void JsonReader::ReadOperationsFromFile_2(const QString &sFilename, std::vector<
                 0,      // Финиш по умолчанию
                 0,      // Индекс работы по умолчанию
                 i + 1,   // Машина (индекс +1)
+                0,
                 QRect(),    // Пустой QRect
                 false       // Не выделен по умолчанию
             });
@@ -182,7 +185,9 @@ void JsonReader::ReadOperationsFromFile_2(const QString &sFilename, std::vector<
                     op->startTime,
                     op->finishTime,
                     op->jobIndex,
+
                     i + 1,   // Машина (индекс +1)
+                    op->setupTime,
                     QRect(),    // Пустой QRect
                     false       // Не выделен по умолчанию
                 });
