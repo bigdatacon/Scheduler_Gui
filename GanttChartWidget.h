@@ -33,6 +33,9 @@ protected:
     void updateChart();
     void onWorkersTimeButtonClicked();
 
+    void showJobOperationDialog(const SJobOperation& sOp, const QString& relatedMachineInfo);
+    void showMachineOperationDialog(const SMachineOperation& mOp);
+
 private slots:
     void OnSolveButtonClicked();  // Обработчик для нажатия кнопки
     void OnSolveButtonClicked_2();  // Обработчик для нажатия кнопки
