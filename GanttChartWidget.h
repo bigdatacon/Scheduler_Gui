@@ -34,7 +34,7 @@ protected:
     void onWorkersTimeButtonClicked();
 
     void showJobOperationDialog(const SJobOperation& sOp, const QString& relatedMachineInfo);
-    void showMachineOperationDialog(const SMachineOperation& mOp);
+    void showMachineOperationDialog(const SMachineOperation& mOp, const QString& relatedJobsInfo, int iQuantMachines);
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private slots:
