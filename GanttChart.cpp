@@ -455,7 +455,21 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
 
 
         // Рисуем линию, которая будет обозначать setup_time
-        pPainter->drawLine(iBarStartX + iSetupWidth, oMachineRect.top(), iBarStartX + iSetupWidth, oMachineRect.bottom());
+//        pPainter->drawLine(iBarStartX + iSetupWidth, oMachineRect.top(), iBarStartX + iSetupWidth, oMachineRect.bottom());
+
+
+        // Устанавливаем полупрозрачное перо для наклонных линий
+        QPen pen(QColor(0, 0, 0, 93)); // Полупрозрачный черный цвет (50% прозрачности)
+        pPainter->setPen(pen);
+
+        // Рисуем наклонные линии с шагом 1 пиксель
+        for (int x = 0; x < iSetupWidth; x += 2) { // Шаг 2 пикселя, чтобы сделать наклонные линии
+            int startX = iBarStartX + x;
+            int startY = oMachineRect.top();
+            int endX = iBarStartX + x -1; // Смещаем линию на один пиксель по диагонали
+            int endY = oMachineRect.bottom();
+            pPainter->drawLine(startX, startY, endX, endY); // Рисуем диагональную линию
+        }
 
         // Рисуем контур и текст
         if (sOp.bHighlighted) {
@@ -473,44 +487,6 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
         pPainter->drawText(oMachineRect, Qt::AlignCenter, labelText);
     }
 
-
-
-//    for (auto &sOp : m_vMsOperations_cont) {
-//        int iBarStartX = ioffsetFromSide + sOp.iStart * iScaleFactorX;
-//        int iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
-//        int iBarCenterY = iOffsetYJs + (sOp.iMachine - 1) * iMachineHeight + iMachineHeight / 2;
-
-//        // Уменьшаем высоту бара до 50% от высоты строки машины
-//        QRect oMachineRect(iBarStartX, iBarCenterY - iMachineHeight * 0.25, iBarWidth, iMachineHeight * 0.5);
-
-//        // Сохраняем прямоугольник в структуре операции
-//        sOp.rect = oMachineRect;
-
-//        // Если бар выделен, изменяем цвет и толщину пера
-//        if (sOp.bHighlighted) {
-//            pPainter->setPen(QPen(Qt::black, 3)); // Черный жирный контур
-//            pPainter->fillRect(oMachineRect, Qt::yellow); // Желтая заливка
-//        } else {
-//            pPainter->setPen(textPen);
-//            pPainter->fillRect(oMachineRect, m_umapJobColors[sOp.iJob]);
-//        }
-
-
-//        if (sOp.bHighlighted) {
-//            pPainter->drawRect(oMachineRect);
-//            pPainter->setFont(dynamicFont);
-//            dynamicFont.setBold(true);  // Делаем шрифт жирным
-//            pPainter->setPen(Qt::black); // Черный цвет текста
-//        }
-//        else {
-//            pPainter->drawRect(oMachineRect);
-//            pPainter->setFont(dynamicFont);
-//        }
-
-//        // Формируем текст для подписи
-//        QString labelText = QString("Д %1").arg(sOp.iJob);
-//        pPainter->drawText(oMachineRect, Qt::AlignCenter, labelText);
-//    }
 
     // Отрисовка баров для операций на графике задач (m_vJsOperations_cont)
     for (auto &sOp : m_vJsOperations_cont) {
