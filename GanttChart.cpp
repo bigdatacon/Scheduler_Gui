@@ -237,6 +237,7 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     pPainter->setFont(axisLabelFont);
     pPainter->setPen(timeLabelPen);
 
+
 //    pPainter->drawText(midPointMachineDuration, iOffsetYJs - ioffsetFromVertical*0.5, "Длительность:");
             // Создаём строку с данными из ScheduleMetrics
     QString scheduleMetricsText = QString("Длительность: %1, стоимость: %2")
