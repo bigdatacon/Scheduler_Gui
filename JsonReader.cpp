@@ -13,26 +13,63 @@ QString JsonReader::getHigherPath(const QString &currentPath, int levelsUp) {
 
 
 void JsonReader::ReadOperationsFromFile(const QString &sFilename, std::vector<SJobOperation> &m_vJsOperations_cont, std::vector<SMachineOperation> &m_vMsOperations_cont, ScheduleMetrics &m_ScheduleMetrics) {
+//    std::vector<std::vector<MSOperation*>> ms_operations = {
+//            {new MSOperation{2, 5, 0, 32 ,10}},
+//            {new MSOperation{}},
+//            {new MSOperation{3, 1, 40, 71, 12},  new MSOperation{2, 9, 72, 103, 13}},
+//            {new MSOperation{1, 6, 0, 28 ,23}},
+//            {new MSOperation{1, 2, 28, 33 ,3}},
+//            {new MSOperation{3, 10, 0, 40 ,7}},
+//            {new MSOperation{3, 3, 71, 99 ,4}},
+//            {new MSOperation{1, 6, 0, 28 ,2}},
+//            {new MSOperation{1, 7, 33, 65 ,10}},
+//            {new MSOperation{}},
+//            {new MSOperation{1, 6, 0, 28 ,9}},
+//            {new MSOperation{2, 8, 32, 72, 11},  new MSOperation{1, 4, 72, 134, 22}}
+//    };
+//    std::vector<std::vector<JSOperation*>> js_operations = {
+//        {new JSOperation{{4, 8, 11}, 6, 0, 28}, new JSOperation{{5}, 2, 28, 33}, new JSOperation{{9}, 7, 33, 65}, new JSOperation{{12}, 4, 72, 134}},
+//        {new JSOperation{{1}, 5, 0, 32}, new JSOperation{{12}, 8, 32, 72}, new JSOperation{{3}, 9, 72, 103}},
+//        {new JSOperation{{6}, 10, 0, 40}, new JSOperation{{3}, 1, 40, 71}, new JSOperation{{7}, 3, 71, 99}}
+//    };
+//    MSchedule
+//    Machine 1 OpCnt 1 SetupTime 0 | 2 1 22 53
+//    Machine 2 OpCnt 1 SetupTime 0 | 2 9 53 84
+//    Machine 3 OpCnt 1 SetupTime 0 | 1 5 95 127
+//    Machine 4 OpCnt 2 SetupTime 25 | 1 2 0 24 | 3 10 61 101
+//    Machine 5 OpCnt 1 SetupTime 11 | 1 6 39 95
+//    Machine 6 OpCnt 1 SetupTime 0 | 1 4 24 39
+//    Machine 7 OpCnt 2 SetupTime 11 | 2 3 0 22 | 1 6 39 95
+//    Machine 8 OpCnt 1 SetupTime 0 | 2 1 22 53
+//    Machine 9 OpCnt 2 SetupTime 25 | 3 7 0 40 | 3 10 61 101
+//    Machine 10 OpCnt 2 SetupTime 11 | 1 2 0 24 | 3 8 40 61
+//    Machine 11 OpCnt 1 SetupTime 0 | 3 7 0 40
+//    Machine 12 OpCnt 2 SetupTime 25 | 1 4 24 39 | 3 10 61 101
+//    JSchedule
+//    Job 1 OpCnt 4 | (4 10) 2 0 24 | (12 6) 4 24 39 | (5 7) 6 39 95 | (3) 5 95 127
+//    Job 2 OpCnt 3 | (7) 3 0 22 | (1 8) 1 22 53 | (2) 9 53 84
+//    Job 3 OpCnt 3 | (9 11) 7 0 40 | (10) 8 40 61 | (4 9 12) 10 61 101
+
     std::vector<std::vector<MSOperation*>> ms_operations = {
-            {new MSOperation{2, 5, 0, 32 ,10}},
-            {new MSOperation{}},
-            {new MSOperation{3, 1, 40, 71, 12},  new MSOperation{2, 9, 72, 103, 13}},
-            {new MSOperation{1, 6, 0, 28 ,23}},
-            {new MSOperation{1, 2, 28, 33 ,3}},
-            {new MSOperation{3, 10, 0, 40 ,7}},
-            {new MSOperation{3, 3, 71, 99 ,4}},
-            {new MSOperation{1, 6, 0, 28 ,2}},
-            {new MSOperation{1, 7, 33, 65 ,10}},
-            {new MSOperation{}},
-            {new MSOperation{1, 6, 0, 28 ,9}},
-            {new MSOperation{2, 8, 32, 72, 11},  new MSOperation{1, 4, 72, 134, 22}}
-    };
-    std::vector<std::vector<JSOperation*>> js_operations = {
-        {new JSOperation{{4, 8, 11}, 6, 0, 28}, new JSOperation{{5}, 2, 28, 33}, new JSOperation{{9}, 7, 33, 65}, new JSOperation{{12}, 4, 72, 134}},
-        {new JSOperation{{1}, 5, 0, 32}, new JSOperation{{12}, 8, 32, 72}, new JSOperation{{3}, 9, 72, 103}},
-        {new JSOperation{{6}, 10, 0, 40}, new JSOperation{{3}, 1, 40, 71}, new JSOperation{{7}, 3, 71, 99}}
+            {new MSOperation{2, 1, 22, 53, 0}},  // Machine 1
+            {new MSOperation{2, 9, 53, 84, 0}},  // Machine 2
+            {new MSOperation{1, 5, 95, 127, 0}}, // Machine 3
+            {new MSOperation{1, 2, 0, 24, 0}, new MSOperation{3, 10, 61, 101, 25}}, // Machine 4
+            {new MSOperation{1, 6, 39, 95, 11}}, // Machine 5
+            {new MSOperation{1, 4, 24, 39, 0}},  // Machine 6
+            {new MSOperation{2, 3, 0, 22, 0}, new MSOperation{1, 6, 39, 95, 11}}, // Machine 7
+            {new MSOperation{2, 1, 22, 53, 0}},  // Machine 8
+            {new MSOperation{3, 7, 0, 40, 0}, new MSOperation{3, 10, 61, 101, 25}}, // Machine 9
+            {new MSOperation{1, 2, 0, 24, 0}, new MSOperation{3, 8, 40, 61, 11}}, // Machine 10
+            {new MSOperation{3, 7, 0, 40, 0}},  // Machine 11
+            {new MSOperation{1, 4, 24, 39, 0}, new MSOperation{3, 10, 61, 101, 25}}  // Machine 12
     };
 
+    std::vector<std::vector<JSOperation*>> js_operations = {
+            { new JSOperation{{4, 10}, 2, 0, 24}, new JSOperation{{12, 6}, 4, 24, 39}, new JSOperation{{5,7}, 6, 39, 95}, new JSOperation{{3}, 5, 95, 127}},
+            { new JSOperation{{7}, 3, 0, 22}, new JSOperation{{1, 8}, 1 , 22,  53}, new JSOperation{{2}, 9, 53, 84}},
+            { new JSOperation{{9, 11}, 7, 0, 40}, new JSOperation{{10}, 8, 40, 61}, new JSOperation{{4, 9, 12}, 10, 61, 101}}
+    };
 
     m_vMsOperations_cont.clear();
     m_vJsOperations_cont.clear();
