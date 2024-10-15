@@ -10,7 +10,7 @@
 #include <QPushButton>  // Добавляем этот include для кнопки
 #include <QTextEdit>  // Добавляем для текстового поля
 #include <QDialog>    // Для диалогового окна
-
+#include <QRadioButton>  // Для радиокнопок
 
 
 class GanttChartWidget : public QWidget {
@@ -44,8 +44,6 @@ private slots:
 
     void OnSolveButtonClicked_SolverRestart();// Обработчик для нажатия кнопки перезапустить solver
 
-
-
 private:
     void Initialize();
     void DrawGanttChart();
@@ -71,6 +69,10 @@ private:
     ScheduleMetrics m_ScheduleMetrics;  // Добавляем объект структуры
 
     QPushButton* m_pRestartSolverButton; // Кнопка для перезапуска солвера
+
+    // Добавляем радиокнопки
+    QRadioButton* m_pSetupRadioButton; // Кнопка для установки режима наладки
+    QRadioButton* m_pWorkersTimeRadioButton; // Кнопка для установки режима полного времени
 
 };
 

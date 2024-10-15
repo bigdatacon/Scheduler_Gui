@@ -7,7 +7,7 @@
 #include <QLabel>
 #include <QApplication>
 #include <QDesktopWidget>  // для доступа к информации о размерах экрана
-
+#include "GlobalState.h"  // Подключаем заголовок с глобальной переменной
 
 
 GanttChartWidget::GanttChartWidget(QWidget *pParent)
@@ -24,11 +24,20 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent)
     m_pShowMetricsButton = new QPushButton("Отобразить метрики расписания", this);  // Новая кнопка отображения метрик
     m_pRestartSolverButton = new QPushButton("Перезапустить солвер", this);  // Новая кнопка перезапуск солвера
 
+    // Радиокнопки для выбора режима
+    m_pSetupRadioButton = new QRadioButton("Наладка", this);
+    m_pWorkersTimeRadioButton = new QRadioButton("Время по рабочим", this);
+    // Устанавливаем по умолчанию режим "наладка"
+    m_pSetupRadioButton->setChecked(true);
+
     // Добавляем кнопки на тулбар
     m_pToolBar->addWidget(m_pSolveButton);
     m_pToolBar->addWidget(m_pShowTimeButton);
     m_pToolBar->addWidget(m_pShowMetricsButton);  // Добавляем кнопку метрик
     m_pToolBar->addWidget(m_pRestartSolverButton);  // Добавляем кнопку перезапуск солвера
+    // Добавляем радиокнопки на тулбар
+    m_pToolBar->addWidget(m_pSetupRadioButton);
+    m_pToolBar->addWidget(m_pWorkersTimeRadioButton);
 
     // Создаем вертикальный layout и добавляем тулбар и график в него
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -44,6 +53,21 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent)
     connect(m_pShowTimeButton, &QPushButton::clicked, this, &GanttChartWidget::DrawWorkersTimeChart); // Подключаем сигнал к слоту
     connect(m_pShowMetricsButton, &QPushButton::clicked, this, &GanttChartWidget::OnShowScheduleMetricsClicked);  // Подключаем кнопку метрик
     connect(m_pRestartSolverButton, &QPushButton::clicked, this, &GanttChartWidget::OnSolveButtonClicked_SolverRestart);  // Подключаем кнопку метрик
+
+    // Подключаем сигналы радиокнопок к обработчикам
+    connect(m_pSetupRadioButton, &QRadioButton::toggled, this, [this](bool checked) {
+        if (checked) {
+            g_currentState = SETUP;
+            qDebug() << "Режим установлен: Наладка";
+        }
+    });
+
+    connect(m_pWorkersTimeRadioButton, &QRadioButton::toggled, this, [this](bool checked) {
+        if (checked) {
+            g_currentState = WORKERS_TIME;
+            qDebug() << "Режим установлен: Время по рабочим";
+        }
+    });
 }
 
 
@@ -173,6 +197,15 @@ void GanttChartWidget::paintEvent(QPaintEvent *event) {
     // Рисуем с учетом высоты тулбара
     int toolbarHeight = m_pToolBar->height();
 //    oPainter.translate(0, toolbarHeight); // Смещаем систему координат
+
+    if (g_currentState == SETUP) {
+        qDebug() << "Установлен режим: Наладка";
+        // Логика для режима "наладка"
+    } else if (g_currentState == WORKERS_TIME) {
+        qDebug() << "Установлен режим: Время по рабочим";
+        // Логика для режима "время по рабочим"
+    }
+
 
     if (m_bDisplayingWorkersTimeChart) {
         // Отрисовываем workers chart

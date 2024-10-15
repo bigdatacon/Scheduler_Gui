@@ -13,6 +13,7 @@ SOURCES += \
 #    GanttChart.cpp \
     GanttChart.cpp \
     GanttChartWidget.cpp \
+    GlobalState.cpp \
     JsonReader.cpp \
     MainWindow.cpp \
     main.cpp
@@ -22,6 +23,7 @@ HEADERS += \
 #    GanttChart.h \
     GanttChart.h \
     GanttChartWidget.h \
+    GlobalState.h \
     InputData.h \
     JsonReader.h \
     MainWindow.h \
