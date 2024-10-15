@@ -38,9 +38,11 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private slots:
-    void OnSolveButtonClicked();  // Обработчик для нажатия кнопки
-    void OnSolveButtonClicked_2();  // Обработчик для нажатия кнопки
+    void OnSolveButtonClicked();  // Обработчик для нажатия кнопки запустить solver
+    void OnSolveButtonClicked_2();  // Обработчик для нажатия кнопки время по рабочим
     void OnShowScheduleMetricsClicked();  // Новый слот для открытия окна с данными
+
+    void OnSolveButtonClicked_SolverRestart();// Обработчик для нажатия кнопки перезапустить solver
 
 
 
@@ -67,6 +69,8 @@ private:
     // Добавляем кнопку для отображения метрик расписания
     QPushButton* m_pShowMetricsButton;
     ScheduleMetrics m_ScheduleMetrics;  // Добавляем объект структуры
+
+    QPushButton* m_pRestartSolverButton; // Кнопка для перезапуска солвера
 
 };
 

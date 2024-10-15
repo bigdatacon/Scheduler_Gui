@@ -18,15 +18,17 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent)
     // Создаем тулбар и кнопки
     m_pToolBar = new QToolBar(this);
     //кнопка Запустить солвер из файл
-    m_pSolveButton = new QPushButton("Запустить солвер из файла", this);
+    m_pSolveButton = new QPushButton("Запустить солвер из файла", this); // Новая кнопка запуск солвера
     // кнопка для отображения времени по рабочим
-    m_pShowTimeButton = new QPushButton("Отобразить время по рабочим", this);
-    m_pShowMetricsButton = new QPushButton("Отобразить метрики расписания", this);  // Новая кнопка
+    m_pShowTimeButton = new QPushButton("Отобразить время по рабочим", this); // Новая кнопка отображения времени по рабочим
+    m_pShowMetricsButton = new QPushButton("Отобразить метрики расписания", this);  // Новая кнопка отображения метрик
+    m_pRestartSolverButton = new QPushButton("Перезапустить солвер", this);  // Новая кнопка перезапуск солвера
 
     // Добавляем кнопки на тулбар
     m_pToolBar->addWidget(m_pSolveButton);
     m_pToolBar->addWidget(m_pShowTimeButton);
     m_pToolBar->addWidget(m_pShowMetricsButton);  // Добавляем кнопку метрик
+    m_pToolBar->addWidget(m_pRestartSolverButton);  // Добавляем кнопку перезапуск солвера
 
     // Создаем вертикальный layout и добавляем тулбар и график в него
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -41,7 +43,7 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent)
     connect(m_pShowTimeButton, &QPushButton::clicked, this, &GanttChartWidget::onWorkersTimeButtonClicked);
     connect(m_pShowTimeButton, &QPushButton::clicked, this, &GanttChartWidget::DrawWorkersTimeChart); // Подключаем сигнал к слоту
     connect(m_pShowMetricsButton, &QPushButton::clicked, this, &GanttChartWidget::OnShowScheduleMetricsClicked);  // Подключаем кнопку метрик
-
+    connect(m_pRestartSolverButton, &QPushButton::clicked, this, &GanttChartWidget::OnSolveButtonClicked_SolverRestart);  // Подключаем кнопку метрик
 }
 
 
@@ -85,6 +87,12 @@ void GanttChartWidget::OnSolveButtonClicked() {
 
 void GanttChartWidget::OnSolveButtonClicked_2() {
     QMessageBox::information(this, "Файл не выбран", "перерисовывю на структурах: " );
+    const QString filename;
+    LoadJsonData_2(filename);
+}
+
+void GanttChartWidget::OnSolveButtonClicked_SolverRestart() {
+    QMessageBox::information(this, "Перезапуск солвера", "делаю то же самое что и на кнопке запустить солвер: " );
     const QString filename;
     LoadJsonData_2(filename);
 }
