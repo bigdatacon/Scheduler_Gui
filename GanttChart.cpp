@@ -188,7 +188,48 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int iScreenWidth, int iScree
     int ioffsetFromVertical =  std::max(static_cast<int>(iScreenHeight * 0.05), 50);
     int ioffsetFromSide =  std::max(static_cast<int>(iScreenWidth * 0.05), 50);
 
-    int iScaleFactorX = (iScreenWidth - ioffsetFromSide*2) / iMaxFinish;
+
+    // Находим максимальное количество баров для каждой машины и задачи
+    QMap<int, int> qmMachineBarsCount;
+    QMap<int, int> qmJobBarsCount;
+
+    // Считаем количество баров (операций) для каждой машины
+    for (const auto &op : m_vMsOperations_cont) {
+        qmMachineBarsCount[op.iMachine]++;
+    }
+
+    // Считаем количество баров (операций) для каждой задачи
+    for (const auto &op : m_vJsOperations_cont) {
+        qmJobBarsCount[op.iJob]++;
+    }
+
+    // Находим максимальное количество баров для всех машин
+    int maxBarsForMachines = 0;
+    for (auto count : qmMachineBarsCount.values()) {
+        maxBarsForMachines = std::max(maxBarsForMachines, count);
+    }
+
+    // Находим максимальное количество баров для всех задач
+    int maxBarsForJobs = 0;
+    for (auto count : qmJobBarsCount.values()) {
+        maxBarsForJobs = std::max(maxBarsForJobs, count);
+    }
+
+    // Выбираем наибольшее значение из максимального количества баров для машин и задач
+    int maxBarsCount = std::max(maxBarsForMachines, maxBarsForJobs);
+
+    // Расчет масштабного фактора на основе временной шкалы (iMaxFinish)
+    int scaleByTime = (iScreenWidth - ioffsetFromSide * 2) / iMaxFinish;
+
+    // Расчет масштабного фактора на основе максимального количества баров (maxBarsCount)
+    int scaleByBars = (iScreenWidth - ioffsetFromSide * 2) / maxBarsCount;
+
+    // Выбираем наименьшее значение, чтобы обеспечить правильное распределение
+    int iScaleFactorX = std::min(scaleByTime, scaleByBars);
+
+
+
+//    int iScaleFactorX = (iScreenWidth - ioffsetFromSide*2) / iMaxFinish;
     //---------------------------------------------------------------------------//
 
     // Перерисовываем изображение с новыми размерами окна
