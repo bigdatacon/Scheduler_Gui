@@ -23,12 +23,6 @@ class GanttChartWidget : public QWidget {
     Q_OBJECT
 
 public:
-    //GanttChartWidget(QWidget *pParent = nullptr);
-    //GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart);
-    //GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart, QLineEdit *zoomLabel);
-
-//    GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart, QLineEdit *zoomLabel, int m_toolbarHeight);
-//    GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart, QLineEdit *zoomLabel, int m_toolbarHeight, QScrollArea *pScrollArea);
     GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart,
                      QLineEdit *zoomLabel, int m_toolbarHeight, QScrollArea *pScrollArea,
                      int statusBarHeight);
@@ -36,7 +30,6 @@ public:
 
     ~GanttChartWidget();
     void LoadData(const QString &sFilename);
-//    void UpdateSize(); // Новый метод для обновления размеров виджета
     void setToolbarHeight(int height);
 
 
@@ -68,9 +61,6 @@ private slots:
     void OnSolveButtonClicked_SolverRestart();// Обработчик для нажатия кнопки перезапустить solver
     void OnZoomOutClicked();  // Слот для уменьшения зума
     void OnZoomInClicked();   // Слот для увеличения зума
-
-//    void OnZoomOutClickedScroll();  // Слот для уменьшения зума через скролл
-//    void OnZoomInClickedScroll();   // Слот для увеличения зума через скролл
 
     void OnZoomInClickedScroll(const QPointF &mousePos);
     void OnZoomOutClickedScroll(const QPointF &mousePos);
@@ -125,10 +115,6 @@ private:
     QRadioButton* m_pDurationRadioButton; // Кнопка для установки режима оптимизации длительности
     QRadioButton* m_pCostRadioButton; // Кнопка для установки режима оптимизации стоимости
     QRadioButton* m_pSetupsRadioButton; // Кнопка для установки режима оптимизации переналадок
-
-    // отдельно блок для иконок увеличения мощности
-//    QPushButton* m_pDoublePowerButton;  // Кнопка для удвоения мощности
-//    QPushButton* m_pQuadruplePowerButton;  // Кнопка для учетверения мощности
 
     QCheckBox* m_pDoublePowerButton;  // Кнопка для удвоения мощности
     QCheckBox* m_pQuadruplePowerButton;  // Кнопка для учетверения мощности

@@ -18,8 +18,6 @@ MainWindow::MainWindow(QWidget *parent)
     setStatusBar(new QStatusBar(this));
     int statusBarHeight = statusBar()->sizeHint().height();
 
-
-
     // Создаем область прокрутки
     m_pScrollArea = new QScrollArea(this);
     // Создаем логический объект GanttChart (локально в MainWindow)
@@ -44,11 +42,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_pScrollArea->setWidget(m_pChartWidget);
     m_pScrollArea->setWidgetResizable(false);
 
-    // Создаём тулбар
-//    m_pToolBar = new QToolBar(this);
-//    m_pToolBar->setMovable(false);
-
-
     // Создаём кнопки
     m_pSolveButton = new QPushButton(QIcon(":/resources/rocket-2.png"), "", this);
     m_pSolveButton->setToolTip("Запустить солвер из файла");
@@ -65,10 +58,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_pZoomInButton = new QPushButton("+x", this);
     m_pZoomOutButton = new QPushButton("-x", this);
 
-//    m_pZoomLabel = new QLineEdit("Zoom: 1", this);
-//    m_pZoomLabel->setReadOnly(true);
-//    m_pZoomLabel->setAlignment(Qt::AlignCenter);
-//    m_pZoomLabel->setMaximumWidth(80);
 
     // Радиокнопки для режима оптимизации
     m_pDurationRadioButton = new QRadioButton("Оптимизация длительности", this);
@@ -147,10 +136,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_pSolverCheckTimer, &QTimer::timeout, this, [this]() {
         if (g_bSolverRunning) {
             m_pRestartSolverButton->setEnabled(false);
-//            qDebug() << "solver is not enabled"  ;
         } else {
             m_pRestartSolverButton->setEnabled(true);
-//            qDebug() << "solver is enabled" ;
         }
     });
 
@@ -175,7 +162,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Размещаем тулбар и диаграмму в вертикальном layout
     QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
-//    mainLayout->setContentsMargins(0, 0, 0, 0);
     // Устанавливаем отступы: снизу отступ равен высоте статусной строки,
     // чтобы график не заходил под неё.
     mainLayout->setContentsMargins(0, 0, 0, statusBar()->sizeHint().height());

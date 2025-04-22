@@ -12,10 +12,6 @@
 #include <QDir>
 
 
-//GanttChart::GanttChart()
-//{
-//    m_pSolver = NULL;
-//}
 GanttChart::GanttChart() : m_iZoom(1) {
     m_pSolver = NULL;
 }
@@ -29,39 +25,23 @@ GanttChart::~GanttChart()
 
 void GanttChart::LoadData(const QString &sFilename) 
 {
-    //JsonReader oReader;
-    //oReader.ReadOperationsFromFile(m_pSolver, sFilename,  m_vJsOperations_cont, m_vMsOperations_cont, m_ScheduleMetrics, m_vResources);
+
 
     if ( g_pSolver == NULL ) 
     {
-        // Получаем путь к директории, где находится исполняемый файл
-        //QString appDirPath = "/Users/pafonin/Work/Расписания/Scheduler_Gui-ganth_finish/"; // !!!!!!!!!!!!!!!! Поменять название
         QString appDirPath = QCoreApplication::applicationDirPath();
-
-        // Проверяем, заканчивается ли appDirPath на '/', если нет — добавляем
         if (!appDirPath.endsWith("/")) {
             appDirPath += "/";
         }
-
-        // Формируем начальный путь
         QString fullPath = sFilename;
 
-        // Если fullPath уже содержит полный путь (абсолютный), оставляем его
         if (!fullPath.startsWith(appDirPath)) {
             fullPath = appDirPath + sFilename;
         }
 
-        // Выводим полный путь к файлу
-//        std::cout << "Полный путь к файлу (fullPath): " << fullPath.toStdString() << std::endl;
-
-        // Преобразуем QString в QByteArray, затем в const char*
         QByteArray byteArray = fullPath.toUtf8();
         const char* filenameChar = byteArray.constData();
 
-        // Выводим полный путь к файлу
-//        std::cout << "Полный путь к файлу (filenameChar): " << filenameChar << std::endl;
-
-        // Проверяем наличие файла через std::filesystem::exists
         if (!std::filesystem::exists(filenameChar)) {
             std::cout << "Ошибка: файл " << filenameChar << " не существует." << std::endl;
 
@@ -69,7 +49,6 @@ void GanttChart::LoadData(const QString &sFilename)
             std::cout << "Файл " << filenameChar << " существует." << std::endl;
         }
 
-        // Сначала проверим наличие файла через QFile в корне проекта
         QFile file(fullPath);
         if (!file.exists()) {
             std::cout << "Ошибка: файл " << sFilename.toStdString() << " не существует." << std::endl;
@@ -106,16 +85,12 @@ void GanttChart::LoadData(const QString &sFilename)
         g_pSolver->SetWeights(0,0,1,0,0,0);
     }
 
-//    g_pSolver->Run();
     g_bSolverRunning = true;  // Солвер запущен
-//    std::cout << "Solver started" << std::endl;
 
     g_pSolver->Run();  // Запуск солвера
 
     g_bSolverRunning = false;  // Солвер завершён
-//    std::cout << "Solver finished" << std::endl;
 
-    // чита данные из структур
     MSchedule* pMSchedule = g_pSolver->GetMSchedule();
     std::vector<std::vector<MSOperation*>> ms_operations = pMSchedule->GetOperations();
 
@@ -213,52 +188,6 @@ void GanttChart::LoadData(const QString &sFilename)
             }
 
         }
-
-    }
-
-    std::cout << "Resource Operations:\n";
-
-    for (const auto& op : m_vMsOperations_cont) {
-
-    std::cout << "Start: " << op.iStart
-
-    << ", Finish: " << op.iFinish
-
-    << ", Job: " << op.iJob
-
-    << ", Resource: " << op.iMachine
-
-    << '\n';
-
-    }
-
-    std::cout << "Job Operations:\n";
-
-    for (const auto& op : m_vJsOperations_cont) {
-
-        std::cout << "Start: " << op.iStart
-
-                  << ", Finish: " << op.iFinish
-
-                  << ", Job: " << op.iJob
-
-                  << ", Resources: ";
-
-        // Вывод всех индексов машин из вектора
-
-        for (size_t j = 0; j < op.vMachinesIndexes.size(); ++j) {
-
-            std::cout << op.vMachinesIndexes[j];
-
-            if (j != op.vMachinesIndexes.size() - 1) {
-
-                std::cout << ", "; // Добавляем запятую между индексами, кроме последнего
-
-            }
-
-        }
-
-        std::cout << '\n'; // Переходим на новую строку после вывода каждой операции
 
     }
 
@@ -382,14 +311,6 @@ std::tuple<int, int, int> GanttChart::calculateMaxValues() {
         std::cout << "\n";
     }
 
-//    for (const auto &op : m_vJsOperations_cont) {
-//        for (const auto &machineIndex : op.vMachinesIndexes) {
-//            if (machineIndex > iMaxMachine) {
-//                iMaxMachine = machineIndex;
-//            }
-//        }
-//    }
-
 
     for (const auto &op : m_vMsOperations_cont) {
         if (op.iJob > iMaxJob) {
@@ -490,10 +411,6 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int VIRTUAL_SCREEN_WIDTH, in
     double iScaleFactorX = (VIRTUAL_SCREEN_WIDTH - ioffsetFromSide*2) / iMaxFinish;
     //---------------------------------------------------------------------------//
 
-    // Перерисовываем изображение с новыми размерами окна
-//    QImage m_oChartImage = QImage(VIRTUAL_SCREEN_WIDTH, VIRTUAL_SCREEN_HEIGHT, QImage::Format_ARGB32);
-//    m_oChartImage.fill(Qt::white);
-
     // Расчет доступной высоты для графиков, учитывая новый отступ снизу
     double availableHeight = VIRTUAL_SCREEN_HEIGHT - ioffsetFromVertical*2 - (ioffsetFromVertical*0.5 * 6 + pPainter->fontMetrics().height());
     float totalRowCount = fMachineRowCount + fJobRowCount;
@@ -575,8 +492,6 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int VIRTUAL_SCREEN_WIDTH, in
     doc.drawContents(pPainter);
     pPainter->restore(); // Восстанавливаем состояние QPainter
 
-//    qDebug() << "iOffsetYJs:" << iOffsetYJs << "iOffsetYMs:" << iOffsetYMs;
-//    qDebug() << "fMachineRowCount:" << fMachineRowCount << "fJobRowCount:" << fJobRowCount;
 
 //    // Центрирование подписи "Время (мин)" между графиками
     double timeLabelX = ioffsetFromSide + (VIRTUAL_SCREEN_WIDTH - ioffsetFromSide) / 2 - ioffsetFromSide / 2;
@@ -1017,8 +932,6 @@ for (size_t groupIdx = 0; groupIdx < m_vGroupedPredecessors.size(); ++groupIdx) 
             maxMachine = std::max(maxMachine, op->iMachine);
         }
 
-//        double yStart = iOffsetYJs + (minMachine - 1 + 0.5) * iMachineHeight;
-//        double yEnd   = iOffsetYJs + (maxMachine - 1 + 0.5) * iMachineHeight;
 
 
         double yStart = iOffsetYJs + (minMachine  + 0.5) * iMachineHeight;
@@ -1088,651 +1001,6 @@ for (size_t groupIdx = 0; groupIdx < m_vGroupedPredecessors.size(); ++groupIdx) 
 
 
 }
-
-
-
-//void GanttChart::DrawGanttChart(QPainter *pPainter, int VIRTUAL_SCREEN_WIDTH, int VIRTUAL_SCREEN_HEIGHT) {
-
-//    // -- данные по максмальному числу машин и прочего - ///
-//    auto [iMaxFinish_f, iMaxMachine, iMaxJob] = calculateMaxValues();
-//    double iMaxFinish = iMaxFinish_f;
-//    double fMachineRowCount = iMaxMachine ;  // Количество строк для машин
-//    double fJobRowCount = iMaxJob ;          // Количество строк для задач
-//     // ------------------------------------------------ ///
-
-
-//    // -------------------------- ОПРЕДЕЛЕНИЕ ШРИФТОВ И ПЁР ----------------------------
-//    QFont titleFont;
-//    QFont axisLabelFont;
-//    QFont dynamicFont;
-//    QFont verticalFont;
-//    QFont verticalFontRotate;
-
-
-//    // Вычисляем средний размер экрана для более сбалансированного расчета шрифта
-//    double iAverageScreenSize = static_cast<int>((VIRTUAL_SCREEN_WIDTH + VIRTUAL_SCREEN_HEIGHT) / 2.5);
-
-//    // Определение минимального размера шрифта
-//    int iFontSize = std::max(8, static_cast<int>(iAverageScreenSize * 0.01));
-
-//    // Шрифт для заголовков
-//    titleFont.setPointSize(std::max(9, static_cast<int>(iAverageScreenSize * 0.013)));
-//    titleFont.setBold(true);
-
-//    // Шрифт для подписей на осях (рабочие/детали)
-//    verticalFont.setPointSize(std::max(8, static_cast<int>(iAverageScreenSize * 0.01)));
-
-//    // Шрифт для динамических подписей (на барах)
-//    dynamicFont.setPointSize(std::max(7, static_cast<int>(iAverageScreenSize * 0.007)));
-//    dynamicFont.setBold(true);
-
-//    // Шрифт для подписей осей (цифры)
-//    axisLabelFont.setPointSize(iFontSize);
-
-//     // Шрифт повернутых подписей графиков
-//    verticalFontRotate.setPointSize(iFontSize);
-//    verticalFontRotate.setBold(true);
-
-//    // Определение перьев для сетки и осей
-//    QPen axisPen(Qt::black, 2);    // Для осей и заголовков
-//    QPen gridPen(QColor(0, 0, 0, 50));  // Для сетки
-//    QPen textPen(Qt::black, 1);    // Для текста
-
-//    // Определение перьев для подписей ресурсов
-//    QPen resourcePen1(Qt::blue, 1);  // Для станков
-//    QPen resourcePen2(Qt::darkGreen, 1);  // Для рабочих
-//    QPen resourcePen3(Qt::magenta, 1);  // Для оснастки
-
-//    // Перо для "Время (мин)" (чуть прозрачное и жирное)
-//    QPen timeLabelPen(QColor(0, 0, 0, 150));  // Черный с прозрачностью 150
-//    timeLabelPen.setWidth(1);                 // Толщина линии
-//    timeLabelPen.setStyle(Qt::SolidLine);      // Сплошная линия
-//    timeLabelPen.setCapStyle(Qt::SquareCap);   // Стиль линий
-
-//    //--------------------------------------------------------------------------//
-
-//    //-------------------------отступы-----------------------------------------//
-
-//    double ioffsetFromVertical =  std::max(static_cast<int>(VIRTUAL_SCREEN_HEIGHT * 0.05), 50);
-//    double ioffsetFromSide =  std::max(static_cast<int>(VIRTUAL_SCREEN_WIDTH * 0.05), 50);
-
-//    double iScaleFactorX = (VIRTUAL_SCREEN_WIDTH - ioffsetFromSide*2) / iMaxFinish;
-//    //---------------------------------------------------------------------------//
-
-//    // Перерисовываем изображение с новыми размерами окна
-////    QImage m_oChartImage = QImage(VIRTUAL_SCREEN_WIDTH, VIRTUAL_SCREEN_HEIGHT, QImage::Format_ARGB32);
-////    m_oChartImage.fill(Qt::white);
-
-//    // Расчет доступной высоты для графиков, учитывая новый отступ снизу
-//    double availableHeight = VIRTUAL_SCREEN_HEIGHT - ioffsetFromVertical*2 - (ioffsetFromVertical*0.5 * 6 + pPainter->fontMetrics().height());
-//    float totalRowCount = fMachineRowCount + fJobRowCount;
-//    float spacingFactor = 1.1;  // С учетом 10% отступа между барами
-
-//    // Расчет процентной доли от availableHeight для минимальной и максимальной высоты бара
-//    float minBarHeightPercentage = 0.01; // 1% от availableHeight
-//    float maxBarHeightPercentage = 0.10; // 10% от availableHeight
-
-//    double minBarHeight = static_cast<int>(availableHeight * minBarHeightPercentage);
-//    double maxBarHeight = static_cast<int>(availableHeight * maxBarHeightPercentage);
-
-//    // Вычисляем начальное значение высоты бара, основываясь на общем количестве строк и доступной высоте
-//    double iMachineHeight = static_cast<int>(availableHeight / (totalRowCount * spacingFactor));
-//    // Корректируем высоту баров, чтобы она не выходила за установленные процентные пределы
-//    iMachineHeight = std::max(minBarHeight, std::min(maxBarHeight, iMachineHeight));
-
-//    double iOffsetYJs =  ioffsetFromVertical*2  ;
-//    double iOffsetYMs = iMachineHeight * 2 + fMachineRowCount * iMachineHeight + ioffsetFromVertical*2 + ioffsetFromVertical*0.7;
-
-//    // Подписи графиков
-//    QFontMetrics oMetrics(pPainter->font());
-//    double midPointMachine = ioffsetFromSide + (VIRTUAL_SCREEN_WIDTH - ioffsetFromSide) / 2 - oMetrics.horizontalAdvance("Диаграмма по ресурсам") / 2;
-
-//    double midPointJob = ioffsetFromSide + (VIRTUAL_SCREEN_WIDTH - ioffsetFromSide) / 2 -  oMetrics.horizontalAdvance("Диаграмма по работам") / 2;
-
-//    // Устанавливаем шрифт и перо для заголовков
-//    pPainter->setFont(titleFont);
-//    pPainter->setPen(axisPen);
-
-//    // Отрисовка заголовков графиков
-//    pPainter->drawText(midPointMachine, iOffsetYJs - ioffsetFromVertical * 0.8, "Диаграмма по ресурсам");
-//    pPainter->drawText(midPointJob, iOffsetYMs - VIRTUAL_SCREEN_HEIGHT * 0.01, "Диаграмма по работам");
-
-//    // Устанавливаю шрифт  для время мин
-//    pPainter->setFont(axisLabelFont);
-//    pPainter->setPen(timeLabelPen);
-
-//    // Создаём строку с данными из ScheduleMetrics
-//    QString scheduleMetricsText;
-
-//    if ( g_currentState == DURATION )
-//    {
-//        scheduleMetricsText = QString("<b>Длительность: %1</b>, Стоимость: %2, Суммарное время переналадок: %3   (Мощность солвера: %4)")
-//        .arg(m_ScheduleMetrics.iDuration)
-//        .arg(m_ScheduleMetrics.iCost)
-//        .arg(m_ScheduleMetrics.iSumSetupTime)
-//        .arg(g_iSolverPower);
-//    }
-//    else if ( g_currentState == COST )
-//    {
-//        scheduleMetricsText = QString("Длительность: %1, <b>Стоимость: %2</b>, Суммарное время переналадок: %3   (Мощность солвера: %4)")
-//        .arg(m_ScheduleMetrics.iDuration)
-//        .arg(m_ScheduleMetrics.iCost)
-//        .arg(m_ScheduleMetrics.iSumSetupTime)
-//        .arg(g_iSolverPower);
-//    }
-//    else if ( g_currentState == SETUPS )
-//    {
-//        scheduleMetricsText = QString("Длительность: %1, Стоимость: %2, <b>Суммарное время переналадок: %3</b>   (Мощность солвера: %4)")
-//        .arg(m_ScheduleMetrics.iDuration)
-//        .arg(m_ScheduleMetrics.iCost)
-//        .arg(m_ScheduleMetrics.iSumSetupTime)
-//        .arg(g_iSolverPower);
-//    }
-
-//    // Используем эту строку для отрисовки текста
-//    double midPointMachineDuration = ioffsetFromSide + (VIRTUAL_SCREEN_WIDTH - ioffsetFromSide) / 2 - oMetrics.horizontalAdvance(QString("Длительность: Суммарное время переналадок: (Мощность солвера: %3)")) / 2;
-
-//    // Указываем QPainter, что текст содержит HTML
-//    QTextDocument doc;
-//    doc.setHtml(scheduleMetricsText);
-//    doc.setDefaultFont(pPainter->font());
-
-//    // Определяем координаты и отрисовываем текст
-//    pPainter->save(); // Сохраняем текущее состояние QPainter
-//    pPainter->translate(midPointMachineDuration, iOffsetYJs - ioffsetFromVertical * 0.5);
-//    doc.drawContents(pPainter);
-//    pPainter->restore(); // Восстанавливаем состояние QPainter
-
-////    qDebug() << "iOffsetYJs:" << iOffsetYJs << "iOffsetYMs:" << iOffsetYMs;
-////    qDebug() << "fMachineRowCount:" << fMachineRowCount << "fJobRowCount:" << fJobRowCount;
-
-////    // Центрирование подписи "Время (мин)" между графиками
-//    double timeLabelX = ioffsetFromSide + (VIRTUAL_SCREEN_WIDTH - ioffsetFromSide) / 2 - ioffsetFromSide / 2;
-//    // Отрисовка подписей "Время (мин)" с учетом динамического отступа
-//    pPainter->drawText(timeLabelX, iOffsetYJs + fMachineRowCount * iMachineHeight + ioffsetFromVertical*0.5, "Время смены");
-
-
-//    // Отрисовка подписей "Время (мин)" с учетом динамического отступа
-//    double labelPositionY = iOffsetYMs + fJobRowCount * iMachineHeight + ioffsetFromVertical*0.5;
-//    double availableSpaceForLabel = VIRTUAL_SCREEN_HEIGHT - labelPositionY;
-
-//    // Проверяем, достаточно ли места для отступа снизу
-//    if (availableSpaceForLabel <   std::max((int)ioffsetFromVertical, 20)) {
-//        labelPositionY = VIRTUAL_SCREEN_HEIGHT - std::max((int)ioffsetFromVertical, 20);  // Поднимаем подпись вверх, чтобы обеспечить отступ снизу
-//    }
-
-//    pPainter->drawText(timeLabelX, labelPositionY, "Время смены");
-
-//    double timeLabelYBottom =iOffsetYMs + fJobRowCount * iMachineHeight + ioffsetFromVertical;
-//    // Убедимся, что подпись не заезжает на график
-//    if (timeLabelYBottom > VIRTUAL_SCREEN_HEIGHT - 10) { // Если подпись слишком низко, поднимаем выше
-//        timeLabelYBottom = VIRTUAL_SCREEN_HEIGHT - 10;
-//        pPainter->drawText(timeLabelX, timeLabelYBottom, "Время смены");
-//    }
-
-//     // рассчитываю где ось x для верхнего графика
-//    double iYPos_workers = iOffsetYJs + (fMachineRowCount-1 + 0.5) * iMachineHeight; // позиция для оси х по рабочим
-//    double iYPos_details = iOffsetYMs + (fJobRowCount-1 + 0.5) * iMachineHeight; // позиция для оси х по деталям
-
-//    pPainter->setFont(axisLabelFont);
-
-
-//    double lastDrawnPosition = -1;  // Переменная для хранения последней позиции, на которой был нарисован текст
-//    double step = 10;
-//    if (iMaxFinish > 100 && iMaxFinish <= 300) {
-//        step = 20;
-//    } else if (iMaxFinish > 300 && iMaxFinish <= 1000) {
-//        step = 50;
-//    } else if (iMaxFinish > 1000 && iMaxFinish <= 3000) {
-//        step = 150;
-//    } else if (iMaxFinish > 3000 && iMaxFinish <= 7000) {
-//        step = 300;
-//    } else if (iMaxFinish > 7000 && iMaxFinish <= 15000) {
-//        step = 500;
-//    }else if (iMaxFinish > 15000) {
-//        step = 1000;
-//    }
-//    for (double i = 0; i <= iMaxFinish; i += step) {
-//        double currentPosition = ioffsetFromSide + i * iScaleFactorX;
-
-//        // Рассчитываем ширину текста для текущего значения
-//        double textWidth = pPainter->fontMetrics().horizontalAdvance(QString::number(i));
-
-//        // Если разница между текущей позицией и последней позицией меньше ширины текста, пропускаем отрисовку
-//        if (lastDrawnPosition != -1 && (currentPosition - lastDrawnPosition) < textWidth) {
-//            i += step;  // Пропускаем одну метку
-//            continue;
-//        }
-
-//        // Рисуем линии и текст
-//        pPainter->setPen(gridPen);
-//        pPainter->drawLine(currentPosition, iOffsetYJs, currentPosition, iYPos_workers);
-//        pPainter->drawLine(currentPosition, iOffsetYMs, currentPosition, iYPos_details);
-
-//        // Пересчитываем минуты в часы смены, начальное время - 8:00
-//        QTime baseTime(8, 0);
-//        QString resultTime = (baseTime.addSecs(i * 60)).toString("HH:mm");
-
-//        pPainter->setPen(textPen);
-//        pPainter->drawText(currentPosition - textWidth / 2, iOffsetYJs + fMachineRowCount * iMachineHeight + ioffsetFromVertical * 0.15, resultTime);
-//        pPainter->drawText(currentPosition - textWidth / 2, iOffsetYMs + fJobRowCount * iMachineHeight + ioffsetFromVertical * 0.15, resultTime);
-
-//        // Обновляем последнюю отрисованную позицию
-//        lastDrawnPosition = currentPosition;
-//    }
-
-//    // 1. Сохраняем информацию о выделенных машинах
-//    std::set<double> highlightedMachines;  // Набор для хранения выделенных машини
-//    highlightedMachines.clear();  // Очищаем набор выделенных машин
-//    std::set<double> highlightedJobs;  // Набор для хранения выделенных деталей
-//    highlightedJobs.clear();  // Очищаем набор выделенных деталей
-//    for (auto &sOp : m_vMsOperations_cont) {
-//        if (sOp.bHighlighted) {
-//            highlightedMachines.insert(sOp.iMachine);  // Добавляем выделенную машину в набор
-//            highlightedJobs.insert(sOp.iJob);  // Добавляем выделенную деталь в набор
-//        }
-//    }
-
-//    // 2. Отрисовка подписей для машин
-//    for (double i = 0; i < fMachineRowCount; ++i) {
-//        double iYPos = iOffsetYJs + (i + 0.5) * iMachineHeight;
-//        pPainter->setPen(gridPen);
-//        pPainter->drawLine(ioffsetFromSide, iYPos, VIRTUAL_SCREEN_WIDTH - ioffsetFromSide, iYPos);
-
-//        QPen resourcePen;
-//        std::string resourceType = g_pSolver->GetResources()[i]->GetType();
-
-//        if ( resourceType == "Станок" )
-//            resourcePen = resourcePen1;
-//        else if ( resourceType == "Рабочий" )
-//            resourcePen = resourcePen2;
-//        else if ( resourceType == "Оснастка" )
-//            resourcePen = resourcePen3;
-//        else
-//            resourcePen = textPen;
-
-//        // Проверяем, выделена ли текущая машина
-//        if (highlightedMachines.count(i + 1)) {
-//            QFont boldFont = pPainter->font();
-//            boldFont.setBold(true);  // Устанавливаем жирный шрифт
-//            pPainter->setFont(boldFont);
-//            pPainter->setPen(Qt::black);  // Устанавливаем черный цвет текста
-
-//            QRect rect(ioffsetFromSide - pPainter->fontMetrics().horizontalAdvance(QString("Р %1").arg(i + 1))-2 , iYPos - pPainter->fontMetrics().height() / 2 , pPainter->fontMetrics().horizontalAdvance(QString("Р %1").arg(i + 1)) , pPainter->fontMetrics().height() );
-
-//            pPainter->setBrush(QBrush(Qt::yellow));  // Fill rectangle with yellow
-//            pPainter->setPen(Qt::yellow);
-//            pPainter->drawRect(rect);
-//            pPainter->setBrush(Qt::NoBrush);  // Reset brush
-//            //pPainter->setPen(Qt::black);  // Set black text color for label
-//            pPainter->setPen(resourcePen);
-//        } else {
-//            pPainter->setFont(verticalFont);  // Стандартный шрифт
-//            //pPainter->setPen(textPen);  // Стандартный цвет текста
-//            pPainter->setPen(resourcePen);
-//        }
-
-//        // Отрисовка подписи
-//        pPainter->drawText(ioffsetFromSide - pPainter->fontMetrics().horizontalAdvance(QString("Р %1").arg(i + 1))-1.5, iYPos + 5, QString("Р %1").arg(i + 1));
-//    }
-
-//    // 2. Отрисовка подписей для деталей
-//    for (double i = 0; i < fJobRowCount; ++i) {
-//        double iYPos = iOffsetYMs + (i + 0.5) * iMachineHeight;
-//        pPainter->setPen(gridPen);
-//        pPainter->drawLine(ioffsetFromSide, iYPos, VIRTUAL_SCREEN_WIDTH - ioffsetFromSide, iYPos);
-
-//        // Проверяем, выделена ли текущая деталь
-//        if (highlightedJobs.count(i + 1)) {
-//            QFont boldFont = pPainter->font();
-//            boldFont.setBold(true);  // Устанавливаем жирный шрифт
-//            pPainter->setFont(boldFont);
-//            pPainter->setPen(Qt::black);  // Устанавливаем черный цвет текста
-
-//            // Draw yellow rectangle around the label to highlight it
-//            QRect rect(ioffsetFromSide - pPainter->fontMetrics().horizontalAdvance(QString("Д %1").arg(i + 1)) - 2, iYPos - pPainter->fontMetrics().height() / 2 , pPainter->fontMetrics().horizontalAdvance(QString("Д %1").arg(i + 1)) , pPainter->fontMetrics().height() );
-//            pPainter->setBrush(QBrush(Qt::yellow));  // Fill rectangle with yellow
-//            pPainter->setPen(Qt::yellow);
-//            pPainter->drawRect(rect);
-//            pPainter->setBrush(Qt::NoBrush);  // Reset brush
-//            pPainter->setPen(Qt::black);  // Set black text color for label
-//        } else {
-//            pPainter->setFont(verticalFont);  // Стандартный шрифт
-//            pPainter->setPen(textPen);  // Стандартный цвет текста
-//        }
-
-//        // Отрисовка подписи
-//        pPainter->drawText(ioffsetFromSide - pPainter->fontMetrics().horizontalAdvance(QString("Д %1").arg(i + 1))-1.5, iYPos + 5, QString("Д %1").arg(i + 1));
-
-//    }
-
-//    pPainter->setPen(gridPen);
-//    // Create a border for the top Gantt chart (machine chart)
-//    pPainter->drawLine(ioffsetFromSide, iOffsetYJs, VIRTUAL_SCREEN_WIDTH - ioffsetFromSide, iOffsetYJs);  // Top border
-//    pPainter->drawLine(VIRTUAL_SCREEN_WIDTH - ioffsetFromSide, iOffsetYJs, VIRTUAL_SCREEN_WIDTH - ioffsetFromSide, iYPos_workers);  // Right border
-//    // Create a border for the bottom Gantt chart (job chart)
-//    pPainter->drawLine(ioffsetFromSide, iOffsetYMs, VIRTUAL_SCREEN_WIDTH - ioffsetFromSide, iOffsetYMs);  // Top border for the job chart
-//    pPainter->drawLine(VIRTUAL_SCREEN_WIDTH - ioffsetFromSide, iOffsetYMs, VIRTUAL_SCREEN_WIDTH - ioffsetFromSide, iYPos_details);  // Right border for the job chart
-
-//    double distance = ioffsetFromSide / 2;  // Например, 1/3 от ширины текста
-
-//    QFontMetrics oMachineMetrics(pPainter->font());
-//    double iMachineTextHeight = oMachineMetrics.height();
-
-//    // Вертикальная подпись "Рабочие"
-//    pPainter->setFont(verticalFontRotate);
-//    pPainter->setPen(textPen);
-
-//    pPainter->save();
-//    double iMachineCenterY = (iOffsetYJs + iOffsetYJs + fMachineRowCount * iMachineHeight) / 2 + iMachineTextHeight / 2 + distance / 2;
-//    pPainter->translate(ioffsetFromSide * 0.3 , iMachineCenterY);
-//    pPainter->rotate(-90);
-//    pPainter->drawText(0, 0, "Ресурсы");
-//    pPainter->restore();  // Восстанавливаем исходную систему координат
-
-//    // Вертикальная подпись "Детали"
-//    pPainter->setFont(verticalFontRotate);
-//    pPainter->setPen(textPen);
-
-//    pPainter->save();
-//    double iJobCenterY = (iOffsetYMs + iOffsetYMs + fJobRowCount * iMachineHeight) / 2 + iMachineTextHeight / 2 + distance / 2;
-//    pPainter->translate(ioffsetFromSide * 0.3 , iJobCenterY);
-//    pPainter->rotate(-90);
-//    pPainter->drawText(0, 0, "Работы");
-//    pPainter->restore();  // Восстанавливаем исходную систему координат
-
-//    // Отрисовка баров для операций на графике машин (m_vMsOperations_cont)
-//    for (auto &sOp : m_vMsOperations_cont) {
-//        if (sOp.iMachine <= 0) {
-//            qDebug() << "❗ Ошибка: sOp.iMachine == 0, данные:";
-//            qDebug() << "iStart:" << sOp.iStart << "iFinish:" << sOp.iFinish << "iJob:" << sOp.iJob << " sOp.iMachine :  " << sOp.iMachine ;
-//            continue;  // Пропускаем
-//        }
-//        double iBarStartX = ioffsetFromSide + sOp.iStart * iScaleFactorX;
-//        double iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
-//        //add check for imachine
-//        if (sOp.iMachine < 1 || sOp.iMachine > fMachineRowCount) {
-//            qDebug() << "Ошибка: некорректный индекс машины: " << sOp.iMachine;
-//            continue;
-//        }
-
-//        double iBarCenterY = iOffsetYJs + (sOp.iMachine - 1) * iMachineHeight + iMachineHeight / 2;
-
-//        // Уменьшаем высоту бара до 50% от высоты строки машины
-//        QRect oMachineRect(iBarStartX, iBarCenterY - iMachineHeight * 0.25, iBarWidth, iMachineHeight * 0.5);
-
-//        // Сохраняем прямоугольник в структуре операции
-//        sOp.rect = oMachineRect;
-
-//        // Если бар выделен, изменяем цвет и толщину пера
-//        if (sOp.bHighlighted) {
-//            pPainter->setPen(QPen(Qt::black, 3)); // Черный жирный контур
-//            pPainter->fillRect(oMachineRect, Qt::yellow); // Желтая заливка
-//        } else {
-//            pPainter->setPen(textPen);
-//            pPainter->fillRect(oMachineRect, m_umapJobColors[sOp.iJob]);
-//        }
-
-//        // Теперь добавляем штриховку/линию для части прямоугольника, равной setup_time
-//        double iSetupWidth =   sOp.iSetupTime  * iScaleFactorX; // Рассчитываем ширину для setup_time
-//        // Используем ту же область oMachineRect, но ограничиваем ширину setup_time
-//        pPainter->setBrush(Qt::NoBrush); // Отключаем заливку, чтобы не перекрывать предыдущую заливку
-
-//        // Устанавливаем полупрозрачное перо для наклонных линий
-//        QPen pen(QColor(0, 0, 0, 93)); // Полупрозрачный черный цвет (50% прозрачности)
-//        pPainter->setPen(pen);
-
-//        // Рисуем наклонные линии с шагом 1 пиксель
-//        for (double x = 0; x < iSetupWidth; x += 2) { // Шаг 2 пикселя, чтобы сделать наклонные линии
-//            double startX = iBarStartX + x;
-//            double startY = oMachineRect.top();
-//            double endX = iBarStartX + x -1; // Смещаем линию на один пиксель по диагонали
-//            double endY = oMachineRect.bottom();
-//            pPainter->drawLine(startX, startY, endX, endY); // Рисуем диагональную линию
-//        }
-
-//        // Рисуем контур и текст
-//        if (sOp.bHighlighted) {
-//            pPainter->drawRect(oMachineRect);
-//            dynamicFont.setBold(true);  // Делаем шрифт жирным
-//            pPainter->setFont(dynamicFont);
-//            pPainter->setPen(Qt::black); // Черный цвет текста
-//        } else {
-//            pPainter->drawRect(oMachineRect);
-//            pPainter->setFont(dynamicFont);
-//        }
-
-//        // Формируем текст для подписи
-//        QString labelText = QString("Д %1 (%2)").arg(sOp.iJob).arg(QString::fromStdString(g_pSolver->GetOperations()[sOp.iOperation]->GetID()));
-//        pPainter->drawText(oMachineRect, Qt::AlignCenter, labelText);
-//    }
-
-//    // Отрисовка баров для операций на графике задач (m_vJsOperations_cont)
-//    for (auto &sOp : m_vJsOperations_cont) {
-//        double iBarStartX = ioffsetFromSide + sOp.iStart * iScaleFactorX;
-//        double iBarWidth = (sOp.iFinish - sOp.iStart) * iScaleFactorX;
-//        //add check for ijob
-//        if (sOp.iJob < 1 || sOp.iJob > fJobRowCount) {
-//            qDebug() << "Ошибка: некорректный индекс работы: " << sOp.iJob;
-//            continue;
-//        }
-
-//        double iBarCenterY = iOffsetYMs + (sOp.iJob - 1) * iMachineHeight + iMachineHeight / 2;
-
-//        // Уменьшаем высоту бара до 50% от высоты строки задачи
-//        QRect oJobRect(iBarStartX, iBarCenterY - iMachineHeight * 0.25, iBarWidth, iMachineHeight * 0.5);
-
-//        // Сохраняем прямоугольник в структуре операции
-//        sOp.rect = oJobRect;
-
-//        // Если бар выделен, изменяем цвет и толщину пера
-//        if (sOp.bHighlighted) {
-//            pPainter->setPen(QPen(Qt::black, 3)); // Черный жирный контур
-//            pPainter->fillRect(oJobRect, Qt::yellow); // Желтая заливка
-
-//        } else {
-//            pPainter->setPen(textPen);
-//            pPainter->fillRect(oJobRect, m_umapJobColors[sOp.iJob]);
-//            // обычный шрифт для жирной подписи по оси y
-
-//        }
-
-//        if (sOp.bHighlighted) {
-//            pPainter->drawRect(oJobRect);
-//            pPainter->setFont(dynamicFont);
-//            dynamicFont.setBold(true);  // Делаем шрифт жирным
-//            pPainter->setPen(Qt::black); // Черный цвет текста
-//        }
-//        else {
-//            pPainter->drawRect(oJobRect);
-//            pPainter->setFont(dynamicFont);
-//        }
-
-
-//        // Формируем текст для подписи с машинами
-//        QString labelText = "Р ";
-//        for (size_t i = 0; i < sOp.vMachinesIndexes.size(); ++i) {
-//            labelText += QString::number(sOp.vMachinesIndexes[i]);
-//            if (i != sOp.vMachinesIndexes.size() - 1) {
-//                labelText += ", ";  // Добавляем запятую между номерами машин, кроме последнего
-//            }
-//        }
-
-//        pPainter->drawText(oJobRect, Qt::AlignCenter, labelText);
-//    }
-
-//    // Очистка данных недоступности
-//    vUnavData.clear();
-
-//    // Итерируемся по ресурсам с их индексами
-//    for (size_t resourceIndex = 0; resourceIndex < m_vResources.size(); ++resourceIndex) {
-//        const auto* pResource = m_vResources[resourceIndex];
-//        if (!pResource) continue; // Пропускаем, если ресурс отсутствует
-
-//        //add check for empty pResources
-//        if (m_vResources.empty()) {
-//            qDebug() << "Ошибка: m_vResources пуст!";
-//            return;
-//        }
-
-
-//        // Номер ресурса для отрисовки на графике
-//        int resourceRow = static_cast<int>(resourceIndex);
-
-//        // Получаем периоды недоступности ресурса
-//        const auto& vUnavailability = pResource->GetUnavailability();
-
-//        // Итерируемся по каждому периоду недоступности
-//        for (const auto& [unavStart, unavEnd] : vUnavailability) {
-//            // Вычисляем координаты для отрисовки периода недоступности
-//            double unavBarStartX = ioffsetFromSide + unavStart * iScaleFactorX;
-//            double unavBarWidth = (unavEnd - unavStart) * iScaleFactorX;
-//            double unavBarCenterY = iOffsetYJs + resourceRow * iMachineHeight + iMachineHeight / 2;
-
-//            // Создаем прямоугольник для периода недоступности
-//            QRect unavMachineRect(unavBarStartX, unavBarCenterY - iMachineHeight * 0.25, unavBarWidth, iMachineHeight * 0.5);
-
-//            // Добавляем данные в вектор
-//            vUnavData.push_back({static_cast<int>(resourceIndex+1), unavStart, unavEnd, unavMachineRect});
-
-//            // Отрисовка прямоугольника с черным цветом
-//            pPainter->setPen(QPen(Qt::black, 3));  // Черный жирный контур
-//            pPainter->fillRect(unavMachineRect, Qt::black);  // Черная заливка
-//            pPainter->drawRect(unavMachineRect);
-//        }
-//    }
-
-
-
-//    // === Отрисовка красных вертикальных линий и стрелок к основной операции ===
-//QPen dashedLinePen(Qt::red, 2, Qt::DashLine);
-//pPainter->setPen(dashedLinePen);
-
-//std::vector<QPointF> predecessorGroupCenters;
-//bool mainCenterValid = false;
-//QPointF mainCenter;
-
-
-//for (size_t groupIdx = 0; groupIdx < m_vGroupedPredecessors.size(); ++groupIdx) {
-//    const auto& group = m_vGroupedPredecessors[groupIdx];
-//    if (group.empty()) {
-//        qDebug() << "Group" << groupIdx << "is empty. Skipping.";
-//        continue;
-//    }
-
-//    std::vector<SResourceOperation*> validGroup;
-//    for (auto* op : group) {
-//        if (op && op->iMachine > 0) {
-//            validGroup.push_back(op);
-//        } else {
-//            qDebug() << "⚠️ Предшественник отброшен (nullptr или iMachine == 0):"
-//                     << "op =" << op
-//                     << (op ? QString("iMachine: %1, iStart: %2, iFinish: %3, iJob: %4")
-//                                     .arg(op->iMachine)
-//                                     .arg(op->iStart)
-//                                     .arg(op->iFinish)
-//                                     : "nullptr");
-//        }
-//    }
-
-
-//    if (validGroup.empty()) {
-//        qDebug() << "Group" << groupIdx << "has no valid operations after filtering. Skipping.";
-//        continue;
-//    }
-
-//    qDebug() << "Group" << groupIdx << "has" << validGroup.size() << "valid operations.";
-
-//    if (validGroup.size() == 1) {
-//        auto* op = validGroup[0];
-//        if (!op) {
-//            qDebug() << "Group" << groupIdx << "only valid op is nullptr. Skipping.";
-//            continue;
-//        }
-
-//        double x = ioffsetFromSide + op->iStart * iScaleFactorX +
-//                   (op->iFinish - op->iStart) * iScaleFactorX / 2;
-//        double y = iOffsetYJs + (op->iMachine - 1 + 0.5) * iMachineHeight;
-//        qDebug() << "Group" << groupIdx << "single operation center at:" << QPointF(x, y);
-
-//        predecessorGroupCenters.emplace_back(x, y);
-//    } else {
-//        double x = ioffsetFromSide + validGroup[0]->iStart * iScaleFactorX +
-//                   (validGroup[0]->iFinish - validGroup[0]->iStart) * iScaleFactorX / 2;
-
-//        int minMachine = validGroup[0]->iMachine;
-//        int maxMachine = validGroup[0]->iMachine;
-//        for (auto* op : validGroup) {
-//            minMachine = std::min(minMachine, op->iMachine);
-//            maxMachine = std::max(maxMachine, op->iMachine);
-//        }
-
-//        double yStart = iOffsetYJs + (minMachine - 1 + 0.5) * iMachineHeight;
-//        double yEnd   = iOffsetYJs + (maxMachine - 1 + 0.5) * iMachineHeight;
-
-//        qDebug() << "Group" << groupIdx << "vertical line at x =" << x
-//                 << "from y =" << yStart << "to y =" << yEnd;
-
-//        pPainter->drawLine(QPointF(x, yStart), QPointF(x, yEnd));
-
-//        predecessorGroupCenters.emplace_back(x, (yStart + yEnd) / 2);
-//    }
-//}
-
-
-
-//    // 2. Основная операция — вертикальная линия и координаты центра
-//    if (!m_vMainOperations.empty()) {
-//        std::vector<SResourceOperation*> validMainOps;
-//        for (auto* op : m_vMainOperations)
-//            if (op) validMainOps.push_back(op);
-
-//        if (!validMainOps.empty()) {
-//            double x = ioffsetFromSide + validMainOps[0]->iStart * iScaleFactorX +
-//                       (validMainOps[0]->iFinish - validMainOps[0]->iStart) * iScaleFactorX / 2;
-
-//            int minMachine = validMainOps[0]->iMachine;
-//            int maxMachine = validMainOps[0]->iMachine;
-//            for (auto* op : validMainOps) {
-//                minMachine = std::min(minMachine, op->iMachine);
-//                maxMachine = std::max(maxMachine, op->iMachine);
-//            }
-
-//            double yStart = iOffsetYJs + (minMachine - 1 + 0.5) * iMachineHeight;
-//            double yEnd   = iOffsetYJs + (maxMachine - 1 + 0.5) * iMachineHeight;
-//            pPainter->drawLine(QPointF(x, yStart), QPointF(x, yEnd));
-
-//            mainCenter = QPointF(x, (yStart + yEnd) / 2);
-//            mainCenterValid = true;
-//        }
-//    }
-
-//    // 3. Стрелки от предшественников к основной операции
-//    if (mainCenterValid) {
-//        QPen arrowPen(Qt::red, 2);
-//        pPainter->setPen(arrowPen);
-//        const int arrowSize = 10;
-
-//        for (const auto& predCenter : predecessorGroupCenters) {
-//            QLineF line(predCenter, mainCenter);
-//            pPainter->drawLine(line);
-
-//            double angle = std::atan2(line.dy(), line.dx());
-//            QPointF arrowP1 = mainCenter - QPointF(std::cos(angle + M_PI / 6) * arrowSize,
-//                                                   std::sin(angle + M_PI / 6) * arrowSize);
-//            QPointF arrowP2 = mainCenter - QPointF(std::cos(angle - M_PI / 6) * arrowSize,
-//                                                   std::sin(angle - M_PI / 6) * arrowSize);
-
-//            QPolygonF arrowHead;
-//            arrowHead << mainCenter << arrowP1 << arrowP2;
-//            pPainter->drawPolygon(arrowHead);
-//        }
-//    }
-
-
-//}
-
-
 
 
 void GanttChart::DrawWorkersTimeChart(QPainter *pPainter, int VIRTUAL_SCREEN_WIDTH, int VIRTUAL_SCREEN_HEIGHT) {

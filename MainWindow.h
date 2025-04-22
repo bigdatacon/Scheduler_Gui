@@ -49,9 +49,6 @@ private:
     QRadioButton *m_pCostRadioButton;
     QRadioButton *m_pSetupsRadioButton;
 
-    // отдельно блок для иконок увеличения мощности
-//    QPushButton* m_pDoublePowerButton;  // Кнопка для удвоения мощности
-//    QPushButton* m_pQuadruplePowerButton;  // Кнопка для учетверения мощности
     QCheckBox* m_pHeuristicsButton1;  // Эвристика 1
     QCheckBox* m_pHeuristicsButton2;  // Эвристика 2
     QTimer* m_pSolverCheckTimer;  // Таймер для проверки статуса солвера

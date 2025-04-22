@@ -53,8 +53,6 @@ struct sUnavData {
 constexpr int VIRTUAL_SCREEN_WIDTH = 1920;
 constexpr int VIRTUAL_SCREEN_HEIGHT = 1080;
 
-//constexpr int VIRTUAL_SCREEN_WIDTH = 1424;
-//constexpr int VIRTUAL_SCREEN_HEIGHT = 968;
 
 class GanttChart {
 public:

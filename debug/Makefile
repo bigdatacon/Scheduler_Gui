@@ -17,7 +17,7 @@ CXX           = g++
 DEFINES       = -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++1z -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I../../SchedulingSolverGUI-31-01-25 -I. -I/home/user1/SchedulingSolverGUI-31-01-25/SchedulingSolverGUI-31-01-25/json/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
+INCPATH       = -I../../SchedulingSolverGUI-31-01-25 -I. -I/home/user1/ghant_versions/52.на\ базе\ февраля\ делаю\ линии\ и\ нумерацию/SchedulingSolverGUI-31-01-25/json/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
 QMAKE         = /usr/lib/qt5/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -37,10 +37,10 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = gch_31.0.0
-DISTDIR = /home/user1/SchedulingSolverGUI-31-01-25/SchedulingSolverGUI-31-01-25/debug/.tmp/gch_31.0.0
+DISTDIR = /home/user1/ghant_versions/52.на\ базе\ февраля\ делаю\ линии\ и\ нумерацию/SchedulingSolverGUI-31-01-25/debug/.tmp/gch_31.0.0
 LINK          = g++
 LFLAGS        = 
-LIBS          = $(SUBLIBS) -L/home/user1/SchedulingSolverGUI-31-01-25/SchedulingSolverGUI-31-01-25 -lSchedulingSolver -Wl,-rpath,/home/user1/SchedulingSolverGUI-31-01-25/SchedulingSolverGUI-31-01-25 /usr/lib/x86_64-linux-gnu/libQt5Widgets.so /usr/lib/x86_64-linux-gnu/libQt5Gui.so /usr/lib/x86_64-linux-gnu/libQt5Core.so -lGL -lpthread   
+LIBS          = $(SUBLIBS) -L/home/user1/ghant_versions/52.на\ базе\ февраля\ делаю\ линии\ и\ нумерацию/SchedulingSolverGUI-31-01-25 -lSchedulingSolver -Wl,-rpath,/home/user1/ghant_versions/52.на\ базе\ февраля\ делаю\ линии\ и\ нумерацию/SchedulingSolverGUI-31-01-25 /usr/lib/x86_64-linux-gnu/libQt5Widgets.so /usr/lib/x86_64-linux-gnu/libQt5Gui.so /usr/lib/x86_64-linux-gnu/libQt5Core.so -lGL -lpthread   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -68,6 +68,7 @@ OBJECTS       = GlobalState.o \
 		moc_GanttChartWidget.o \
 		moc_MainWindow.o
 DIST          = ../.gitignore \
+		../.gitignore \
 		../operation_data.json \
 		../operation_data_2.json \
 		../resources/icons8-ракета-64.png \
@@ -579,7 +580,7 @@ moc_GanttChartWidget.cpp: ../GanttChartWidget.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qscrollarea.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/user1/SchedulingSolverGUI-31-01-25/SchedulingSolverGUI-31-01-25/debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/user1/SchedulingSolverGUI-31-01-25/SchedulingSolverGUI-31-01-25 -I/home/user1/SchedulingSolverGUI-31-01-25/SchedulingSolverGUI-31-01-25/json/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/Library/Developer/CommandLineTools/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/16/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include ../GanttChartWidget.h -o moc_GanttChartWidget.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/user1/ghant_versions/52.на базе февраля делаю линии и нумерацию/SchedulingSolverGUI-31-01-25/debug/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/user1/ghant_versions/52.на базе февраля делаю линии и нумерацию/SchedulingSolverGUI-31-01-25' -I'/home/user1/ghant_versions/52.на базе февраля делаю линии и нумерацию/SchedulingSolverGUI-31-01-25/json/include' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/Library/Developer/CommandLineTools/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/16/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include ../GanttChartWidget.h -o moc_GanttChartWidget.cpp
 
 moc_MainWindow.cpp: ../MainWindow.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QMainWindow \
@@ -739,7 +740,7 @@ moc_MainWindow.cpp: ../MainWindow.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtCore/qbasictimer.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/user1/SchedulingSolverGUI-31-01-25/SchedulingSolverGUI-31-01-25/debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/user1/SchedulingSolverGUI-31-01-25/SchedulingSolverGUI-31-01-25 -I/home/user1/SchedulingSolverGUI-31-01-25/SchedulingSolverGUI-31-01-25/json/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/Library/Developer/CommandLineTools/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/16/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include ../MainWindow.h -o moc_MainWindow.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/user1/ghant_versions/52.на базе февраля делаю линии и нумерацию/SchedulingSolverGUI-31-01-25/debug/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/user1/ghant_versions/52.на базе февраля делаю линии и нумерацию/SchedulingSolverGUI-31-01-25' -I'/home/user1/ghant_versions/52.на базе февраля делаю линии и нумерацию/SchedulingSolverGUI-31-01-25/json/include' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/Library/Developer/CommandLineTools/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/16/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include ../MainWindow.h -o moc_MainWindow.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -1220,7 +1221,9 @@ MainWindow.o: ../MainWindow.cpp ../MainWindow.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qbuttongroup.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtCore/QDebug \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QMessageBox \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qmessagebox.h
+		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qmessagebox.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStatusBar \
+		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstatusbar.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainWindow.o ../MainWindow.cpp
 
 main.o: ../main.cpp /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication \
@@ -1386,7 +1389,9 @@ main.o: ../main.cpp /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication \
 		/usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer \
 		/usr/include/x86_64-linux-gnu/qt5/QtCore/qtimer.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtCore/qbasictimer.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtCore/QDebug
+		/usr/include/x86_64-linux-gnu/qt5/QtCore/QDebug \
+		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStatusBar \
+		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstatusbar.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../main.cpp
 
 qrc_resources.o: qrc_resources.cpp 
