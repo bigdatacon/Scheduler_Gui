@@ -299,11 +299,11 @@ std::tuple<int, int, int> GanttChart::calculateMaxValues() {
     int iMaxMachine = 0;
     int iMaxJob = 0;
 
-    std::cout << "[DEBUG] machineIndexes from JSOperations:\n";
+//    std::cout << "[DEBUG] machineIndexes from JSOperations:\n";
     for (const auto &op : m_vJsOperations_cont) {
-        std::cout << "   Job " << op.iJob << ", Op " << op.iOperation << ": ";
+//        std::cout << "   Job " << op.iJob << ", Op " << op.iOperation << ": ";
         for (const auto &machineIndex : op.vMachinesIndexes) {
-            std::cout << machineIndex << " ";
+//            std::cout << machineIndex << " ";
             if (machineIndex > iMaxMachine) {
                 iMaxMachine = machineIndex;
             }
@@ -332,13 +332,7 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int VIRTUAL_SCREEN_WIDTH, in
     double fMachineRowCount = iMaxMachine +1;  // Количество строк для машин
 //    double fJobRowCount = iMaxJob ;          // Количество строк для задачdouble fMachineRowCount = iMaxMachine ;  // Количество строк для машин
     double fJobRowCount = iMaxJob +1;          // Количество строк для задачdouble fMachineRowCount = iMaxMachine ;  // Количество строк для машин
-    std::cout << "[calculateMaxValues()] MaxFinish: " << iMaxFinish_f
-              << ", MaxMachine: " << iMaxMachine
-              << ", MaxJob: " << iMaxJob
-            << ", fMachineRowCount " << fMachineRowCount
-            << ", fJobRowCount: " << fJobRowCount <<
 
-            std::endl;
 
     int maxMachineIndex = -1;
     int maxJobIndex = -1;
@@ -348,7 +342,7 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int VIRTUAL_SCREEN_WIDTH, in
     for (const auto& op : m_vJsOperations_cont) {
         if (op.iJob > maxJobIndex) maxJobIndex = op.iJob;
     }
-    std::cout << "[REAL] Max iMachine index in data (- mean real data+1): " << maxMachineIndex << ", Max iJob index (- mean real data+1): " << maxJobIndex << std::endl;
+//    std::cout << "[REAL] Max iMachine index in data (- mean real data+1): " << maxMachineIndex << ", Max iJob index (- mean real data+1): " << maxJobIndex << std::endl;
 
      // ------------------------------------------------ ///
 
@@ -589,7 +583,7 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int VIRTUAL_SCREEN_WIDTH, in
         pPainter->drawLine(ioffsetFromSide, iYPos, VIRTUAL_SCREEN_WIDTH - ioffsetFromSide, iYPos);
 
         QPen resourcePen;
-        std::cout << "[DEBUG] Accessing GetResources()[" << i << "], size = " << g_pSolver->GetResources().size() << std::endl;
+//        std::cout << "[DEBUG] Accessing GetResources()[" << i << "], size = " << g_pSolver->GetResources().size() << std::endl;
         std::string resourceType = g_pSolver->GetResources()[i]->GetType();
 
         if ( resourceType == "Станок" )
@@ -703,8 +697,8 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int VIRTUAL_SCREEN_WIDTH, in
     for (auto &sOp : m_vMsOperations_cont) {
 //        if (sOp.iMachine <= 0) {
         if (sOp.iMachine < 0 || sOp.iMachine >= fMachineRowCount) {
-            qDebug() << "❗ Ошибка: sOp.iMachine < 0, данные:";
-            qDebug() << "iStart:" << sOp.iStart << "iFinish:" << sOp.iFinish << "iJob:" << sOp.iJob << " sOp.iMachine :  " << sOp.iMachine << "fMachineRowCount: " << fMachineRowCount;
+//            qDebug() << "❗ Ошибка: sOp.iMachine < 0, данные:";
+//            qDebug() << "iStart:" << sOp.iStart << "iFinish:" << sOp.iFinish << "iJob:" << sOp.iJob << " sOp.iMachine :  " << sOp.iMachine << "fMachineRowCount: " << fMachineRowCount;
             continue;  // Пропускаем
         }
         double iBarStartX = ioffsetFromSide + sOp.iStart * iScaleFactorX;
@@ -712,7 +706,7 @@ void GanttChart::DrawGanttChart(QPainter *pPainter, int VIRTUAL_SCREEN_WIDTH, in
         //add check for imachine
 //        if (sOp.iMachine < 1 || sOp.iMachine > fMachineRowCount) {
         if (sOp.iMachine < 0 || sOp.iMachine >= fMachineRowCount) {
-            qDebug() << "Ошибка: некорректный индекс машины: " << sOp.iMachine;
+//            qDebug() << "Ошибка: некорректный индекс машины: " << sOp.iMachine;
             continue;
         }
 
