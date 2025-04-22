@@ -1,0 +1,1483 @@
+#include "GanttChartWidget.h"
+#include <QVBoxLayout>
+#include <QFileDialog>
+#include <iostream>
+#include <QMessageBox>
+#include <QDebug> // Подключите для использования qDebug
+#include "GlobalState.h"
+#include <QThread>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QTimer>
+#include <algorithm> // Для std::clamp
+#include <QCursor>
+
+
+
+GanttChartWidget::GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart,
+                                     QLineEdit *zoomLabel, int m_toolbarHeight, QScrollArea *pScrollArea,
+                                     int statusBarHeight)
+    : QWidget(pParent),
+      m_pZoomLabel(zoomLabel),
+      m_toolbarHeight(m_toolbarHeight),
+      m_pGanttChart(pGanttChart),
+      m_pScrollArea(pScrollArea),
+      m_istatusBarHeight(statusBarHeight),
+      m_iDraggedJob(-1),
+      m_iDraggedMachine(-1),
+      m_bJsMode(true),
+      m_offset(0, 0),
+      m_lastMousePos(0, 0),
+      m_bHandToolActive(false)
+{
+    qDebug() << "GanttChartWidget: m_pScrollArea =" << m_pScrollArea;
+    if (!m_pGanttChart) {
+        qDebug() << "Ошибка: передан nullptr в GanttChartWidget";
+        return;
+    }
+    m_bendScroll = false;
+    setMouseTracking(true); // Чтобы получать mouseMoveEvent без зажатых кнопок
+    Initialize();
+    // В конструкторе GanttChartWidget после Initialize():
+    QTimer::singleShot(900, this, SLOT(UpdateSize()));
+
+    updateScrollBars();
+}
+
+
+
+
+GanttChartWidget::~GanttChartWidget() {
+    delete m_pGanttChart;
+}
+
+void GanttChartWidget::Initialize() {
+//    qDebug() << "Initialize  Обновленная высота строки состояния : " << m_istatusBarHeight;
+//    qDebug() << "Initialize  первичаня высота : " << VIRTUAL_SCREEN_HEIGHT;
+    int width = VIRTUAL_SCREEN_WIDTH * m_pGanttChart->get_zoom();
+    int height = VIRTUAL_SCREEN_HEIGHT* m_pGanttChart->get_zoom()-m_istatusBarHeight*2;
+
+//    qDebug() << "Initialize  актуальная  высота : " << height;
+
+    m_oChartImage = QImage(width, height, QImage::Format_ARGB32);
+    m_oChartImage.fill(Qt::white);
+
+    m_oWorkersImage = QImage(width, height, QImage::Format_ARGB32);
+    m_oWorkersImage.fill(Qt::white);
+}
+
+
+void GanttChartWidget::updateZoomedImages() {
+    Initialize();  // Обновляем размеры изображений
+    DrawGanttChart();  // Перерисовываем диаграмму Гантта
+    DrawWorkersTimeChart();  // Перерисовываем диаграмму ресурсов
+    update();  // Обновляем отображение
+}
+
+
+void GanttChartWidget::OnSolveButtonClicked() {
+    // Здесь можно поместить логику для запуска солвера из файла
+    m_filename = QFileDialog::getOpenFileName(this, "Выберите файл для солвера", "", "TXT Files (*.txt);;All Files (*)");
+    
+    if (!m_filename.isEmpty()) {
+        // Создаем немодальное окно с информацией о выбранном файле
+        QMessageBox *msgBox = new QMessageBox(this);
+        msgBox->setText("Файл выбран");
+        msgBox->setInformativeText("Вы выбрали файл: " + m_filename);
+        msgBox->setStandardButtons(QMessageBox::Ok);
+        msgBox->setModal(false); // Делаем окно немодальным
+        msgBox->show();
+
+        if ( g_pSolver != NULL )
+        {
+            delete g_pSolver;
+            g_pSolver = NULL;
+        }
+
+        // Загружаем данные из файла
+        LoadData(m_filename);
+    } else {
+        // Создаем немодальное предупреждение о том, что файл не выбран
+        QMessageBox *msgBox = new QMessageBox(this);
+        msgBox->setText("Нет файла");
+        msgBox->setInformativeText("Ничего не получено");
+        msgBox->setStandardButtons(QMessageBox::Ok);
+        msgBox->setModal(false); // Делаем окно немодальным
+        msgBox->show();
+    }
+}
+
+
+void GanttChartWidget::OnSolveButtonClicked_SolverRestart() {
+    LoadData(m_filename);
+}
+
+
+void GanttChartWidget::LoadData(const QString &filename) {
+    m_filename = filename;
+
+    if (m_pGanttChart) {
+        std::cout << "This file_name in LoadJsonData: " << filename.toStdString() << std::endl;
+        m_pGanttChart->LoadData(filename);
+        DrawGanttChart(); // Перерисовываем диаграмму при загрузке данных
+        DrawWorkersTimeChart(); // сразу рисую диаграмму по ресурсам
+        update();
+    }
+}
+
+void GanttChartWidget::DrawGanttChart() {
+    int width = VIRTUAL_SCREEN_WIDTH * m_pGanttChart->get_zoom();
+    int height = VIRTUAL_SCREEN_HEIGHT* m_pGanttChart->get_zoom()-m_istatusBarHeight*2;
+
+    m_oChartImage = QImage(width, height, QImage::Format_ARGB32); // Обновляем размеры изображения
+    m_oChartImage.fill(Qt::white);
+
+    QPainter oPainter(&m_oChartImage);
+
+    if (!oPainter.isActive()) {
+        qWarning("QPainter on m_oChartImage is not active");
+        return;
+    }
+
+    // Передаем размеры виджета в функцию DrawGanttChart
+    if (m_pGanttChart) {
+        m_pGanttChart->DrawGanttChart(&oPainter, width, height);
+    }
+
+    b_yet_draw_ghant_chart = true;
+    UpdateSize(); // Обновляем размеры виджета
+    update();  // Обновляем экран
+}
+
+
+void GanttChartWidget::DrawWorkersTimeChart() {
+//    qDebug() << "DrawWorkersTimeChart Обновленная высота тулбара: " << m_toolbarHeight;
+    int width = VIRTUAL_SCREEN_WIDTH * m_pGanttChart->get_zoom();
+//    int height = (VIRTUAL_SCREEN_HEIGHT-m_toolbarHeight ) * m_pGanttChart->get_zoom();
+    int height = VIRTUAL_SCREEN_HEIGHT * m_pGanttChart->get_zoom()-m_istatusBarHeight*2;
+
+    m_oWorkersImage = QImage(width, height, QImage::Format_ARGB32); // Обновляем размеры изображения
+    m_oWorkersImage.fill(Qt::white);
+
+    QPainter painter(&m_oWorkersImage);
+
+    if (!painter.isActive()) {
+        qWarning("QPainter on m_oWorkersImage is not active");
+        return;
+    }
+
+    if (m_pGanttChart) {
+        m_pGanttChart->DrawWorkersTimeChart(&painter, width, height);
+    }
+
+    b_yet_draw_workers_chart = true;
+    UpdateSize(); // Обновляем размеры виджета
+    update();
+}
+
+
+void GanttChartWidget::paintEvent(QPaintEvent *event) {
+//    qDebug() << "paintEvent вызван. Обновленная высота тулбара: " << m_toolbarHeight;
+
+    QPainter oPainter(this);
+    oPainter.setRenderHint(QPainter::Antialiasing);
+
+    // Полная область виджета (включая тулбар)
+    QRect visibleRect(0, 0, width(), height());
+    // Заполняем фон белым цветом
+    oPainter.fillRect(visibleRect, Qt::white);
+
+    // Определяем, что отображать: график ресурсов или диаграмму Гантта
+    if (m_bDisplayingWorkersTimeChart) {
+        // Рисуем диаграмму утилизации ресурсов
+        drawImageWithOffset(oPainter, m_oWorkersImage, visibleRect);
+    } else {
+        // Рисуем диаграмму Гантта
+        drawImageWithOffset(oPainter, m_oChartImage, visibleRect);
+    }
+}
+
+
+void GanttChartWidget::drawImageWithOffset(QPainter &oPainter, const QImage &sourceImage, const QRect &visibleRect) {
+    // Размер изображения (оригинала)
+    QRect sourceImageRect = sourceImage.rect();
+
+    // Ограничиваем смещение таким образом, чтобы оно корректно учитывало выход за пределы
+    QRect adjustedSourceRect = sourceImageRect.translated(-m_offset);
+
+    // Проверяем размеры adjustedSourceRect (можно позволить отрицательные значения)
+    if (visibleRect.isEmpty()) {
+        qWarning() << "Видимый прямоугольник пуст. Рисование пропущено.";
+        return;
+    }
+
+    // Рассчитываем целевой прямоугольник на экране (видимая область с учетом смещения)
+    QRect targetRect = QRect(visibleRect.topLeft() + m_offset, sourceImageRect.size());
+
+    // Рисуем изображение. Здесь мы используем drawImage напрямую без обрезания
+    oPainter.drawImage(targetRect, sourceImage);
+}
+
+
+
+//void GanttChartWidget::resizeEvent(QResizeEvent *event) {
+//    // Просто вызываем обновление виджета, перерисовка будет ограничена paintEvent
+//    update();
+//}
+
+void GanttChartWidget::resizeEvent(QResizeEvent *event) {
+    // Здесь используйте размеры, полученные через event->size() или this->size()
+    int availableWidth = event->size().width();
+    int availableHeight = event->size().height();
+    // Если требуется вычесть высоту статусной строки (если она не входит в центральный виджет),
+    // то эту величину можно сохранить в поле и вычесть её:
+    int adjustedHeight = availableHeight; // если статусная строка уже вне centralWidget, то она не входит
+    // Либо, если график рисуется внутри центрального виджета и вам нужно отступить снизу:
+    // int adjustedHeight = availableHeight - m_statusBarHeight;
+
+    // Пересчитать изображение (например, вызвать Initialize() с новыми размерами)
+    // Здесь можно, например, создать новое QImage нужного размера
+    // и перерисовать график:
+    // ...
+    update();
+    QWidget::resizeEvent(event);
+}
+
+
+
+void GanttChartWidget::onWorkersTimeButtonClicked() {
+    m_bDisplayingWorkersTimeChart = !m_bDisplayingWorkersTimeChart;
+    updateChart();
+}
+
+// Update the chart based on the current display flag
+void GanttChartWidget::updateChart() {
+    resizeEvent(new QResizeEvent(size(), size()));
+}
+
+
+void GanttChartWidget::OnZoomOutClicked() {
+    if (!m_pGanttChart) {
+        qDebug() << "Ошибка: m_pGanttChart не инициализирован";
+        return;
+    }
+
+    double zoom = m_pGanttChart->get_zoom();  // Используем double вместо int
+
+    if (this == nullptr) {
+        qDebug() << "Ошибка: объект GanttChartWidget не существует.";
+        return;
+    }
+
+    qDebug() << "Текущий поток: " << QThread::currentThread();
+    if (!m_pGanttChart) {
+        qDebug() << "Ошибка: m_pGanttChart не инициализирован.";
+        return;
+    }
+
+    if (zoom > 1.0) {  // Проверяем, что зум больше 1.0
+        double newZoom = zoom - 1.0;
+        if (newZoom < 1.0) {
+            newZoom = 1.0;  // Гарантируем, что зум не упадет ниже 1.0
+        }
+
+        m_pGanttChart->set_zoom(newZoom);
+        m_pZoomLabel->setText("Zoom: " + QString::number(newZoom, 'f', 1));
+
+        updateZoomedImages();
+        UpdateSize(); // Обновляем размеры виджета
+        updateScrollBars(); // Обновляем состояние полос прокрутки
+    }
+}
+
+void GanttChartWidget::OnZoomInClicked() {
+    if (!m_pGanttChart) {
+        qDebug() << "Ошибка: m_pGanttChart не инициализирован";
+        return;
+    }
+    int zoom = m_pGanttChart->get_zoom();
+//    qDebug() << "Текущий зум в OnZoomInClicked: " << zoom;
+//    qDebug() << "Проверка this: " << this;
+    if (this == nullptr) {
+        qDebug() << "Ошибка: объект GanttChartWidget не существует.";
+        return;
+    }
+
+    qDebug() << "Текущий поток: " << QThread::currentThread();
+    if (!m_pGanttChart) {
+        qDebug() << "Ошибка: m_pGanttChart не инициализирован.";
+        return;
+    }
+    QString testString = "step 0 : ";
+//    qDebug() << "Тестовая строка: " << testString;
+
+//    qDebug() << "step 0 : " ;
+//    qDebug() << "step 00 : " << m_pGanttChart->get_zoom();
+    if (m_pGanttChart->get_zoom() < 8) {
+//        qDebug() << "step 1 : " << zoom;
+        m_pGanttChart->set_zoom(m_pGanttChart->get_zoom() + 1);
+//        qDebug() << "step 2 : " << zoom;
+//        m_pZoomLabel->setText("Zoom: " + QString::number(m_pGanttChart->get_zoom()));
+        m_pZoomLabel->setText("Zoom: " + QString::number(m_pGanttChart->get_zoom(), 'f', 1));
+//        qDebug() << "step 3 : " << zoom;
+        updateZoomedImages();
+//        qDebug() << "step 4 : " << zoom;
+        UpdateSize(); // Обновляем размеры виджета
+//        qDebug() << "step 5 : " << zoom;
+        updateScrollBars(); // Обновляем состояние полос прокрутки
+    } else {
+        //QMessageBox::warning(this, "Zoom Limit", "Zoom не может быть больше 8");
+    }
+}
+
+
+double GanttChartWidget::scrollBarValueToDouble(QScrollBar *scrollBar, double zoom) const {
+    // Преобразуем значение полосы прокрутки (int) в координату изображения (double)
+    return static_cast<double>(scrollBar->value()) / zoom;
+}
+int GanttChartWidget::doubleToScrollBarValue(double value, double zoom) const {
+    // Преобразуем координату изображения (double) в значение полосы прокрутки (int)
+    return static_cast<int>(value * zoom);
+}
+
+
+
+QScrollArea* GanttChartWidget::findScrollArea() const {
+    QWidget *currentParent = parentWidget();  // Начинаем с текущего родителя
+    while (currentParent) {  // Проходим по всем уровням родителей
+        QScrollArea *scrollArea = qobject_cast<QScrollArea *>(currentParent);
+        if (scrollArea) {
+            return scrollArea;  // Если нашли QScrollArea, возвращаем его
+        }
+        currentParent = currentParent->parentWidget();  // Переходим к следующему родителю
+    }
+    return nullptr;  // Если QScrollArea не найден, возвращаем nullptr
+}
+
+
+void GanttChartWidget::mousePressEvent(QMouseEvent *event) {
+    // Обработчик "ладони" (перетаскивание)
+    if (event->modifiers() == Qt::ControlModifier && event->button() == Qt::LeftButton) {
+        if (m_pGanttChart->get_zoom() != 1.0) {
+            m_bHandToolActive = true;
+            m_lastMousePos = event->pos();
+            setCursor(Qt::ClosedHandCursor);  // Изменяем курсор на "ладонь"
+            event->accept();
+            return;  // Прерываем дальнейшую обработку событий
+        }
+    }
+
+    QPoint clickPos = event->pos() - m_offset;
+    bool barClicked = false;
+    bool clickedLower = false;
+    bool clickedUpper = false;
+
+    if (!m_pGanttChart) {
+        qDebug() << "m_pGanttChart не инициализирован";
+        return;
+    }
+
+    // Получаем операции
+    auto &msOperations = m_pGanttChart->getMsOperations();
+    auto &jsOperations = m_pGanttChart->getJsOperations();
+    auto &vUnavData = m_pGanttChart->getUnavData();
+
+    // Вывод содержимого операций для отладки
+    qDebug() << "Содержимое msOperations:";
+    for (const auto &mOp : msOperations) {
+        qDebug() << "   Машина:" << mOp.iMachine
+                 << "Работа:" << mOp.iJob
+                 << "Операция:" << mOp.iOperation
+                 << "Начало:" << mOp.iStart
+                 << "Конец:" << mOp.iFinish
+                 << "Выделен:" << mOp.bHighlighted;
+    }
+    qDebug() << "Содержимое jsOperations:";
+    for (const auto &sOp : jsOperations) {
+        qDebug() << "   Работа:" << sOp.iJob
+                 << "Операция:" << sOp.iOperation
+                 << "Начало:" << sOp.iStart
+                 << "Конец:" << sOp.iFinish
+                 << "Машины:" << sOp.vMachinesIndexes
+                 << "Выделен:" << sOp.bHighlighted;
+    }
+
+    // --- Логика для кликов по нижнему графику (jsOperations) ---
+    if (event->button() == Qt::LeftButton) {
+        for (auto &sOp : jsOperations) {
+            if (sOp.rect.contains(clickPos)) {
+                qDebug() << "Левый клик по нижнему бару: Работа:" << sOp.iJob
+                         << "Операция:" << sOp.iOperation;
+                // Сброс выделения
+                for (auto &jobOp : jsOperations) jobOp.bHighlighted = false;
+                for (auto &machineOp : msOperations) machineOp.bHighlighted = false;
+                sOp.bHighlighted = true;
+
+                // Выделяем связанные бары на верхнем графике
+                qDebug() << "Машины для работы" << sOp.iJob << "Операция:" << sOp.iOperation << ":";
+                for (auto &machineIndex : sOp.vMachinesIndexes) {
+                    qDebug() << "   Машина:" << machineIndex;
+                    for (auto &mOp : msOperations) {
+                        if (mOp.iMachine == machineIndex &&
+                            mOp.iJob == sOp.iJob &&
+                            mOp.iStart == sOp.iStart &&
+                            mOp.iFinish == sOp.iFinish) {
+                            mOp.bHighlighted = true;
+                            qDebug() << "      Выделен верхний бар: Машина:" << mOp.iMachine
+                                     << "Работа:" << mOp.iJob
+                                     << "Операция:" << mOp.iOperation;
+                        }
+                    }
+                }
+                // Выделяем предшественников только на нижнем графике
+                {
+                    const auto &preds = g_pSolver->GetOperations()[sOp.iOperation]->GetPredecessors();
+                    int countPredLower = 0;
+                    for (auto &lowerOp : jsOperations) {
+                        if (lowerOp.iJob == sOp.iJob) {
+                            string opID = g_pSolver->GetOperations()[lowerOp.iOperation]->GetID();
+                            for (const auto &pred : preds) {
+                                if (get<0>(pred) == opID) {
+                                    lowerOp.bHighlighted = true;
+                                    countPredLower++;
+                                    qDebug() << "      Выделен предшественник (нижний): Работа:" << lowerOp.iJob
+                                             << "Операция:" << lowerOp.iOperation;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    qDebug() << "Всего предшественников (нижний):" << countPredLower;
+                }
+                clickedLower = true;
+                barClicked = true;
+                break;
+            }
+        }
+    }
+
+    // --- Логика для кликов по верхнему графику ---
+    if (!barClicked && event->button() == Qt::LeftButton) {
+        for (auto &mOp : msOperations) {
+            if (mOp.rect.contains(clickPos)) {
+                // Сохраняем параметры нажатого элемента
+                int clickedJob = mOp.iJob;
+                int clickedOperation = mOp.iOperation;
+                int clickedMachine = mOp.iMachine;
+                qDebug() << "Левый клик по верхнему графику: Машина:" << clickedMachine
+                         << "Работа:" << clickedJob
+                         << "Операция:" << clickedOperation;
+                // Сброс выделения
+                for (auto &jobOp : jsOperations) jobOp.bHighlighted = false;
+                for (auto &machineOp : msOperations) machineOp.bHighlighted = false;
+
+                mOp.bHighlighted = true;
+
+                // Первый проход: выделяем связанные нижние бары для этого элемента
+                int countLinked = 0;
+                for (auto &sOp : jsOperations) {
+                    if (sOp.iJob == clickedJob &&
+                        std::find(sOp.vMachinesIndexes.begin(), sOp.vMachinesIndexes.end(), clickedMachine) != sOp.vMachinesIndexes.end()) {
+                        sOp.bHighlighted = true;
+                        countLinked++;
+                        qDebug() << "   Найден связанный нижний бар: Работа:" << sOp.iJob
+                                 << "Операция:" << sOp.iOperation
+                                 << "Машины:" << sOp.vMachinesIndexes;
+                    }
+                }
+                qDebug() << "Всего связанных нижних баров:" << countLinked;
+
+
+                // Второй проход: выделяем дополнительные верхние бары с тем же job и операцией,
+                // Очистим векторы перед новым кликом
+                m_pGanttChart->m_vMainOperations.clear();
+                m_pGanttChart->m_vGroupedPredecessors.clear();
+
+                // Выделяем дополнительные верхние бары с тем же job и операцией, но с другим номером машины и совпадающими временами.
+                int countAdditional = 0;
+                for (auto &upperOp : msOperations) {
+                    if (upperOp.iJob == clickedJob &&
+                        upperOp.iOperation == clickedOperation &&
+                        upperOp.iStart == mOp.iStart &&
+                        upperOp.iFinish == mOp.iFinish)
+                    {
+                        upperOp.bHighlighted = true;
+                        m_pGanttChart->m_vMainOperations.push_back(&upperOp);  // добавляем в основной вектор
+                        countAdditional++;
+                        qDebug() << "      Выделен основной или дополнительный верхний бар: Машина:" << upperOp.iMachine
+                                 << "Работа:" << upperOp.iJob
+                                 << "Операция:" << upperOp.iOperation;
+                    }
+                }
+                qDebug() << "Всего основных/дополнительных верхних баров:" << countAdditional;
+
+                // Группируем предшественников по времени начала
+                const auto &preds = g_pSolver->GetOperations()[clickedOperation]->GetPredecessors();
+                int countPredUpper = 0;
+                std::map<int, std::vector<SResourceOperation*>> timeToGroup;
+
+                for (auto &upperOp : msOperations) {
+                    std::string opID = g_pSolver->GetOperations()[upperOp.iOperation]->GetID();
+                    for (const auto &pred : preds) {
+                        if (get<0>(pred) == opID) {
+                            upperOp.bHighlighted = true;
+                            timeToGroup[upperOp.iStart].push_back(&upperOp);
+                            countPredUpper++;
+                            qDebug() << "      Выделен предшественник (верхний): Машина:" << upperOp.iMachine
+                                     << "Работа:" << upperOp.iJob
+                                     << "Операция:" << upperOp.iOperation;
+                            break;
+                        }
+                    }
+                }
+                for (auto &[startTime, group] : timeToGroup) {
+                    m_pGanttChart->m_vGroupedPredecessors.push_back(group);
+                }
+                qDebug() << "Всего предшественников (верхний):" << countPredUpper;
+
+
+                clickedUpper = true;
+                barClicked = true;
+                break;
+            }
+        }
+    }
+
+    if (!barClicked) {
+        qDebug() << "Клик по пустой области";
+        for (auto &jobOp : jsOperations) jobOp.bHighlighted = false;
+        for (auto &machineOp : msOperations) machineOp.bHighlighted = false;
+    }
+
+    DrawGanttChart();
+    update();
+
+    if (event->button() == Qt::RightButton) {
+        handleRightClick(clickPos, jsOperations, msOperations, vUnavData);
+    }
+}
+
+void GanttChartWidget::handleRightClick(QPoint clickPos, std::vector<SJobOperation> &jsOperations, std::vector<SResourceOperation> &msOperations, std::vector<sUnavData> &vUnavData) {
+    int resourceCount = g_pSolver->GetResources().size();
+
+    // Проверка кликов по прямоугольникам недоступности
+    for (const auto& unav : vUnavData) {
+        if (unav.rect.contains(clickPos)) {
+            QTime baseTime(8, 0);
+            QString start = baseTime.addSecs(unav.time_start * 60).toString("HH:mm");
+            QString finish = baseTime.addSecs(unav.time_end * 60).toString("HH:mm");
+
+            QString info;
+            if (unav.resource_num >= 0 && unav.resource_num < resourceCount) {
+                info = QString("Ресурс: %1 (%2)\nНачало: %3\nКонец: %4")
+                        .arg(QString::fromStdString(g_pSolver->GetResources()[unav.resource_num]->GetName()))
+                        .arg(QString::fromStdString(g_pSolver->GetResources()[unav.resource_num]->GetType()))
+                        .arg(start)
+                        .arg(finish);
+            } else {
+                info = QString("Недопустимый индекс ресурса: %1").arg(unav.resource_num);
+                qWarning() << "Недопустимый unav.resource_num:" << unav.resource_num;
+            }
+
+            QMessageBox* msgBox = new QMessageBox(this);
+            msgBox->setText("Информация о недоступности ресурса");
+            msgBox->setInformativeText(info);
+            msgBox->setStandardButtons(QMessageBox::Ok);
+            msgBox->setModal(false);
+            msgBox->show();
+            return;
+        }
+    }
+
+    // Клик по нижнему графику (операции по работам)
+    for (auto &sOp : jsOperations) {
+        if (sOp.rect.contains(clickPos)) {
+            qDebug() << "Правый клик по бару: Д" << sOp.iJob;
+
+            QTime baseTime(8, 0);
+            QString start = baseTime.addSecs(sOp.iStart * 60).toString("HH:mm");
+            QString finish = baseTime.addSecs(sOp.iFinish * 60).toString("HH:mm");
+
+            QString info = QString("%1\nID: %2")
+                .arg(QString::fromStdString(g_pSolver->GetJobs()[sOp.iJob]->GetID()))
+                .arg(QString::fromStdString(g_pSolver->GetOperations()[sOp.iOperation]->GetID()));
+
+            auto predecs = g_pSolver->GetOperations()[sOp.iOperation]->GetPredecessors();
+            if (!predecs.empty()) {
+                info.append(" (");
+                for (size_t i = 0; i < predecs.size(); ++i) {
+                    const auto& [id, type, val] = predecs[i];
+                    info.append(QString::fromStdString(id)).append(" ")
+                        .append(QChar(type)).append(" ")
+                        .append(QString::number(val));
+                    if (i < predecs.size() - 1)
+                        info.append(", ");
+                }
+                info.append(")");
+            }
+
+            info.append(QString("\nТип: %1\nРазряд: %2\nНачало: %3\nКонец: %4\nДлительность: %5 мин\nРесурсы: ")
+                        .arg(QString::fromStdString(g_pSolver->GetOperations()[sOp.iOperation]->GetType()))
+                        .arg(g_pSolver->GetOperations()[sOp.iOperation]->GetDischarge())
+                        .arg(start)
+                        .arg(finish)
+                        .arg(sOp.iFinish - sOp.iStart));
+
+            for (int machineIndex : sOp.vMachinesIndexes) {
+                if (machineIndex >= 0 && machineIndex < resourceCount) {
+                    info.append(QString("%1, ").arg(QString::fromStdString(g_pSolver->GetResources()[machineIndex]->GetName())));
+                } else {
+                    info.append(QString("[недопустимый %1], ").arg(machineIndex));
+                    qWarning() << "Недопустимый machineIndex в sOp:" << machineIndex;
+                }
+            }
+
+            if (!sOp.vMachinesIndexes.empty()) {
+                info.chop(2);
+            }
+
+            QMessageBox *msgBox = new QMessageBox(this);
+            msgBox->setText("Информация об операции");
+            msgBox->setInformativeText(info);
+            msgBox->setStandardButtons(QMessageBox::Ok);
+            msgBox->setModal(false);
+            msgBox->show();
+            return;
+        }
+    }
+
+    // Клик по верхнему графику (операции по ресурсам)
+    for (auto &mOp : msOperations) {
+        if (mOp.rect.contains(clickPos)) {
+            qDebug() << "Правый клик по бару на верхнем графике: Рабочий" << mOp.iMachine;
+
+            QTime baseTime(8, 0);
+            QString start = baseTime.addSecs(mOp.iStart * 60).toString("HH:mm");
+            QString finish = baseTime.addSecs(mOp.iFinish * 60).toString("HH:mm");
+
+            QString info = QString("%1\nID: %2")
+                .arg(QString::fromStdString(g_pSolver->GetJobs()[mOp.iJob]->GetID()))
+                .arg(QString::fromStdString(g_pSolver->GetOperations()[mOp.iOperation]->GetID()));
+
+            auto predecs = g_pSolver->GetOperations()[mOp.iOperation]->GetPredecessors();
+            if (!predecs.empty()) {
+                info.append(" (");
+                for (size_t i = 0; i < predecs.size(); ++i) {
+                    const auto& [id, type, val] = predecs[i];
+                    info.append(QString::fromStdString(id)).append(" ")
+                        .append(QChar(type)).append(" ")
+                        .append(QString::number(val));
+                    if (i < predecs.size() - 1)
+                        info.append(", ");
+                }
+                info.append(")");
+            }
+
+            if (mOp.iMachine >= 0 && mOp.iMachine < resourceCount) {
+                auto resource = g_pSolver->GetResources()[mOp.iMachine];
+
+                info.append(QString("\nТип: %1\nРазряд: %2\nНачало: %3\nКонец: %4\nДлительность: %5 мин\nПереналадка: %6 мин\nРесурс: %7 (%8)")
+                        .arg(QString::fromStdString(g_pSolver->GetOperations()[mOp.iOperation]->GetType()))
+                        .arg(g_pSolver->GetOperations()[mOp.iOperation]->GetDischarge())
+                        .arg(start)
+                        .arg(finish)
+                        .arg(mOp.iFinish - mOp.iStart)
+                        .arg(mOp.iSetupTime)
+                        .arg(QString::fromStdString(resource->GetName()))
+                        .arg(QString::fromStdString(resource->GetType())));
+
+                auto useCases = resource->GetUseCases();
+                auto reqResources = g_pSolver->GetOperations()[mOp.iOperation]->GetRequiredResources();
+
+                info.append(" (");
+                bool flag = false;
+                for (auto& uc : useCases) {
+                    if (flag) info.append(", ");
+                    flag = true;
+
+                    bool highlighted = false;
+                    for (const auto& req : reqResources) {
+                        if (uc.first == req.first && uc.second >= g_pSolver->GetOperations()[mOp.iOperation]->GetDischarge()) {
+                            info.append(QString("*%1 %2*").arg(QString::fromStdString(uc.first)).arg(uc.second));
+                            highlighted = true;
+                            break;
+                        }
+                    }
+                    if (!highlighted)
+                        info.append(QString("%1 %2").arg(QString::fromStdString(uc.first)).arg(uc.second));
+                }
+                info.append(")");
+
+            } else {
+                info.append(QString("\n❗ Недопустимый индекс ресурса: %1").arg(mOp.iMachine));
+                qWarning() << "Недопустимый mOp.iMachine:" << mOp.iMachine;
+            }
+
+            QMessageBox *msgBox = new QMessageBox(this);
+            msgBox->setText("Информация об операции");
+            msgBox->setInformativeText(info);
+            msgBox->setStandardButtons(QMessageBox::Ok);
+            msgBox->setModal(false);
+            msgBox->show();
+            return;
+        }
+    }
+}
+
+
+//void GanttChartWidget::handleRightClick(QPoint clickPos, std::vector<SJobOperation> &jsOperations, std::vector<SResourceOperation> &msOperations, std::vector<sUnavData> &vUnavData) {
+//    // Проверка кликов по прямоугольникам недоступности
+//    for (const auto& unav : vUnavData) {
+//        if (unav.rect.contains(clickPos)) {
+////            qDebug() << "Правый клик по недоступности ресурса: " << unav.resource_num;
+
+//            // Базовое время — начало смены, например, 8:00
+//            QTime baseTime(8, 0);
+
+//            // Преобразуем время начала и конца в формат "HH:mm"
+//            QString start = (baseTime.addSecs(unav.time_start * 60)).toString("HH:mm");
+//            QString finish = (baseTime.addSecs(unav.time_end * 60)).toString("HH:mm");
+
+//            // Формируем текст с информацией
+//            QString info = QString("Ресурс: %1 (%2)\nНачало: %3\nКонец: %4")
+//                                .arg(QString::fromStdString(g_pSolver->GetResources()[unav.resource_num-1]->GetName()))
+//                                .arg(QString::fromStdString(g_pSolver->GetResources()[unav.resource_num-1]->GetType()))
+//                                .arg(start)  // Используем преобразованное время начала
+//                                .arg(finish); // Используем преобразованное время конца
+
+//            // Показываем сообщение
+//            QMessageBox* msgBox = new QMessageBox(this);
+//            msgBox->setText("Информация о недоступности ресурса");
+//            msgBox->setInformativeText(info);
+//            msgBox->setStandardButtons(QMessageBox::Ok);
+//            msgBox->setModal(false);
+//            msgBox->show();
+
+//            return; // Завершаем обработку после нахождения совпадения
+//        }
+//    }
+
+//    // Проверка на клики по нижнему графику
+//    for (auto &sOp : jsOperations) {
+//        if (sOp.rect.contains(clickPos)) {
+//            qDebug() << "Правый клик по бару: Д" << sOp.iJob;
+
+//            // Пересчитываем минуты в часы смены, начальное время - 8:00
+//            QTime baseTime(8, 0);
+//            QString start = (baseTime.addSecs(sOp.iStart * 60)).toString("HH:mm");
+//            QString finish = (baseTime.addSecs(sOp.iFinish * 60)).toString("HH:mm");
+
+//            // Формируем текст для отображения информации о баре
+//            QString info = QString("%1\nID: %2")
+////                            .arg(QString::fromStdString(g_pSolver->GetJobs()[sOp.iJob-1]->GetID()))
+//                            .arg(QString::fromStdString(g_pSolver->GetJobs()[sOp.iJob]->GetID()))
+//                            .arg(QString::fromStdString(g_pSolver->GetOperations()[sOp.iOperation]->GetID()));
+
+//            // Добавляем предшественников операции
+//            std::vector<tuple<string, char, int>> predecs = g_pSolver->GetOperations()[sOp.iOperation]->GetPredecessors();
+
+//            if ( predecs.size() > 0 )
+//            {
+//                info.append(QString(" ("));
+
+//                for (int i = 0; i < predecs.size(); i++ )
+//                {
+//                    info.append(QString::fromStdString(get<0>(predecs[i])));
+//                    info.append(QString(" "));
+//                    info.append(QString("%1").arg(get<1>(predecs[i])));
+//                    info.append(QString(" "));
+//                    info.append(QString("%1").arg(get<2>(predecs[i])));
+
+//                    if ( i < predecs.size() - 1 )
+//                        info.append(QString(", "));
+//                }
+
+//                info.append(QString(")"));
+//            }
+
+//            info.append(QString("\nТип: %1\nРазряд: %2\nНачало: %3\nКонец: %4\nДлительность: %5 мин\nРесурсы: ")
+//                            .arg(QString::fromStdString(g_pSolver->GetOperations()[sOp.iOperation]->GetType()))
+//                            .arg(g_pSolver->GetOperations()[sOp.iOperation]->GetDischarge())
+//                            .arg(start)
+//                            .arg(finish)
+//                            .arg(sOp.iFinish-sOp.iStart)); //.arg(g_pSolver->GetOperations()[sOp.iOperation]->GetDuration());
+
+//            // Добавляем индексы машин
+//            for (int machineIndex : sOp.vMachinesIndexes) {
+////                info.append(QString("%1, ").arg(QString::fromStdString(g_pSolver->GetResources()[machineIndex-1]->GetName())));
+//                info.append(QString("%1, ").arg(QString::fromStdString(g_pSolver->GetResources()[machineIndex]->GetName())));
+////                cout << "Resources size in widget: "<< g_pSolver->GetResources().size() << endl;
+//            }
+//            if (!sOp.vMachinesIndexes.empty()) {
+//                info.chop(2);
+//            }
+
+//            // Создаем немодальное окно с информацией
+//            QMessageBox *msgBox = new QMessageBox(this);
+//            msgBox->setText("Информация об операции");
+//            msgBox->setInformativeText(info);
+//            msgBox->setStandardButtons(QMessageBox::Ok);
+//            msgBox->setModal(false); // Делаем окно немодальным
+//            msgBox->show();
+
+//            return; // Завершаем выполнение функции после обработки
+//        }
+//    }
+
+//    // Проверка на клики по верхнему графику
+//    for (auto &mOp : msOperations) {
+//        if (mOp.rect.contains(clickPos)) {
+//            qDebug() << "Правый клик по бару на верхнем графике: Рабочий" << mOp.iMachine;
+
+//            // Пересчитываем минуты в часы смены, начальное время - 8:00
+//            QTime baseTime(8, 0);
+//            QString start = (baseTime.addSecs(mOp.iStart * 60)).toString("HH:mm");
+//            QString finish = (baseTime.addSecs(mOp.iFinish * 60)).toString("HH:mm");
+
+//            // Формируем текст для отображения информации о баре
+//            QString info = QString("%1\nID: %2")
+////                            .arg(QString::fromStdString(g_pSolver->GetJobs()[mOp.iJob-1]->GetID()))
+//                            .arg(QString::fromStdString(g_pSolver->GetJobs()[mOp.iJob]->GetID()))
+//                            .arg(QString::fromStdString(g_pSolver->GetOperations()[mOp.iOperation]->GetID()));
+
+//            // Добавляем предшественников операции
+//            std::vector<tuple<string, char, int>> predecs = g_pSolver->GetOperations()[mOp.iOperation]->GetPredecessors();
+
+//            if ( predecs.size() > 0 )
+//            {
+//                info.append(QString(" ("));
+
+//                for (int i = 0; i < predecs.size(); i++ )
+//                {
+//                    info.append(QString::fromStdString(get<0>(predecs[i])));
+//                    info.append(QString(" "));
+//                    info.append(QString("%1").arg(get<1>(predecs[i])));
+//                    info.append(QString(" "));
+//                    info.append(QString("%1").arg(get<2>(predecs[i])));
+
+//                    if ( i < predecs.size() - 1 )
+//                        info.append(QString(", "));
+//                }
+
+//                info.append(QString(")"));
+//            }
+
+//            info.append(QString("\nТип: %1\nРазряд: %2\nНачало: %3\nКонец: %4\nДлительность: %5 мин\nПереналадка: %6 мин\nРесурс: %7 (%8)")
+//                            .arg(QString::fromStdString(g_pSolver->GetOperations()[mOp.iOperation]->GetType()))
+//                            .arg(g_pSolver->GetOperations()[mOp.iOperation]->GetDischarge())
+//                            .arg(start)
+//                            .arg(finish)
+//                            .arg(mOp.iFinish-mOp.iStart) //.arg(g_pSolver->GetOperations()[mOp.iOperation]->GetDuration())
+//                            .arg(mOp.iSetupTime)
+////                            .arg(QString::fromStdString(g_pSolver->GetResources()[mOp.iMachine-1]->GetName()))
+////                            .arg(QString::fromStdString(g_pSolver->GetResources()[mOp.iMachine-1]->GetType())));
+//                            .arg(QString::fromStdString(g_pSolver->GetResources()[mOp.iMachine]->GetName()))
+//                            .arg(QString::fromStdString(g_pSolver->GetResources()[mOp.iMachine]->GetType())));
+
+//            // Добавляем случаи использования
+////            vector<pair<string, int>> useCases = g_pSolver->GetResources()[mOp.iMachine-1]->GetUseCases();
+//            vector<pair<string, int>> useCases = g_pSolver->GetResources()[mOp.iMachine]->GetUseCases();
+
+//            bool flag = false;
+//            bool highlightCase = false;
+
+//            info.append(QString(" ("));
+
+//            for (pair<string, int> useCase : useCases)
+//            {
+//                if ( flag )
+//                    info.append(QString(", "));
+//                else
+//                    flag = true;
+
+//                if ( !highlightCase )
+//                {
+//                    vector<pair<string, int>> reqResources = g_pSolver->GetOperations()[mOp.iOperation]->GetRequiredResources();
+
+//                    for (pair<string, int> reqResource : reqResources)
+//                    {
+//                        if ( useCase.second >= g_pSolver->GetOperations()[mOp.iOperation]->GetDischarge() && useCase.first == reqResource.first )
+//                        {
+//                            // Выделяем ** используемый случай использования ресурса
+//                            info.append(QString("*%1 ").arg(QString::fromStdString(useCase.first)));
+//                            info.append(QString("%1*").arg(useCase.second));
+
+//                            highlightCase = true;
+//                            break;
+//                        }
+//                    }
+
+//                    if ( highlightCase )
+//                        continue;
+//                }
+
+//                // Отображаем другие случаи использования ресурса
+//                info.append(QString("%1 ").arg(QString::fromStdString(useCase.first)));
+//                info.append(QString("%1").arg(useCase.second));
+//            }
+
+//            info.append(QString(")"));
+
+//            // Создаем немодальное окно с информацией
+//            QMessageBox *msgBox = new QMessageBox(this);
+//            msgBox->setText("Информация об операции");
+//            msgBox->setInformativeText(info);
+//            msgBox->setStandardButtons(QMessageBox::Ok);
+//            msgBox->setModal(false); // Делаем окно немодальным
+//            msgBox->show();
+
+//            return; // Завершаем выполнение функции после обработки
+//        }
+//    }
+//}
+
+//void GanttChartWidget::handleRightClick(QPoint clickPos, std::vector<SJobOperation> &jsOperations, std::vector<SResourceOperation> &msOperations, std::vector<sUnavData> &vUnavData) {
+//    // Проверка кликов по прямоугольникам недоступности
+//    for (const auto& unav : vUnavData) {
+//        if (unav.rect.contains(clickPos)) {
+////            qDebug() << "Правый клик по недоступности ресурса: " << unav.resource_num;
+
+//            // Базовое время — начало смены, например, 8:00
+//            QTime baseTime(8, 0);
+
+//            // Преобразуем время начала и конца в формат "HH:mm"
+//            QString start = (baseTime.addSecs(unav.time_start * 60)).toString("HH:mm");
+//            QString finish = (baseTime.addSecs(unav.time_end * 60)).toString("HH:mm");
+
+//            // Формируем текст с информацией
+//            QString info = QString("Ресурс: %1 (%2)\nНачало: %3\nКонец: %4")
+//                                .arg(QString::fromStdString(g_pSolver->GetResources()[unav.resource_num-1]->GetName()))
+//                                .arg(QString::fromStdString(g_pSolver->GetResources()[unav.resource_num-1]->GetType()))
+//                                .arg(start)  // Используем преобразованное время начала
+//                                .arg(finish); // Используем преобразованное время конца
+
+//            // Показываем сообщение
+//            QMessageBox* msgBox = new QMessageBox(this);
+//            msgBox->setText("Информация о недоступности ресурса");
+//            msgBox->setInformativeText(info);
+//            msgBox->setStandardButtons(QMessageBox::Ok);
+//            msgBox->setModal(false);
+//            msgBox->show();
+
+//            return; // Завершаем обработку после нахождения совпадения
+//        }
+//    }
+
+//    // Проверка на клики по нижнему графику
+//    for (auto &sOp : jsOperations) {
+//        if (sOp.rect.contains(clickPos)) {
+//            qDebug() << "Правый клик по бару: Д" << sOp.iJob;
+
+//            // Пересчитываем минуты в часы смены, начальное время - 8:00
+//            QTime baseTime(8, 0);
+//            QString start = (baseTime.addSecs(sOp.iStart * 60)).toString("HH:mm");
+//            QString finish = (baseTime.addSecs(sOp.iFinish * 60)).toString("HH:mm");
+
+//            // Формируем текст для отображения информации о баре
+//            QString info = QString("%1\nID: %2")
+//                            .arg(QString::fromStdString(g_pSolver->GetJobs()[sOp.iJob-1]->GetID()))
+//                            .arg(QString::fromStdString(g_pSolver->GetOperations()[sOp.iOperation]->GetID()));
+
+//            // Добавляем предшественников операции
+//            std::vector<tuple<string, char, int>> predecs = g_pSolver->GetOperations()[sOp.iOperation]->GetPredecessors();
+
+//            if ( predecs.size() > 0 )
+//            {
+//                info.append(QString(" ("));
+
+//                for (int i = 0; i < predecs.size(); i++ )
+//                {
+//                    info.append(QString::fromStdString(get<0>(predecs[i])));
+//                    info.append(QString(" "));
+//                    info.append(QString("%1").arg(get<1>(predecs[i])));
+//                    info.append(QString(" "));
+//                    info.append(QString("%1").arg(get<2>(predecs[i])));
+
+//                    if ( i < predecs.size() - 1 )
+//                        info.append(QString(", "));
+//                }
+
+//                info.append(QString(")"));
+//            }
+
+//            info.append(QString("\nТип: %1\nРазряд: %2\nНачало: %3\nКонец: %4\nДлительность: %5 мин\nРесурсы: ")
+//                            .arg(QString::fromStdString(g_pSolver->GetOperations()[sOp.iOperation]->GetType()))
+//                            .arg(g_pSolver->GetOperations()[sOp.iOperation]->GetDischarge())
+//                            .arg(start)
+//                            .arg(finish)
+//                            .arg(sOp.iFinish-sOp.iStart)); //.arg(g_pSolver->GetOperations()[sOp.iOperation]->GetDuration());
+
+//            // Добавляем индексы машин
+//            for (int machineIndex : sOp.vMachinesIndexes) {
+//                info.append(QString("%1, ").arg(QString::fromStdString(g_pSolver->GetResources()[machineIndex-1]->GetName())));
+////                cout << "Resources size in widget: "<< g_pSolver->GetResources().size() << endl;
+//            }
+//            if (!sOp.vMachinesIndexes.empty()) {
+//                info.chop(2);
+//            }
+
+//            // Создаем немодальное окно с информацией
+//            QMessageBox *msgBox = new QMessageBox(this);
+//            msgBox->setText("Информация об операции");
+//            msgBox->setInformativeText(info);
+//            msgBox->setStandardButtons(QMessageBox::Ok);
+//            msgBox->setModal(false); // Делаем окно немодальным
+//            msgBox->show();
+
+//            return; // Завершаем выполнение функции после обработки
+//        }
+//    }
+
+//    // Проверка на клики по верхнему графику
+//    for (auto &mOp : msOperations) {
+//        if (mOp.rect.contains(clickPos)) {
+//            qDebug() << "Правый клик по бару на верхнем графике: Рабочий" << mOp.iMachine;
+
+//            // Пересчитываем минуты в часы смены, начальное время - 8:00
+//            QTime baseTime(8, 0);
+//            QString start = (baseTime.addSecs(mOp.iStart * 60)).toString("HH:mm");
+//            QString finish = (baseTime.addSecs(mOp.iFinish * 60)).toString("HH:mm");
+
+//            // Формируем текст для отображения информации о баре
+//            QString info = QString("%1\nID: %2")
+//                            .arg(QString::fromStdString(g_pSolver->GetJobs()[mOp.iJob-1]->GetID()))
+//                            .arg(QString::fromStdString(g_pSolver->GetOperations()[mOp.iOperation]->GetID()));
+
+//            // Добавляем предшественников операции
+//            std::vector<tuple<string, char, int>> predecs = g_pSolver->GetOperations()[mOp.iOperation]->GetPredecessors();
+
+//            if ( predecs.size() > 0 )
+//            {
+//                info.append(QString(" ("));
+
+//                for (int i = 0; i < predecs.size(); i++ )
+//                {
+//                    info.append(QString::fromStdString(get<0>(predecs[i])));
+//                    info.append(QString(" "));
+//                    info.append(QString("%1").arg(get<1>(predecs[i])));
+//                    info.append(QString(" "));
+//                    info.append(QString("%1").arg(get<2>(predecs[i])));
+
+//                    if ( i < predecs.size() - 1 )
+//                        info.append(QString(", "));
+//                }
+
+//                info.append(QString(")"));
+//            }
+
+//            info.append(QString("\nТип: %1\nРазряд: %2\nНачало: %3\nКонец: %4\nДлительность: %5 мин\nПереналадка: %6 мин\nРесурс: %7 (%8)")
+//                            .arg(QString::fromStdString(g_pSolver->GetOperations()[mOp.iOperation]->GetType()))
+//                            .arg(g_pSolver->GetOperations()[mOp.iOperation]->GetDischarge())
+//                            .arg(start)
+//                            .arg(finish)
+//                            .arg(mOp.iFinish-mOp.iStart) //.arg(g_pSolver->GetOperations()[mOp.iOperation]->GetDuration())
+//                            .arg(mOp.iSetupTime)
+//                            .arg(QString::fromStdString(g_pSolver->GetResources()[mOp.iMachine-1]->GetName()))
+//                            .arg(QString::fromStdString(g_pSolver->GetResources()[mOp.iMachine-1]->GetType())));
+
+//            // Добавляем случаи использования
+//            vector<pair<string, int>> useCases = g_pSolver->GetResources()[mOp.iMachine-1]->GetUseCases();
+//            bool flag = false;
+//            bool highlightCase = false;
+
+//            info.append(QString(" ("));
+
+//            for (pair<string, int> useCase : useCases)
+//            {
+//                if ( flag )
+//                    info.append(QString(", "));
+//                else
+//                    flag = true;
+
+//                if ( !highlightCase )
+//                {
+//                    vector<pair<string, int>> reqResources = g_pSolver->GetOperations()[mOp.iOperation]->GetRequiredResources();
+
+//                    for (pair<string, int> reqResource : reqResources)
+//                    {
+//                        if ( useCase.second >= g_pSolver->GetOperations()[mOp.iOperation]->GetDischarge() && useCase.first == reqResource.first )
+//                        {
+//                            // Выделяем ** используемый случай использования ресурса
+//                            info.append(QString("*%1 ").arg(QString::fromStdString(useCase.first)));
+//                            info.append(QString("%1*").arg(useCase.second));
+
+//                            highlightCase = true;
+//                            break;
+//                        }
+//                    }
+
+//                    if ( highlightCase )
+//                        continue;
+//                }
+
+//                // Отображаем другие случаи использования ресурса
+//                info.append(QString("%1 ").arg(QString::fromStdString(useCase.first)));
+//                info.append(QString("%1").arg(useCase.second));
+//            }
+
+//            info.append(QString(")"));
+
+//            // Создаем немодальное окно с информацией
+//            QMessageBox *msgBox = new QMessageBox(this);
+//            msgBox->setText("Информация об операции");
+//            msgBox->setInformativeText(info);
+//            msgBox->setStandardButtons(QMessageBox::Ok);
+//            msgBox->setModal(false); // Делаем окно немодальным
+//            msgBox->show();
+
+//            return; // Завершаем выполнение функции после обработки
+//        }
+//    }
+//}
+
+
+
+void GanttChartWidget::OnShowScheduleMetricsClicked() {
+    // Инициализация данных структуры ScheduleMetrics
+    // Создаем новое диалоговое окно для отображения данных
+    QDialog* dialog = new QDialog(this);
+    dialog->setWindowTitle("Метрики расписания");
+
+    // Создаем текстовое поле для отображения данных
+    QTextEdit* textEdit = new QTextEdit(dialog);
+    textEdit->setReadOnly(true);  // Делаем поле только для чтения
+
+    // Отключаем перенос строк
+    textEdit->setWordWrapMode(QTextOption::NoWrap);
+
+    // Добавляем текст
+    QString dataText;
+    
+    // Имя файла
+    QString fileName = "Schedule.txt";
+
+    // Создание объекта QFile для работы с файлом
+    QFile file(fileName);
+
+    // Проверка, что файл открылся
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        std::cerr << "Не удалось открыть файл!" << std::endl;
+        return;
+    }
+
+    // Чтение данных из файла и сохранение в переменную dataText
+    QTextStream in(&file);
+    dataText = in.readAll();
+
+    // Закрываем файл
+    file.close();
+    textEdit->setText(dataText);
+
+    // Добавляем вертикальную и горизонтальную полосу прокрутки
+    textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    textEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+
+    // Устанавливаем layout в диалоговом окне
+    QVBoxLayout* dialogLayout = new QVBoxLayout(dialog);
+    dialogLayout->addWidget(textEdit);
+    dialog->setLayout(dialogLayout);
+
+    // Показываем диалог
+    dialog->exec();
+}
+
+
+
+void GanttChartWidget::UpdateSize() {
+//     qDebug() << "UpdateSize Обновленная высота тулбара: " << m_toolbarHeight;
+    int width = VIRTUAL_SCREEN_WIDTH * m_pGanttChart->get_zoom();
+    int height = VIRTUAL_SCREEN_HEIGHT * m_pGanttChart->get_zoom()-m_istatusBarHeight*2 ;
+
+    setMinimumSize(width, height);
+    resize(width, height ); // Корректный расчет общей высоты
+}
+
+
+
+void GanttChartWidget::setToolbarHeight(int height) {
+    m_toolbarHeight = height;
+    update(); // Перерисовываем виджет при изменении высоты тулбара
+};
+
+
+
+void GanttChartWidget::OnZoomOutClickedScroll(const QPointF &mousePosWidget) {
+    QScrollArea *scrollArea = findScrollArea();  // Используем универсальную функцию поиска
+    if (!scrollArea) {
+        qDebug() << "Ошибка: QScrollArea не найден";
+        return;
+    }
+
+    auto hScroll = scrollArea->horizontalScrollBar();
+    auto vScroll = scrollArea->verticalScrollBar();
+
+    // Текущий масштаб
+    double currentZoom = m_pGanttChart->get_zoom();
+    if (currentZoom <= 1.0) {
+        QMessageBox::warning(this, "Zoom Limit", "Zoom не может быть меньше 1.0");
+        return;
+    }
+
+    // Смещение полос прокрутки (верхний левый угол видимой области)
+    QPointF scrollOffset(hScroll->value(), vScroll->value());
+
+    // Абсолютная позиция мыши на изображении (до изменения масштаба)
+    QPointF mousePosImage = (mousePosWidget + scrollOffset) / currentZoom;
+
+    // Уменьшаем зум
+    m_pGanttChart->set_zoom(currentZoom - 0.2);
+    double newZoom = m_pGanttChart->get_zoom();
+
+    // Новая позиция мыши на изображении (с учётом нового масштаба)
+    QPointF newMousePosImage = mousePosImage * newZoom;
+
+    // Вычисляем новое смещение для скроллов
+    QPointF newScrollOffset = newMousePosImage - mousePosWidget;
+
+    // Обновляем полосы прокрутки
+    hScroll->setValue(static_cast<int>(newScrollOffset.x()));
+    vScroll->setValue(static_cast<int>(newScrollOffset.y()));
+
+    // Обновляем текст Zoom
+    m_pZoomLabel->setText("Zoom: " + QString::number(newZoom, 'f', 1));
+
+    // Обновляем изображение
+    updateZoomedImages();
+    UpdateSize();
+    updateScrollBars(); // Обновляем состояние полос прокрутки
+
+//    qDebug() << "Zoom Out Completed";
+//    qDebug() << "New Zoom:" << newZoom;
+//    qDebug() << "New Scroll Offset (X):" << newScrollOffset.x();
+//    qDebug() << "New Scroll Offset (Y):" << newScrollOffset.y();
+}
+
+
+
+void GanttChartWidget::OnZoomInClickedScroll(const QPointF &mousePosWidget) {
+    QScrollArea *scrollArea = findScrollArea();  // Используем универсальную функцию поиска
+    if (!scrollArea) {
+        qDebug() << "Ошибка: QScrollArea не найден";
+        return;
+    }
+
+    auto hScroll = scrollArea->horizontalScrollBar();
+    auto vScroll = scrollArea->verticalScrollBar();
+
+    // Текущий масштаб
+    double currentZoom = m_pGanttChart->get_zoom();
+    if (currentZoom >= 8.0) {
+        QMessageBox::warning(this, "Zoom Limit", "Zoom не может быть больше 8");
+        return;
+    }
+
+    // Смещение полос прокрутки (верхний левый угол видимой области)
+    QPointF scrollOffset(hScroll->value(), vScroll->value());
+
+    // Абсолютная позиция мыши на изображении (до изменения масштаба)
+    QPointF mousePosImage = (mousePosWidget + scrollOffset) / currentZoom;
+
+    // Увеличиваем зум
+    m_pGanttChart->set_zoom(currentZoom + 0.2);
+    double newZoom = m_pGanttChart->get_zoom();
+
+    // Новая позиция мыши на изображении (с учётом нового масштаба)
+    QPointF newMousePosImage = mousePosImage * newZoom;
+
+    // Вычисляем новое смещение для скроллов
+    QPointF newScrollOffset = newMousePosImage - mousePosWidget;
+
+    // Обновляем полосы прокрутки
+    hScroll->setValue(static_cast<int>(newScrollOffset.x()));
+    vScroll->setValue(static_cast<int>(newScrollOffset.y()));
+
+    // Обновляем текст Zoom
+    m_pZoomLabel->setText("Zoom: " + QString::number(newZoom, 'f', 1));
+
+    // Обновляем изображение
+    updateZoomedImages();
+    UpdateSize();
+    updateScrollBars(); // Обновляем состояние полос прокрутки
+
+//    qDebug() << "Zoom In Completed";
+//    qDebug() << "New Zoom:" << newZoom;
+//    qDebug() << "New Scroll Offset (X):" << newScrollOffset.x();
+//    qDebug() << "New Scroll Offset (Y):" << newScrollOffset.y();
+}
+
+
+
+void GanttChartWidget::wheelEvent(QWheelEvent *event) {
+    if (event->modifiers() == Qt::ControlModifier) {
+        // Координаты указателя мыши относительно виджета
+        QPointF mousePosWidget = event->position();
+
+        // Определяем направление прокрутки
+        int delta = event->angleDelta().y();
+        if (delta > 0) {
+            OnZoomInClickedScroll(mousePosWidget);  // Передаем координаты мыши
+        } else if (delta < 0) {
+            OnZoomOutClickedScroll(mousePosWidget);  // Передаем координаты мыши
+        }
+
+        event->accept();
+    } else {
+        QWidget::wheelEvent(event);
+    }
+}
+
+
+
+void GanttChartWidget::mouseReleaseEvent(QMouseEvent *event) {
+    if (m_bHandToolActive && event->button() == Qt::LeftButton) {
+        m_bHandToolActive = false;
+        setCursor(Qt::ArrowCursor);  // Возвращаем стандартный курсор
+        event->accept();
+    } else {
+        QWidget::mouseReleaseEvent(event);
+    }
+}
+
+
+void GanttChartWidget::mouseMoveEvent(QMouseEvent *event) {
+    // Если активен режим перетаскивания (hand tool), выполняем существующую логику
+    if (m_bHandToolActive) {
+        QPoint currentMousePos = event->pos();
+        QPoint offset = currentMousePos - m_lastMousePos;
+        m_offset += offset;
+        // (Ваш существующий код для ограничения смещения и обновления полос прокрутки)
+        m_lastMousePos = currentMousePos;
+        update();
+        event->accept();
+    } else {
+        // Если не перетаскиваем, проверяем позицию курсора для вывода информации о баре.
+        QPoint pos = event->pos() - m_offset; // компенсируем смещение
+
+        QString statusText;
+        bool found = false;
+
+        // Сначала проверяем периоды недоступности (vUnavData)
+        for (const auto &unav : m_pGanttChart->getUnavData()) {
+            if (unav.rect.contains(pos)) {
+                QTime baseTime(8, 0);
+                QString start = (baseTime.addSecs(unav.time_start * 60)).toString("HH:mm");
+                QString finish = (baseTime.addSecs(unav.time_end * 60)).toString("HH:mm");
+                statusText = QString("Период недоступности Ресурса: %1 (%2)\nНачало: %3, Конец: %4")
+                                .arg(QString::fromStdString(g_pSolver->GetResources()[unav.resource_num - 1]->GetName()))
+                                .arg(QString::fromStdString(g_pSolver->GetResources()[unav.resource_num - 1]->GetType()))
+                                .arg(start).arg(finish);
+                found = true;
+                break;
+            }
+        }
+
+        // Если не найдено в недоступных периодах, проверяем обычные бары (jsOperations)
+        if (!found) {
+            for (const auto &sOp : m_pGanttChart->getJsOperations()) {
+                if (sOp.rect.contains(pos)) {
+                    QTime baseTime(8, 0);
+                    QString start = (baseTime.addSecs(sOp.iStart * 60)).toString("HH:mm");
+                    QString finish = (baseTime.addSecs(sOp.iFinish * 60)).toString("HH:mm");
+                    statusText = QString("Работа: %1\nОперация: %2\nНачало: %3, Конец: %4")
+//                                    .arg(QString::fromStdString(g_pSolver->GetJobs()[sOp.iJob - 1]->GetID()))
+                                    .arg(QString::fromStdString(g_pSolver->GetJobs()[sOp.iJob ]->GetID()))
+                                    .arg(QString::fromStdString(g_pSolver->GetOperations()[sOp.iOperation]->GetID()))
+                                    .arg(start).arg(finish);
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        // Если все еще не найдено – проверяем бары из msOperations (например, для верхнего графика)
+        if (!found) {
+            for (const auto &mOp : m_pGanttChart->getMsOperations()) {
+                if (mOp.rect.contains(pos)) {
+                    QTime baseTime(8, 0);
+                    QString start = (baseTime.addSecs(mOp.iStart * 60)).toString("HH:mm");
+                    QString finish = (baseTime.addSecs(mOp.iFinish * 60)).toString("HH:mm");
+                    statusText = QString("Рабочий: %1\nОперация: %2\nНачало: %3, Конец: %4")
+                                    .arg(mOp.iMachine)
+                                    .arg(QString::fromStdString(g_pSolver->GetOperations()[mOp.iOperation]->GetID()))
+                                    .arg(start).arg(finish);
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!found) {
+            statusText = "Пустая область";
+        }
+
+        // Отправляем сформированное сообщение в MainWindow
+        emit statusTextChanged(statusText);
+
+        // Передаем событие базовому обработчику
+        QWidget::mouseMoveEvent(event);
+    }
+}
+
+
+
+void GanttChartWidget::updateScrollBars() {
+    if (!m_pScrollArea) {
+        qDebug() << "Ошибка: m_pScrollArea == nullptr. Область прокрутки не задана.";
+        return; // Проверяем, что область прокрутки существует
+    }
+
+    if (!m_pGanttChart) {
+        qDebug() << "Ошибка: m_pGanttChart == nullptr. Объект диаграммы Ганта не задан.";
+        return; // Проверяем, что объект диаграммы Ганта существует
+    }
+
+    double zoom = m_pGanttChart->get_zoom();
+//    qDebug() << "updateScrollBars() вызван. Текущий зум:" << zoom;
+
+    if (zoom == 1.0) {
+//        qDebug() << "Зум равен 1. Отключаем полосы прокрутки.";
+
+        // Отключаем возможность двигать полосы прокрутки
+        m_pScrollArea->horizontalScrollBar()->setEnabled(false);
+        m_pScrollArea->horizontalScrollBar()->setValue(m_pScrollArea->horizontalScrollBar()->minimum());
+//        qDebug() << "Горизонтальная полоса прокрутки: "
+//                 << "Enabled:" << m_pScrollArea->horizontalScrollBar()->isEnabled()
+//                 << ", Value:" << m_pScrollArea->horizontalScrollBar()->value();
+
+        m_pScrollArea->verticalScrollBar()->setEnabled(false);
+        m_pScrollArea->verticalScrollBar()->setValue(m_pScrollArea->verticalScrollBar()->minimum());
+//        qDebug() << "Вертикальная полоса прокрутки: "
+//                 << "Enabled:" << m_pScrollArea->verticalScrollBar()->isEnabled()
+//                 << ", Value:" << m_pScrollArea->verticalScrollBar()->value();
+        // Сбрасываем смещение к начальному значению
+        m_offset = QPoint(0, 0);
+        // Перерисовываем виджет, чтобы обновить его состояние
+        update();
+    } else {
+        qDebug() << "Зум не равен 1. Включаем полосы прокрутки.";
+
+        // Включаем полосы прокрутки
+        m_pScrollArea->horizontalScrollBar()->setEnabled(true);
+        m_pScrollArea->verticalScrollBar()->setEnabled(true);
+
+//        qDebug() << "Горизонтальная полоса прокрутки: "
+//                 << "Enabled:" << m_pScrollArea->horizontalScrollBar()->isEnabled()
+//                 << ", Value:" << m_pScrollArea->horizontalScrollBar()->value();
+
+//        qDebug() << "Вертикальная полоса прокрутки: "
+//                 << "Enabled:" << m_pScrollArea->verticalScrollBar()->isEnabled()
+//                 << ", Value:" << m_pScrollArea->verticalScrollBar()->value();
+    }
+}
+
+
+
+void GanttChartWidget::showEvent(QShowEvent *event) {
+    QWidget::showEvent(event);
+    QTimer::singleShot(300, this, SLOT(UpdateSize()));
+}
+
+
+
+
+

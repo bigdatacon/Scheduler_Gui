@@ -1,0 +1,13 @@
+*.user
+*.autosave
+*.pro.user
+*.qmake.stash
+build-*/
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+core*
+debug/core.*

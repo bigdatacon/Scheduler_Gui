@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>resources/icons8-rocket-64.png</file>
+    </qresource>
+    <qresource prefix="/new/prefix2"/>
+    <qresource prefix="/two"/>
+    <qresource prefix="/">
+        <file>resources/rocket-2.png</file>
+        <file>resources/metrics.png</file>
+        <file>resources/restart.png</file>
+        <file>resources/data.png</file>
+    </qresource>
+</RCC>
