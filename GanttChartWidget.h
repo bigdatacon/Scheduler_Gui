@@ -85,6 +85,7 @@ private:
     void updateZoomedImages();  // Метод для обновления изображений после изменения зума
     void PerformDelayedInitialization() ;
     void drawImageWithOffset(QPainter &oPainter, const QImage &sourceImage, const QRect &visibleRect);
+    QPoint clampOffsetToValidRange(QPoint offset) const ;
 
 
     GanttChart* m_pGanttChart;

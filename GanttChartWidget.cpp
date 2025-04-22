@@ -45,6 +45,21 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart,
     m_pScrollArea->setContentsMargins(0, 0, 0, 0);
     m_pScrollArea->viewport()->setContentsMargins(0, 0, 0, 0);
 
+    connect(m_pScrollArea->horizontalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
+        m_offset.setX(value);
+        m_offset = clampOffsetToValidRange(m_offset);
+        m_fPreciseScrollOffset.setX(m_offset.x());
+        update();
+    });
+
+    connect(m_pScrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
+        m_offset.setY(value);
+        m_offset = clampOffsetToValidRange(m_offset);
+        m_fPreciseScrollOffset.setY(m_offset.y());
+        update();
+    });
+
+
     updateScrollBars();
 }
 
@@ -917,13 +932,52 @@ void GanttChartWidget::OnShowScheduleMetricsClicked() {
 
 
 
+//void GanttChartWidget::UpdateSize() {
+//    int width = VIRTUAL_SCREEN_WIDTH * m_pGanttChart->get_zoom();
+//    int height = VIRTUAL_SCREEN_HEIGHT * m_pGanttChart->get_zoom()-m_istatusBarHeight*2 ;
+
+//    setMinimumSize(width, height);
+//    resize(width, height ); // Корректный расчет общей высоты
+//}
+
+
+QPoint GanttChartWidget::clampOffsetToValidRange(QPoint offset) const {
+    QSize imageSize = m_bDisplayingWorkersTimeChart ? m_oWorkersImage.size() : m_oChartImage.size();
+    QSize viewportSize = m_pScrollArea->viewport()->size();
+
+    int minOffsetX = std::min(0, viewportSize.width() - imageSize.width());
+    int minOffsetY = std::min(0, viewportSize.height() - imageSize.height());
+
+    int maxOffsetX = 0;
+    int maxOffsetY = 0;
+
+    return QPoint(
+        std::clamp(offset.x(), minOffsetX, maxOffsetX),
+        std::clamp(offset.y(), minOffsetY, maxOffsetY)
+    );
+}
+
+
+
+
 void GanttChartWidget::UpdateSize() {
-    int width = VIRTUAL_SCREEN_WIDTH * m_pGanttChart->get_zoom();
-    int height = VIRTUAL_SCREEN_HEIGHT * m_pGanttChart->get_zoom()-m_istatusBarHeight*2 ;
+    if (!m_pGanttChart || !m_pScrollArea) return;
+
+    double zoom = m_pGanttChart->get_zoom();
+    int width = VIRTUAL_SCREEN_WIDTH * zoom;
+    int height = VIRTUAL_SCREEN_HEIGHT * zoom - m_istatusBarHeight * 2;
 
     setMinimumSize(width, height);
-    resize(width, height ); // Корректный расчет общей высоты
+    resize(width, height);
+
+    m_offset = clampOffsetToValidRange(m_offset);
+    m_fPreciseScrollOffset = QPointF(m_offset);
+
+    m_pScrollArea->horizontalScrollBar()->setValue(m_offset.x());
+    m_pScrollArea->verticalScrollBar()->setValue(m_offset.y());
 }
+
+
 
 
 void GanttChartWidget::setToolbarHeight(int height) {
@@ -981,56 +1035,19 @@ void GanttChartWidget::mouseMoveEvent(QMouseEvent *event) {
         QPoint currentMousePos = event->pos();
         QPoint offset = currentMousePos - m_lastMousePos;
 
-        qDebug() << "[HAND] m_offset before += offset" << m_offset;
-        m_offset += offset;
-        qDebug() << "[HAND] m_offset after += offset" << m_offset;
-
-        QSize imageSize = m_bDisplayingWorkersTimeChart ? m_oWorkersImage.size() : m_oChartImage.size();
-        QSize viewportSize = m_pScrollArea->viewport()->size();
-
-        int imageLeft = m_offset.x();
-        int imageRight = imageLeft + imageSize.width();
-        int imageBottom = m_offset.y() + imageSize.height();
-
-        int viewportRight = viewportSize.width();
-        int viewportBottom = viewportSize.height();
-
-//        int minOffsetX = viewportRight - imageSize.width()-imageLeft; // Правый край изображения >= правого края viewport
-        int minOffsetX = viewportRight - imageSize.width(); // Правый край изображения >= правого края viewport
-        int maxOffsetX = 0;                                 // Левая граница изображения не вылезает за левый край
-
-        int minOffsetY = viewportBottom - imageSize.height();
-//        int minOffsetY = viewportBottom - imageSize.height()- m_offset.y();
-        int maxOffsetY = 0;
-
-
-
-        qDebug() << "[CHECK] imageLeft =" << imageLeft << " imageRight =" << imageRight;
-        qDebug() << "[CHECK] viewportRight =" << viewportRight;
-        qDebug() << "[CHECK] imageBottom =" << imageBottom << " viewportBottom =" << viewportBottom;
-
-        qDebug() << "[CLAMP RANGE] X: from" << minOffsetX << "to" << maxOffsetX;
-        qDebug() << "[CLAMP RANGE] Y: from" << minOffsetY << "to" << maxOffsetY;
-
-        m_offset.setX(std::clamp(m_offset.x(), minOffsetX, maxOffsetX));
-        m_offset.setY(std::clamp(m_offset.y(), minOffsetY, maxOffsetY));
-
-        qDebug() << "[HAND] m_offset after clamp:" << m_offset;
+        QPoint proposedOffset = m_offset + offset;
+        m_offset = clampOffsetToValidRange(proposedOffset);
+        m_fPreciseScrollOffset = QPointF(m_offset);
 
         m_lastMousePos = currentMousePos;
         update();
-        // Синхронизируем точный offset и scrollBar'ы после ручного перетаскивания
-        m_fPreciseScrollOffset = QPointF(m_offset);  // теперь scroll и offset синхронизированы
 
-        QScrollBar* hScroll = m_pScrollArea->horizontalScrollBar();
-        QScrollBar* vScroll = m_pScrollArea->verticalScrollBar();
-
-        hScroll->setValue(static_cast<int>(std::round(m_fPreciseScrollOffset.x())));
-        vScroll->setValue(static_cast<int>(std::round(m_fPreciseScrollOffset.y())));
-
+        m_pScrollArea->horizontalScrollBar()->setValue(m_offset.x());
+        m_pScrollArea->verticalScrollBar()->setValue(m_offset.y());
 
         event->accept();
     }
+
 
 
 
@@ -1190,7 +1207,6 @@ void GanttChartWidget::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
     QTimer::singleShot(300, this, SLOT(UpdateSize()));
 }
-
 
 
 
