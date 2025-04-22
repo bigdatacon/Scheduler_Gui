@@ -86,6 +86,7 @@ private:
     void PerformDelayedInitialization() ;
     void drawImageWithOffset(QPainter &oPainter, const QImage &sourceImage, const QRect &visibleRect);
 
+
     GanttChart* m_pGanttChart;
     QScrollArea* m_pScrollArea; // Указатель на область прокрутки
 
