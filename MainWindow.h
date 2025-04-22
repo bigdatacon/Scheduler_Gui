@@ -28,6 +28,9 @@ private slots:
     void onZoomOutButtonClicked();
     void onOptimizationModeChanged();
 
+    void onZoomResetClicked();
+
+
 private:
     void resizeEvent(QResizeEvent *event);
 
@@ -42,7 +45,10 @@ private:
     QPushButton *m_pRestartSolverButton;
     QPushButton *m_pZoomInButton;
     QPushButton *m_pZoomOutButton;
-    QLineEdit *m_pZoomLabel;
+//    QLineEdit *m_pZoomLabel;
+
+    QPushButton* m_pZoomButton;
+
 
     // Радиокнопки для выбора режима оптимизации
     QRadioButton *m_pDurationRadioButton;

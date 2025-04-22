@@ -24,7 +24,7 @@ class GanttChartWidget : public QWidget {
 
 public:
     GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart,
-                     QLineEdit *zoomLabel, int m_toolbarHeight, QScrollArea *pScrollArea,
+                     QPushButton *m_pZoomButton, int m_toolbarHeight, QScrollArea *pScrollArea,
                      int statusBarHeight);
 
 
@@ -53,12 +53,14 @@ protected:
 
 public slots:
     void UpdateSize(); // Объявляем как слот
+    void setZoom(double zoomLevel) ;
 
 private slots:
     void OnSolveButtonClicked();  // Обработчик для нажатия кнопки
     void OnShowScheduleMetricsClicked();  // Новый слот для открытия окна с данными
 
     void OnSolveButtonClicked_SolverRestart();// Обработчик для нажатия кнопки перезапустить solver
+
     void OnZoomOutClicked();  // Слот для уменьшения зума
     void OnZoomInClicked();   // Слот для увеличения зума
 
@@ -109,7 +111,8 @@ private:
     // Элементы управления зумом
     QPushButton* m_pZoomOutButton;  // Кнопка для уменьшения зума
     QPushButton* m_pZoomInButton;   // Кнопка для увеличения зума
-    QLineEdit* m_pZoomLabel;  // Отображение текущего значения зума
+    QPushButton* m_pZoomButton;
+//    QLineEdit* m_pZoomLabel;  // Отображение текущего значения зума
 
     // Добавляем радиокнопки
     QRadioButton* m_pDurationRadioButton; // Кнопка для установки режима оптимизации длительности

@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_GanttChartWidget_t {
-    QByteArrayData data[22];
-    char stringdata0[348];
+    QByteArrayData data[24];
+    char stringdata0[366];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -37,28 +37,30 @@ QT_MOC_LITERAL(1, 17, 17), // "statusTextChanged"
 QT_MOC_LITERAL(2, 35, 0), // ""
 QT_MOC_LITERAL(3, 36, 4), // "text"
 QT_MOC_LITERAL(4, 41, 10), // "UpdateSize"
-QT_MOC_LITERAL(5, 52, 20), // "OnSolveButtonClicked"
-QT_MOC_LITERAL(6, 73, 28), // "OnShowScheduleMetricsClicked"
-QT_MOC_LITERAL(7, 102, 34), // "OnSolveButtonClicked_SolverRe..."
-QT_MOC_LITERAL(8, 137, 16), // "OnZoomOutClicked"
-QT_MOC_LITERAL(9, 154, 15), // "OnZoomInClicked"
-QT_MOC_LITERAL(10, 170, 21), // "OnZoomInClickedScroll"
-QT_MOC_LITERAL(11, 192, 8), // "mousePos"
-QT_MOC_LITERAL(12, 201, 22), // "OnZoomOutClickedScroll"
-QT_MOC_LITERAL(13, 224, 14), // "findScrollArea"
-QT_MOC_LITERAL(14, 239, 12), // "QScrollArea*"
-QT_MOC_LITERAL(15, 252, 22), // "scrollBarValueToDouble"
-QT_MOC_LITERAL(16, 275, 11), // "QScrollBar*"
-QT_MOC_LITERAL(17, 287, 9), // "scrollBar"
-QT_MOC_LITERAL(18, 297, 4), // "zoom"
-QT_MOC_LITERAL(19, 302, 22), // "doubleToScrollBarValue"
-QT_MOC_LITERAL(20, 325, 5), // "value"
-QT_MOC_LITERAL(21, 331, 16) // "updateScrollBars"
+QT_MOC_LITERAL(5, 52, 7), // "setZoom"
+QT_MOC_LITERAL(6, 60, 9), // "zoomLevel"
+QT_MOC_LITERAL(7, 70, 20), // "OnSolveButtonClicked"
+QT_MOC_LITERAL(8, 91, 28), // "OnShowScheduleMetricsClicked"
+QT_MOC_LITERAL(9, 120, 34), // "OnSolveButtonClicked_SolverRe..."
+QT_MOC_LITERAL(10, 155, 16), // "OnZoomOutClicked"
+QT_MOC_LITERAL(11, 172, 15), // "OnZoomInClicked"
+QT_MOC_LITERAL(12, 188, 21), // "OnZoomInClickedScroll"
+QT_MOC_LITERAL(13, 210, 8), // "mousePos"
+QT_MOC_LITERAL(14, 219, 22), // "OnZoomOutClickedScroll"
+QT_MOC_LITERAL(15, 242, 14), // "findScrollArea"
+QT_MOC_LITERAL(16, 257, 12), // "QScrollArea*"
+QT_MOC_LITERAL(17, 270, 22), // "scrollBarValueToDouble"
+QT_MOC_LITERAL(18, 293, 11), // "QScrollBar*"
+QT_MOC_LITERAL(19, 305, 9), // "scrollBar"
+QT_MOC_LITERAL(20, 315, 4), // "zoom"
+QT_MOC_LITERAL(21, 320, 22), // "doubleToScrollBarValue"
+QT_MOC_LITERAL(22, 343, 5), // "value"
+QT_MOC_LITERAL(23, 349, 16) // "updateScrollBars"
 
     },
     "GanttChartWidget\0statusTextChanged\0\0"
-    "text\0UpdateSize\0OnSolveButtonClicked\0"
-    "OnShowScheduleMetricsClicked\0"
+    "text\0UpdateSize\0setZoom\0zoomLevel\0"
+    "OnSolveButtonClicked\0OnShowScheduleMetricsClicked\0"
     "OnSolveButtonClicked_SolverRestart\0"
     "OnZoomOutClicked\0OnZoomInClicked\0"
     "OnZoomInClickedScroll\0mousePos\0"
@@ -76,7 +78,7 @@ static const uint qt_meta_data_GanttChartWidget[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      13,   14, // methods
+      14,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -84,37 +86,39 @@ static const uint qt_meta_data_GanttChartWidget[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   79,    2, 0x06 /* Public */,
+       1,    1,   84,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       4,    0,   82,    2, 0x0a /* Public */,
-       5,    0,   83,    2, 0x08 /* Private */,
-       6,    0,   84,    2, 0x08 /* Private */,
-       7,    0,   85,    2, 0x08 /* Private */,
-       8,    0,   86,    2, 0x08 /* Private */,
-       9,    0,   87,    2, 0x08 /* Private */,
-      10,    1,   88,    2, 0x08 /* Private */,
-      12,    1,   91,    2, 0x08 /* Private */,
-      13,    0,   94,    2, 0x08 /* Private */,
-      15,    2,   95,    2, 0x08 /* Private */,
-      19,    2,  100,    2, 0x08 /* Private */,
-      21,    0,  105,    2, 0x08 /* Private */,
+       4,    0,   87,    2, 0x0a /* Public */,
+       5,    1,   88,    2, 0x0a /* Public */,
+       7,    0,   91,    2, 0x08 /* Private */,
+       8,    0,   92,    2, 0x08 /* Private */,
+       9,    0,   93,    2, 0x08 /* Private */,
+      10,    0,   94,    2, 0x08 /* Private */,
+      11,    0,   95,    2, 0x08 /* Private */,
+      12,    1,   96,    2, 0x08 /* Private */,
+      14,    1,   99,    2, 0x08 /* Private */,
+      15,    0,  102,    2, 0x08 /* Private */,
+      17,    2,  103,    2, 0x08 /* Private */,
+      21,    2,  108,    2, 0x08 /* Private */,
+      23,    0,  113,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString,    3,
 
  // slots: parameters
     QMetaType::Void,
+    QMetaType::Void, QMetaType::Double,    6,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QPointF,   11,
-    QMetaType::Void, QMetaType::QPointF,   11,
-    0x80000000 | 14,
-    QMetaType::Double, 0x80000000 | 16, QMetaType::Double,   17,   18,
-    QMetaType::Int, QMetaType::Double, QMetaType::Double,   20,   18,
+    QMetaType::Void, QMetaType::QPointF,   13,
+    QMetaType::Void, QMetaType::QPointF,   13,
+    0x80000000 | 16,
+    QMetaType::Double, 0x80000000 | 18, QMetaType::Double,   19,   20,
+    QMetaType::Int, QMetaType::Double, QMetaType::Double,   22,   20,
     QMetaType::Void,
 
        0        // eod
@@ -128,20 +132,21 @@ void GanttChartWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int
         switch (_id) {
         case 0: _t->statusTextChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 1: _t->UpdateSize(); break;
-        case 2: _t->OnSolveButtonClicked(); break;
-        case 3: _t->OnShowScheduleMetricsClicked(); break;
-        case 4: _t->OnSolveButtonClicked_SolverRestart(); break;
-        case 5: _t->OnZoomOutClicked(); break;
-        case 6: _t->OnZoomInClicked(); break;
-        case 7: _t->OnZoomInClickedScroll((*reinterpret_cast< const QPointF(*)>(_a[1]))); break;
-        case 8: _t->OnZoomOutClickedScroll((*reinterpret_cast< const QPointF(*)>(_a[1]))); break;
-        case 9: { QScrollArea* _r = _t->findScrollArea();
+        case 2: _t->setZoom((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 3: _t->OnSolveButtonClicked(); break;
+        case 4: _t->OnShowScheduleMetricsClicked(); break;
+        case 5: _t->OnSolveButtonClicked_SolverRestart(); break;
+        case 6: _t->OnZoomOutClicked(); break;
+        case 7: _t->OnZoomInClicked(); break;
+        case 8: _t->OnZoomInClickedScroll((*reinterpret_cast< const QPointF(*)>(_a[1]))); break;
+        case 9: _t->OnZoomOutClickedScroll((*reinterpret_cast< const QPointF(*)>(_a[1]))); break;
+        case 10: { QScrollArea* _r = _t->findScrollArea();
             if (_a[0]) *reinterpret_cast< QScrollArea**>(_a[0]) = std::move(_r); }  break;
-        case 10: { double _r = _t->scrollBarValueToDouble((*reinterpret_cast< QScrollBar*(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2])));
+        case 11: { double _r = _t->scrollBarValueToDouble((*reinterpret_cast< QScrollBar*(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< double*>(_a[0]) = std::move(_r); }  break;
-        case 11: { int _r = _t->doubleToScrollBarValue((*reinterpret_cast< double(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2])));
+        case 12: { int _r = _t->doubleToScrollBarValue((*reinterpret_cast< double(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 12: _t->updateScrollBars(); break;
+        case 13: _t->updateScrollBars(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -185,13 +190,13 @@ int GanttChartWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 13)
+        if (_id < 14)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 13;
+        _id -= 14;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 13)
+        if (_id < 14)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 13;
+        _id -= 14;
     }
     return _id;
 }

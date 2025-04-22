@@ -24,10 +24,13 @@ MainWindow::MainWindow(QWidget *parent)
     GanttChart *pGanttChart = new GanttChart();
 
     // Инициализация m_pZoomLabel в MainWindow
-    m_pZoomLabel = new QLineEdit("Zoom: 1", this);
-    m_pZoomLabel->setReadOnly(true);
-    m_pZoomLabel->setAlignment(Qt::AlignCenter);
-    m_pZoomLabel->setMaximumWidth(90);
+    m_pZoomButton = new QPushButton("Zoom: 1", this);
+//    m_pZoomButton->setAlignment(Qt::AlignCenter);
+    m_pZoomButton->setMaximumWidth(90);
+//    m_pZoomLabel = new QLineEdit("Zoom: 1", this);
+//    m_pZoomLabel->setReadOnly(true);
+//    m_pZoomLabel->setAlignment(Qt::AlignCenter);
+//    m_pZoomLabel->setMaximumWidth(90);
 
     // Создаём тулбар
     m_pToolBar = new QToolBar(this);
@@ -35,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     int m_toolbarHeight = m_pToolBar->height();
 
     // Передаем этот объект в GanttChartWidget
-    m_pChartWidget = new GanttChartWidget(this, pGanttChart, m_pZoomLabel, m_toolbarHeight, m_pScrollArea, statusBarHeight);
+    m_pChartWidget = new GanttChartWidget(this, pGanttChart, m_pZoomButton, m_toolbarHeight, m_pScrollArea, statusBarHeight);
 
 
     // Настраиваем область прокрутки
@@ -151,7 +154,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_pToolBar->addWidget(m_pShowMetricsButton);
     m_pToolBar->addWidget(m_pRestartSolverButton);
     m_pToolBar->addWidget(m_pZoomOutButton);
-    m_pToolBar->addWidget(m_pZoomLabel);
+//    m_pToolBar->addWidget(m_pZoomLabel);
+    m_pToolBar->addWidget(m_pZoomButton);
     m_pToolBar->addWidget(m_pZoomInButton);
     m_pToolBar->addWidget(m_pDurationRadioButton);
     m_pToolBar->addWidget(m_pCostRadioButton);
@@ -177,6 +181,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_pRestartSolverButton, &QPushButton::clicked, this, &MainWindow::onRestartSolverButtonClicked);
     connect(m_pZoomInButton, &QPushButton::clicked, this, &MainWindow::onZoomInButtonClicked);
     connect(m_pZoomOutButton, &QPushButton::clicked, this, &MainWindow::onZoomOutButtonClicked);
+    connect(m_pZoomButton, &QPushButton::clicked, this, &MainWindow::onZoomResetClicked);
+
 
     connect(radioGroup, &QButtonGroup::idClicked, this, &MainWindow::onOptimizationModeChanged);
 
@@ -218,6 +224,18 @@ void MainWindow::onRestartSolverButtonClicked() {
     m_pChartWidget->OnSolveButtonClicked_SolverRestart();
 }
 
+void MainWindow::onZoomResetClicked() {
+    if (!m_pChartWidget) {
+        qDebug() << "Ошибка: m_pChartWidget не инициализирован";
+        return;
+    }
+    m_pChartWidget->setZoom(1.0);
+    m_pZoomButton->setText("Zoom: 1");
+    m_pChartWidget->update();
+
+}
+
+
 void MainWindow::onZoomInButtonClicked() {
     if (!m_pChartWidget) {
         qDebug() << "Ошибка: m_pChartWidget не инициализирован";
@@ -233,6 +251,8 @@ void MainWindow::onZoomOutButtonClicked() {
     }
     m_pChartWidget->OnZoomOutClicked();
 }
+
+
 
 void MainWindow::onOptimizationModeChanged() {
     if (m_pDurationRadioButton->isChecked()) {
