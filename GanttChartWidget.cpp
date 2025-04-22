@@ -994,6 +994,8 @@ void GanttChartWidget::updateScrollBars() {
 
         // Сбрасываем смещение к начальному значению
         m_offset = QPoint(0, 0);
+        m_fPreciseScrollOffset = QPointF(0.0, 0.0);
+
         // Перерисовываем виджет, чтобы обновить его состояние
         update();
     } else {
