@@ -269,6 +269,8 @@ void GanttChartWidget::setZoom(double zoomLevel) {
     UpdateSize();
     findScrollArea()->horizontalScrollBar()->setValue(0);
     findScrollArea()->verticalScrollBar()->setValue(0);
+
+    updateScrollBars();
     m_pZoomButton->setText("Zoom: 1.0");
     update();
 
@@ -968,45 +970,77 @@ void GanttChartWidget::mouseMoveEvent(QMouseEvent *event) {
 }
 
 
-
 void GanttChartWidget::updateScrollBars() {
-    if (!m_pScrollArea) {
-        qDebug() << "Ошибка: m_pScrollArea == nullptr. Область прокрутки не задана.";
-        return; // Проверяем, что область прокрутки существует
-    }
-
-    if (!m_pGanttChart) {
-        qDebug() << "Ошибка: m_pGanttChart == nullptr. Объект диаграммы Ганта не задан.";
-        return; // Проверяем, что объект диаграммы Ганта существует
+    if (!m_pScrollArea || !m_pGanttChart) {
+        qDebug() << "Ошибка: m_pScrollArea или m_pGanttChart не инициализированы.";
+        return;
     }
 
     double zoom = m_pGanttChart->get_zoom();
 
     if (zoom == 1.0) {
+        // Скрываем полосы прокрутки полностью
+        m_pScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        m_pScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-        // Отключаем возможность двигать полосы прокрутки
-        m_pScrollArea->horizontalScrollBar()->setEnabled(false);
-        m_pScrollArea->horizontalScrollBar()->setValue(m_pScrollArea->horizontalScrollBar()->minimum());
+        // Сбрасываем значения и смещения
+        m_pScrollArea->horizontalScrollBar()->setValue(0);
+        m_pScrollArea->verticalScrollBar()->setValue(0);
 
-
-        m_pScrollArea->verticalScrollBar()->setEnabled(false);
-        m_pScrollArea->verticalScrollBar()->setValue(m_pScrollArea->verticalScrollBar()->minimum());
-
-        // Сбрасываем смещение к начальному значению
         m_offset = QPoint(0, 0);
         m_fPreciseScrollOffset = QPointF(0.0, 0.0);
 
-        // Перерисовываем виджет, чтобы обновить его состояние
-        update();
     } else {
-//        qDebug() << "Зум не равен 1. Включаем полосы прокрутки.";
+        // Включаем отображение и активацию скроллбаров
+        m_pScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        m_pScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
-        // Включаем полосы прокрутки
         m_pScrollArea->horizontalScrollBar()->setEnabled(true);
         m_pScrollArea->verticalScrollBar()->setEnabled(true);
-
     }
+
+    update();  // Перерисовать, если нужно
 }
+
+
+//void GanttChartWidget::updateScrollBars() {
+//    if (!m_pScrollArea) {
+//        qDebug() << "Ошибка: m_pScrollArea == nullptr. Область прокрутки не задана.";
+//        return; // Проверяем, что область прокрутки существует
+//    }
+
+//    if (!m_pGanttChart) {
+//        qDebug() << "Ошибка: m_pGanttChart == nullptr. Объект диаграммы Ганта не задан.";
+//        return; // Проверяем, что объект диаграммы Ганта существует
+//    }
+
+//    double zoom = m_pGanttChart->get_zoom();
+
+//    if (zoom == 1.0) {
+
+//        // Отключаем возможность двигать полосы прокрутки
+//        m_pScrollArea->horizontalScrollBar()->setEnabled(false);
+//        m_pScrollArea->horizontalScrollBar()->setValue(m_pScrollArea->horizontalScrollBar()->minimum());
+
+
+//        m_pScrollArea->verticalScrollBar()->setEnabled(false);
+//        m_pScrollArea->verticalScrollBar()->setValue(m_pScrollArea->verticalScrollBar()->minimum());
+
+//        // Сбрасываем смещение к начальному значению
+//        m_offset = QPoint(0, 0);
+//        m_fPreciseScrollOffset = QPointF(0.0, 0.0);
+
+//        // Перерисовываем виджет, чтобы обновить его состояние
+//        update();
+//    } else {
+////        qDebug() << "Зум не равен 1. Включаем полосы прокрутки.";
+
+//        // Включаем полосы прокрутки
+//        m_pScrollArea->horizontalScrollBar()->setEnabled(true);
+//        m_pScrollArea->verticalScrollBar()->setEnabled(true);
+
+//    }
+//}
 
 
 
