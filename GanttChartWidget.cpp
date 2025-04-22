@@ -944,8 +944,12 @@ void GanttChartWidget::mouseMoveEvent(QMouseEvent *event) {
         int minOffsetX = viewportRight - imageSize.width()-imageLeft; // Правый край изображения >= правого края viewport
         int maxOffsetX = 0;                                 // Левая граница изображения не вылезает за левый край
 
-        int minOffsetY = viewportBottom - imageSize.height();
+        int minOffsetY = viewportBottom - imageSize.height()- m_offset.y();
         int maxOffsetY = 0;
+
+
+
+
 
         qDebug() << "[CHECK] imageLeft =" << imageLeft << " imageRight =" << imageRight;
         qDebug() << "[CHECK] viewportRight =" << viewportRight;
