@@ -78,7 +78,7 @@ void GanttChartWidget::updateZoomedImages() {
 
 void GanttChartWidget::OnSolveButtonClicked() {
     m_filename = QFileDialog::getOpenFileName(this, "Выберите файл для солвера", "", "TXT Files (*.txt);;All Files (*)");
-    
+
     if (!m_filename.isEmpty()) {
         // Создаем немодальное окно с информацией о выбранном файле
         QMessageBox *msgBox = new QMessageBox(this);
@@ -804,7 +804,7 @@ void GanttChartWidget::OnShowScheduleMetricsClicked() {
 
     // Добавляем текст
     QString dataText;
-    
+
     // Имя файла
     QString fileName = "Schedule.txt";
 
@@ -1014,7 +1014,6 @@ void GanttChartWidget::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
     QTimer::singleShot(300, this, SLOT(UpdateSize()));
 }
-
 
 
 
