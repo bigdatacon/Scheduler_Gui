@@ -891,16 +891,51 @@ void GanttChartWidget::mouseReleaseEvent(QMouseEvent *event) {
 
 
 void GanttChartWidget::mouseMoveEvent(QMouseEvent *event) {
-    // Если активен режим перетаскивания (hand tool), выполняем существующую логику
+    // Если активен режим перетаскивания (hand tool), выполняем существующую логикуd
+//    if (m_bHandToolActive) {
+//        QPoint currentMousePos = event->pos();
+//        QPoint offset = currentMousePos - m_lastMousePos;
+//        m_offset += offset;
+//        // (Ваш существующий код для ограничения смещения и обновления полос прокрутки)
+//        m_lastMousePos = currentMousePos;
+//        update();
+//        event->accept();
+//    }
+
     if (m_bHandToolActive) {
         QPoint currentMousePos = event->pos();
-        QPoint offset = currentMousePos - m_lastMousePos;
-        m_offset += offset;
-        // (Ваш существующий код для ограничения смещения и обновления полос прокрутки)
+        QPoint offsetDelta = currentMousePos - m_lastMousePos;
+        m_offset += offsetDelta;
+
+        QSize imageSize = m_bDisplayingWorkersTimeChart ? m_oWorkersImage.size() : m_oChartImage.size();
+        QSize viewportSize = findScrollArea()->viewport()->size();  // важно!
+
+        // Логика: изображение должно "вставать" по краям и не выходить за экран
+        int minOffsetX = viewportSize.width() - imageSize.width();
+        int minOffsetY = viewportSize.height() - imageSize.height();
+
+        // если картинка меньше, чем экран — не даём сдвигать
+        minOffsetX = std::min(0, minOffsetX);
+        minOffsetY = std::min(0, minOffsetY);
+
+        m_offset.setX(std::clamp(m_offset.x(), minOffsetX, 0));
+        m_offset.setY(std::clamp(m_offset.y(), minOffsetY, 0));
+
         m_lastMousePos = currentMousePos;
         update();
+
+        qDebug() << "[HAND] zoom:" << m_pGanttChart->get_zoom();
+        qDebug() << "[HAND] imageSize:" << imageSize << " viewportSize:" << viewportSize;
+        qDebug() << "[HAND] offset before clamp:" << offsetDelta;
+        qDebug() << "[HAND] m_offset after clamp:" << m_offset;
+
         event->accept();
-    } else {
+    }
+
+
+
+
+    else {
         // Если не перетаскиваем, проверяем позицию курсора для вывода информации о баре.
         QPoint pos = event->pos() - m_offset; // компенсируем смещение
 
