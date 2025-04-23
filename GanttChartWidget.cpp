@@ -48,37 +48,37 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart,
 
 
 
-    QScrollArea *scrollArea = findScrollArea();
-    if (scrollArea) {
-        connect(scrollArea->horizontalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
-            // Устанавливаем offset напрямую из точного значения
-            m_offset.setX(static_cast<int>(m_fPreciseScrollOffset.x()));
+//    QScrollArea *scrollArea = findScrollArea();
+//    if (scrollArea) {
+//        connect(scrollArea->horizontalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
+//            // Устанавливаем offset напрямую из точного значения
+//            m_offset.setX(static_cast<int>(m_fPreciseScrollOffset.x()));
+//            update();
+//        });
+
+//        connect(scrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
+//            m_offset.setY(static_cast<int>(m_fPreciseScrollOffset.y()));
+//            update();
+//        });
+//    }
+
+
+
+
+        connect(m_pScrollArea->horizontalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
+            m_offset.setX(value);
+            m_offset = clampOffsetToValidRange(m_offset);
+            m_fPreciseScrollOffset.setX(m_offset.x());
+
             update();
         });
 
-        connect(scrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
-            m_offset.setY(static_cast<int>(m_fPreciseScrollOffset.y()));
-            update();
-        });
-    }
-
-
-
-
-    //    connect(m_pScrollArea->horizontalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
-    //        m_offset.setX(value);
-    //        m_offset = clampOffsetToValidRange(m_offset);
-    //        m_fPreciseScrollOffset.setX(m_offset.x());
-
-    //        update();
-    //    });
-
-//    connect(m_pScrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
-//        m_offset.setY(value);
-//        m_offset = clampOffsetToValidRange(m_offset);
-//        m_fPreciseScrollOffset.setY(m_offset.y());
-//        update();
-//    });
+    connect(m_pScrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
+        m_offset.setY(value);
+        m_offset = clampOffsetToValidRange(m_offset);
+        m_fPreciseScrollOffset.setY(m_offset.y());
+        update();
+    });
 
 
 
@@ -1138,24 +1138,56 @@ void GanttChartWidget::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void GanttChartWidget::updateScrollBars() {
-    if (!m_pScrollArea || !m_pGanttChart) return;
+    if (!m_pScrollArea || !m_pGanttChart) {
+        qDebug() << "Ошибка: m_pScrollArea или m_pGanttChart не инициализированы.";
+        return;
+    }
 
     double zoom = m_pGanttChart->get_zoom();
 
-    QSize imageSize = getCurrentImageSize(); // ← размер всего изображения
-    QSize viewportSize = m_pScrollArea->viewport()->size();
+    if (zoom == 1.0) {
+        // Скрываем полосы прокрутки полностью
+        m_pScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        m_pScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    int hMax = std::max(0, imageSize.width() - viewportSize.width());
-    int vMax = std::max(0, imageSize.height() - viewportSize.height());
+        // Сбрасываем значения и смещения
+        m_pScrollArea->horizontalScrollBar()->setValue(0);
+        m_pScrollArea->verticalScrollBar()->setValue(0);
 
-    // Устанавливаем диапазоны
-    m_pScrollArea->horizontalScrollBar()->setRange(0, hMax);
-    m_pScrollArea->verticalScrollBar()->setRange(0, vMax);
+        m_offset = QPoint(0, 0);
+        m_fPreciseScrollOffset = QPointF(0.0, 0.0);
 
-    // Обновляем значения
-    m_pScrollArea->horizontalScrollBar()->setValue(static_cast<int>(m_fPreciseScrollOffset.x()));
-    m_pScrollArea->verticalScrollBar()->setValue(static_cast<int>(m_fPreciseScrollOffset.y()));
+    } else {
+        // Включаем отображение и активацию скроллбаров
+        m_pScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        m_pScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
+        m_pScrollArea->horizontalScrollBar()->setEnabled(true);
+        m_pScrollArea->verticalScrollBar()->setEnabled(true);
+    }
+
+    update();  // Перерисовать, если нужно
 }
+
+//void GanttChartWidget::updateScrollBars() {
+//    if (!m_pScrollArea || !m_pGanttChart) return;
+
+//    double zoom = m_pGanttChart->get_zoom();
+
+//    QSize imageSize = getCurrentImageSize(); // ← размер всего изображения
+//    QSize viewportSize = m_pScrollArea->viewport()->size();
+
+//    int hMax = std::max(0, imageSize.width() - viewportSize.width());
+//    int vMax = std::max(0, imageSize.height() - viewportSize.height());
+
+//    // Устанавливаем диапазоны
+//    m_pScrollArea->horizontalScrollBar()->setRange(0, hMax);
+//    m_pScrollArea->verticalScrollBar()->setRange(0, vMax);
+
+//    // Обновляем значения
+//    m_pScrollArea->horizontalScrollBar()->setValue(static_cast<int>(m_fPreciseScrollOffset.x()));
+//    m_pScrollArea->verticalScrollBar()->setValue(static_cast<int>(m_fPreciseScrollOffset.y()));
+//}
 
 
 
