@@ -595,7 +595,10 @@ void GanttChartWidget::OnZoomInClickedScroll(const QPointF &) {
     double newZoom = currentZoom + 0.05;
     m_pGanttChart->set_zoom(newZoom);
     updateZoomedImages();
+    m_bManualResizeOnly = true;
     UpdateSize();
+    m_bManualResizeOnly = false;
+
 
     // 3. Перевычисляем новые координаты и точный scroll
     QPointF mouseImagePosAfterZoom = mouseImagePosBeforeZoom * newZoom;
@@ -649,7 +652,10 @@ void GanttChartWidget::OnZoomOutClickedScroll(const QPointF &) {
     double newZoom = std::max(currentZoom - 0.05, 1.0);  // Защита от выхода ниже 1.0
     m_pGanttChart->set_zoom(newZoom);
     updateZoomedImages();
+    m_bManualResizeOnly = true;
     UpdateSize();
+    m_bManualResizeOnly = false;
+
 
     // 3. Пересчитываем новые координаты и точный scroll
     QPointF mouseImagePosAfterZoom = mouseImagePosBeforeZoom * newZoom;
@@ -1098,32 +1104,30 @@ void GanttChartWidget::UpdateSize() {
     qDebug() << "m_offset before clamp:" << m_offset;
     qDebug() << "m_fPreciseScrollOffset before clamp:" << m_fPreciseScrollOffset;
 
+    if (m_bManualResizeOnly) {
+        qDebug() << "[UpdateSize] Skipping all offset modifications. Preserving scroll offset exactly.";
+        return;
+    }
+
     QSize imageSize(width, height);
     QSize viewportSize = m_pScrollArea->viewport()->size();
 
-    // 👉 Добавь сюда:
     qDebug() << "viewportSize =" << viewportSize;
     qDebug() << "imageSize =" << imageSize;
 
     int minOffsetX = (imageSize.width() > viewportSize.width()) ? viewportSize.width() - imageSize.width() : 0;
     int minOffsetY = (imageSize.height() > viewportSize.height()) ? viewportSize.height() - imageSize.height() : 0;
-
     int maxOffsetX = 0;
     int maxOffsetY = 0;
 
-    if (!m_bSkipOffsetClampInUpdateSize) {
-        m_offset.setX(std::clamp(static_cast<int>(std::round(m_fPreciseScrollOffset.x())), minOffsetX, maxOffsetX));
-        m_offset.setY(std::clamp(static_cast<int>(std::round(m_fPreciseScrollOffset.y())), minOffsetY, maxOffsetY));
-        m_fPreciseScrollOffset = QPointF(m_offset);
-    } else {
-        m_offset.setX(static_cast<int>(std::round(m_fPreciseScrollOffset.x())));
-        m_offset.setY(static_cast<int>(std::round(m_fPreciseScrollOffset.y())));
-        qDebug() << "[UpdateSize] Skipping offset clamp. Preserving precise scroll.";
-    }
+    m_offset.setX(std::clamp(static_cast<int>(std::round(m_fPreciseScrollOffset.x())), minOffsetX, maxOffsetX));
+    m_offset.setY(std::clamp(static_cast<int>(std::round(m_fPreciseScrollOffset.y())), minOffsetY, maxOffsetY));
+    m_fPreciseScrollOffset = QPointF(m_offset);
 
     qDebug() << "m_offset after clamp:" << m_offset;
     qDebug() << "m_fPreciseScrollOffset after clamp:" << m_fPreciseScrollOffset;
 }
+
 
 
 
