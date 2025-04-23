@@ -89,8 +89,9 @@ private:
     void setPreciseOffset(QPointF offset, const QString &context);
 
 
+    QPoint clampOffsetToValidRange(const QPoint& offset) const;
+    QSize getCurrentImageSize() const;
 
-    QPoint clampOffsetToValidRange(QPoint offset) const ;
 
 
     GanttChart* m_pGanttChart;
@@ -154,6 +155,12 @@ private:
     QPointF m_fPreciseScrollOffset = QPointF(0.0, 0.0);  // Точный offset без округления
 //    QPointF m_mouseImagePosSavedBeforeZoom = QPointF(0, 0);
     bool m_bManualResizeOnly = false;
+
+    QPointF m_mouseImagePosBeforeScroll;
+
+
+
+
 
 
 
