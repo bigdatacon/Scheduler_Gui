@@ -85,6 +85,11 @@ private:
     void updateZoomedImages();  // Метод для обновления изображений после изменения зума
     void PerformDelayedInitialization() ;
     void drawImageWithOffset(QPainter &oPainter, const QImage &sourceImage, const QRect &visibleRect);
+    void printStackTrace(const QString &message);
+    void setPreciseOffset(QPointF offset, const QString &context);
+
+
+
     QPoint clampOffsetToValidRange(QPoint offset) const ;
 
 
@@ -148,7 +153,6 @@ private:
 
     QPointF m_fPreciseScrollOffset = QPointF(0.0, 0.0);  // Точный offset без округления
 //    QPointF m_mouseImagePosSavedBeforeZoom = QPointF(0, 0);
-    bool m_bSkipOffsetClampInUpdateSize = false;
     bool m_bManualResizeOnly = false;
 
 
