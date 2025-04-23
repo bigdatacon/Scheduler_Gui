@@ -147,7 +147,9 @@ private:
     int m_istatusBarHeight;
 
     QPointF m_fPreciseScrollOffset = QPointF(0.0, 0.0);  // Точный offset без округления
-    QPointF m_mouseImagePosSavedBeforeZoom = QPointF(0, 0);
+//    QPointF m_mouseImagePosSavedBeforeZoom = QPointF(0, 0);
+    bool m_bSkipOffsetClampInUpdateSize = false;
+
 
 
 
