@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_GanttChartWidget_t {
-    QByteArrayData data[24];
-    char stringdata0[366];
+    QByteArrayData data[21];
+    char stringdata0[321];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -47,15 +47,12 @@ QT_MOC_LITERAL(11, 172, 15), // "OnZoomInClicked"
 QT_MOC_LITERAL(12, 188, 21), // "OnZoomInClickedScroll"
 QT_MOC_LITERAL(13, 210, 8), // "mousePos"
 QT_MOC_LITERAL(14, 219, 22), // "OnZoomOutClickedScroll"
-QT_MOC_LITERAL(15, 242, 14), // "findScrollArea"
-QT_MOC_LITERAL(16, 257, 12), // "QScrollArea*"
-QT_MOC_LITERAL(17, 270, 22), // "scrollBarValueToDouble"
-QT_MOC_LITERAL(18, 293, 11), // "QScrollBar*"
-QT_MOC_LITERAL(19, 305, 9), // "scrollBar"
-QT_MOC_LITERAL(20, 315, 4), // "zoom"
-QT_MOC_LITERAL(21, 320, 22), // "doubleToScrollBarValue"
-QT_MOC_LITERAL(22, 343, 5), // "value"
-QT_MOC_LITERAL(23, 349, 16) // "updateScrollBars"
+QT_MOC_LITERAL(15, 242, 22), // "scrollBarValueToDouble"
+QT_MOC_LITERAL(16, 265, 11), // "QScrollBar*"
+QT_MOC_LITERAL(17, 277, 9), // "scrollBar"
+QT_MOC_LITERAL(18, 287, 4), // "zoom"
+QT_MOC_LITERAL(19, 292, 22), // "doubleToScrollBarValue"
+QT_MOC_LITERAL(20, 315, 5) // "value"
 
     },
     "GanttChartWidget\0statusTextChanged\0\0"
@@ -64,11 +61,9 @@ QT_MOC_LITERAL(23, 349, 16) // "updateScrollBars"
     "OnSolveButtonClicked_SolverRestart\0"
     "OnZoomOutClicked\0OnZoomInClicked\0"
     "OnZoomInClickedScroll\0mousePos\0"
-    "OnZoomOutClickedScroll\0findScrollArea\0"
-    "QScrollArea*\0scrollBarValueToDouble\0"
+    "OnZoomOutClickedScroll\0scrollBarValueToDouble\0"
     "QScrollBar*\0scrollBar\0zoom\0"
-    "doubleToScrollBarValue\0value\0"
-    "updateScrollBars"
+    "doubleToScrollBarValue\0value"
 };
 #undef QT_MOC_LITERAL
 
@@ -78,7 +73,7 @@ static const uint qt_meta_data_GanttChartWidget[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      14,   14, // methods
+      12,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -86,22 +81,20 @@ static const uint qt_meta_data_GanttChartWidget[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   84,    2, 0x06 /* Public */,
+       1,    1,   74,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       4,    0,   87,    2, 0x0a /* Public */,
-       5,    1,   88,    2, 0x0a /* Public */,
-       7,    0,   91,    2, 0x08 /* Private */,
-       8,    0,   92,    2, 0x08 /* Private */,
-       9,    0,   93,    2, 0x08 /* Private */,
-      10,    0,   94,    2, 0x08 /* Private */,
-      11,    0,   95,    2, 0x08 /* Private */,
-      12,    1,   96,    2, 0x08 /* Private */,
-      14,    1,   99,    2, 0x08 /* Private */,
-      15,    0,  102,    2, 0x08 /* Private */,
-      17,    2,  103,    2, 0x08 /* Private */,
-      21,    2,  108,    2, 0x08 /* Private */,
-      23,    0,  113,    2, 0x08 /* Private */,
+       4,    0,   77,    2, 0x0a /* Public */,
+       5,    1,   78,    2, 0x0a /* Public */,
+       7,    0,   81,    2, 0x08 /* Private */,
+       8,    0,   82,    2, 0x08 /* Private */,
+       9,    0,   83,    2, 0x08 /* Private */,
+      10,    0,   84,    2, 0x08 /* Private */,
+      11,    0,   85,    2, 0x08 /* Private */,
+      12,    1,   86,    2, 0x08 /* Private */,
+      14,    1,   89,    2, 0x08 /* Private */,
+      15,    2,   92,    2, 0x08 /* Private */,
+      19,    2,   97,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString,    3,
@@ -116,10 +109,8 @@ static const uint qt_meta_data_GanttChartWidget[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::QPointF,   13,
     QMetaType::Void, QMetaType::QPointF,   13,
-    0x80000000 | 16,
-    QMetaType::Double, 0x80000000 | 18, QMetaType::Double,   19,   20,
-    QMetaType::Int, QMetaType::Double, QMetaType::Double,   22,   20,
-    QMetaType::Void,
+    QMetaType::Double, 0x80000000 | 16, QMetaType::Double,   17,   18,
+    QMetaType::Int, QMetaType::Double, QMetaType::Double,   20,   18,
 
        0        // eod
 };
@@ -140,13 +131,10 @@ void GanttChartWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int
         case 7: _t->OnZoomInClicked(); break;
         case 8: _t->OnZoomInClickedScroll((*reinterpret_cast< const QPointF(*)>(_a[1]))); break;
         case 9: _t->OnZoomOutClickedScroll((*reinterpret_cast< const QPointF(*)>(_a[1]))); break;
-        case 10: { QScrollArea* _r = _t->findScrollArea();
-            if (_a[0]) *reinterpret_cast< QScrollArea**>(_a[0]) = std::move(_r); }  break;
-        case 11: { double _r = _t->scrollBarValueToDouble((*reinterpret_cast< QScrollBar*(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2])));
+        case 10: { double _r = _t->scrollBarValueToDouble((*reinterpret_cast< QScrollBar*(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< double*>(_a[0]) = std::move(_r); }  break;
-        case 12: { int _r = _t->doubleToScrollBarValue((*reinterpret_cast< double(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2])));
+        case 11: { int _r = _t->doubleToScrollBarValue((*reinterpret_cast< double(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 13: _t->updateScrollBars(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -190,13 +178,13 @@ int GanttChartWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 14)
+        if (_id < 12)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 14;
+        _id -= 12;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 14)
+        if (_id < 12)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 14;
+        _id -= 12;
     }
     return _id;
 }

@@ -35,7 +35,7 @@ private:
     void resizeEvent(QResizeEvent *event);
 
     GanttChartWidget *m_pChartWidget;
-    QScrollArea *m_pScrollArea;
+//    QScrollArea *m_pScrollArea;
 
     // Тулбар и элементы управления
     QToolBar *m_pToolBar;

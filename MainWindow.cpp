@@ -8,61 +8,58 @@
 #include "GanttChart.h"
 #include <QStatusBar>
 
+
+// === ОБНОВЛЕННЫЙ MainWindow.cpp с удалением QScrollArea, НО с полной функциональностью ===
+#include "MainWindow.h"
+#include "GanttChartWidget.h"
+#include "GanttChart.h"
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QToolBar>
+#include <QStatusBar>
+#include <QRadioButton>
+#include <QCheckBox>
+#include <QButtonGroup>
+#include <QTimer>
+#include <QDebug>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent) {
     // Центральный виджет
     QWidget *centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
 
-    // В конструкторе MainWindow после создания центрального виджета:
     setStatusBar(new QStatusBar(this));
     int statusBarHeight = statusBar()->sizeHint().height();
 
-    // Создаем область прокрутки
-    m_pScrollArea = new QScrollArea(this);
-    // Создаем логический объект GanttChart (локально в MainWindow)
+    // Создаем логический объект GanttChart
     GanttChart *pGanttChart = new GanttChart();
 
-    // Инициализация m_pZoomLabel в MainWindow
+    // Кнопка Zoom
     m_pZoomButton = new QPushButton("Zoom: 1", this);
-//    m_pZoomButton->setAlignment(Qt::AlignCenter);
     m_pZoomButton->setMaximumWidth(90);
-//    m_pZoomLabel = new QLineEdit("Zoom: 1", this);
-//    m_pZoomLabel->setReadOnly(true);
-//    m_pZoomLabel->setAlignment(Qt::AlignCenter);
-//    m_pZoomLabel->setMaximumWidth(90);
 
-    // Создаём тулбар
+    // Тулбар
     m_pToolBar = new QToolBar(this);
     m_pToolBar->setMovable(false);
     int m_toolbarHeight = m_pToolBar->height();
 
-    // Передаем этот объект в GanttChartWidget
-    m_pChartWidget = new GanttChartWidget(this, pGanttChart, m_pZoomButton, m_toolbarHeight, m_pScrollArea, statusBarHeight);
+    // Диаграмма
+    m_pChartWidget = new GanttChartWidget(this, pGanttChart, m_pZoomButton, m_toolbarHeight, statusBarHeight);
+    m_pChartWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-
-    // Настраиваем область прокрутки
-    m_pScrollArea->setWidget(m_pChartWidget);
-    m_pScrollArea->setWidgetResizable(false);
-
-    // Создаём кнопки
+    // Кнопки
     m_pSolveButton = new QPushButton(QIcon(":/resources/rocket-2.png"), "", this);
     m_pSolveButton->setToolTip("Запустить солвер из файла");
-
     m_pShowTimeButton = new QPushButton(QIcon(":/resources/metrics.png"), "", this);
     m_pShowTimeButton->setToolTip("Расписание / Утилизация ресурсов");
-
     m_pShowMetricsButton = new QPushButton(QIcon(":/resources/data.png"), "", this);
     m_pShowMetricsButton->setToolTip("Метрики расписания");
-
     m_pRestartSolverButton = new QPushButton(QIcon(":/resources/restart.png"), "", this);
     m_pRestartSolverButton->setToolTip("Перезапустить солвер");
-
     m_pZoomInButton = new QPushButton("+x", this);
     m_pZoomOutButton = new QPushButton("-x", this);
 
-
-    // Радиокнопки для режима оптимизации
     m_pDurationRadioButton = new QRadioButton("Оптимизация длительности", this);
     m_pCostRadioButton = new QRadioButton("Оптимизация стоимости", this);
     m_pSetupsRadioButton = new QRadioButton("Оптимизация переналадок", this);
@@ -73,108 +70,58 @@ MainWindow::MainWindow(QWidget *parent)
     radioGroup->addButton(m_pCostRadioButton);
     radioGroup->addButton(m_pSetupsRadioButton);
 
-    // отдельно блок для эвристик
     m_pHeuristicsButton1 = new QCheckBox("Эвристика 1", this);
-    m_pHeuristicsButton1->setToolTip("Эвристика выбора ресурсов");  // Всплывающая подсказка
+    m_pHeuristicsButton1->setToolTip("Эвристика выбора ресурсов");
     m_pHeuristicsButton2 = new QCheckBox("Эвристика 2", this);
-    m_pHeuristicsButton2->setToolTip("Эвристика выбора работ");  // Всплывающая подсказка
+    m_pHeuristicsButton2->setToolTip("Эвристика выбора работ");
 
-    // Подключаем сигналы радиокнопок к обработчикам
+    // Подключения сигналов
     connect(m_pDurationRadioButton, &QRadioButton::toggled, this, [this](bool checked) {
-        if (checked) {
-            g_currentState = DURATION;
-            g_iSolverPower = 0;
-            qDebug() << "Режим установлен: Длительность";
-        }
+        if (checked) { g_currentState = DURATION; g_iSolverPower = 0; }
     });
-
-    // Подключаем сигналы радиокнопок к обработчикам
     connect(m_pCostRadioButton, &QRadioButton::toggled, this, [this](bool checked) {
-        if (checked) {
-            g_currentState = COST;
-            g_iSolverPower = 0;
-            qDebug() << "Режим установлен: Стоимость";
-        }
+        if (checked) { g_currentState = COST; g_iSolverPower = 0; }
     });
-
     connect(m_pSetupsRadioButton, &QRadioButton::toggled, this, [this](bool checked) {
-        if (checked) {
-            g_currentState = SETUPS;
-            g_iSolverPower = 0;
-            qDebug() << "Режим установлен: Переналадки";
-        }
+        if (checked) { g_currentState = SETUPS; g_iSolverPower = 0; }
     });
-
-    // Обработчики состояния чекбоксов
     connect(m_pHeuristicsButton1, &QCheckBox::stateChanged, this, [this](int state) {
-        if ( state == Qt::Checked ) {
-            g_iR1 = 1;
-            g_iSolverPower = 0;
-            //QMessageBox::information(this, "Эвристика 1", "Эвристика выбора ресурсов включена");
-        } else if ( state == Qt::Unchecked ) {
-            g_iR1 = 0;
-            g_iSolverPower = 0;
-            //QMessageBox::information(this, "Эвристика 1", "Эвристика выбора ресурсов выключена");
-        }
+        g_iR1 = (state == Qt::Checked) ? 1 : 0;
+        g_iSolverPower = 0;
     });
-
     connect(m_pHeuristicsButton2, &QCheckBox::stateChanged, this, [this](int state) {
-        if ( state == Qt::Checked ) {
-            g_iJ3 = 1;
-            g_iSolverPower = 0;
-            //QMessageBox::information(this, "Эвристика 2", "Эвристика выбора работ включена");
-        } else if ( state == Qt::Unchecked ) {
-            g_iJ3 = 0;
-            g_iSolverPower = 0;
-            //QMessageBox::information(this, "Эвристика 2", "Эвристика выбора работ выключена");
-        }
+        g_iJ3 = (state == Qt::Checked) ? 1 : 0;
+        g_iSolverPower = 0;
     });
 
-
-
-    // Создаём таймер
     m_pSolverCheckTimer = new QTimer(this);
-
-    // Подключаем таймер к слоту проверки статуса
     connect(m_pSolverCheckTimer, &QTimer::timeout, this, [this]() {
-        if (g_bSolverRunning) {
-            m_pRestartSolverButton->setEnabled(false);
-        } else {
-            m_pRestartSolverButton->setEnabled(true);
-        }
+        m_pRestartSolverButton->setEnabled(!g_bSolverRunning);
     });
-
-    // Запускаем таймер с интервалом 100 мс
     m_pSolverCheckTimer->start(100);
 
-
-    // Добавляем элементы на тулбар
+    // Добавление кнопок на тулбар
     m_pToolBar->addWidget(m_pSolveButton);
     m_pToolBar->addWidget(m_pShowTimeButton);
     m_pToolBar->addWidget(m_pShowMetricsButton);
     m_pToolBar->addWidget(m_pRestartSolverButton);
     m_pToolBar->addWidget(m_pZoomOutButton);
-//    m_pToolBar->addWidget(m_pZoomLabel);
     m_pToolBar->addWidget(m_pZoomButton);
     m_pToolBar->addWidget(m_pZoomInButton);
     m_pToolBar->addWidget(m_pDurationRadioButton);
     m_pToolBar->addWidget(m_pCostRadioButton);
     m_pToolBar->addWidget(m_pSetupsRadioButton);
-
     m_pToolBar->addWidget(m_pHeuristicsButton1);
     m_pToolBar->addWidget(m_pHeuristicsButton2);
 
-    // Размещаем тулбар и диаграмму в вертикальном layout
+    // Layout без QScrollArea
     QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
-    // Устанавливаем отступы: снизу отступ равен высоте статусной строки,
-    // чтобы график не заходил под неё.
-    mainLayout->setContentsMargins(0, 0, 0, statusBar()->sizeHint().height());
-
+    mainLayout->setContentsMargins(0, 0, 0, statusBarHeight);
     mainLayout->setSpacing(0);
-    mainLayout->addWidget(m_pToolBar);
-    mainLayout->addWidget(m_pScrollArea);
+    mainLayout->addWidget(m_pToolBar, 0);
+    mainLayout->addWidget(m_pChartWidget, 1);
 
-    // Подключаем сигналы к слотам
+    // Обработка сигналов
     connect(m_pSolveButton, &QPushButton::clicked, this, &MainWindow::onSolveButtonClicked);
     connect(m_pShowTimeButton, &QPushButton::clicked, this, &MainWindow::onShowTimeButtonClicked);
     connect(m_pShowMetricsButton, &QPushButton::clicked, this, &MainWindow::onShowMetricsButtonClicked);
@@ -182,21 +129,211 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_pZoomInButton, &QPushButton::clicked, this, &MainWindow::onZoomInButtonClicked);
     connect(m_pZoomOutButton, &QPushButton::clicked, this, &MainWindow::onZoomOutButtonClicked);
     connect(m_pZoomButton, &QPushButton::clicked, this, &MainWindow::onZoomResetClicked);
-
-
     connect(radioGroup, &QButtonGroup::idClicked, this, &MainWindow::onOptimizationModeChanged);
+    connect(m_pChartWidget, &GanttChartWidget::statusTextChanged, this, [this](const QString &text) {
+        statusBar()->showMessage(text);
+    });
 
-    connect(m_pChartWidget, &GanttChartWidget::statusTextChanged,
-            this, [this](const QString &text){
-                statusBar()->showMessage(text);
-            });
-
+    setMinimumSize(640, 480);   // минимальный размер
+    resize(1280, 800);          // стартовый размер
+    setWindowFlags(Qt::Window); // убедиться, что обычное окно
 
 }
 
+
+
+//MainWindow::MainWindow(QWidget *parent)
+//    : QMainWindow(parent) {
+//    // Центральный виджет
+//    QWidget *centralWidget = new QWidget(this);
+//    setCentralWidget(centralWidget);
+
+//    // В конструкторе MainWindow после создания центрального виджета:
+//    setStatusBar(new QStatusBar(this));
+//    int statusBarHeight = statusBar()->sizeHint().height();
+
+//    // Создаем логический объект GanttChart (локально в MainWindow)
+//    GanttChart *pGanttChart = new GanttChart();
+
+//    // Инициализация m_pZoomLabel в MainWindow
+//    m_pZoomButton = new QPushButton("Zoom: 1", this);
+//    m_pZoomButton->setMaximumWidth(90);
+
+//    // Создаём тулбар
+//    m_pToolBar = new QToolBar(this);
+//    m_pToolBar->setMovable(false);
+//    int m_toolbarHeight = m_pToolBar->height();
+
+//    // Передаем этот объект в GanttChartWidget
+//    m_pChartWidget = new GanttChartWidget(this, pGanttChart, m_pZoomButton, m_toolbarHeight, statusBarHeight);
+
+
+//    // Настраиваем область прокрутки
+////    m_pScrollArea->setWidget(m_pChartWidget);
+////    m_pScrollArea->setWidgetResizable(false);
+
+//    // Создаём кнопки
+//    m_pSolveButton = new QPushButton(QIcon(":/resources/rocket-2.png"), "", this);
+//    m_pSolveButton->setToolTip("Запустить солвер из файла");
+
+//    m_pShowTimeButton = new QPushButton(QIcon(":/resources/metrics.png"), "", this);
+//    m_pShowTimeButton->setToolTip("Расписание / Утилизация ресурсов");
+
+//    m_pShowMetricsButton = new QPushButton(QIcon(":/resources/data.png"), "", this);
+//    m_pShowMetricsButton->setToolTip("Метрики расписания");
+
+//    m_pRestartSolverButton = new QPushButton(QIcon(":/resources/restart.png"), "", this);
+//    m_pRestartSolverButton->setToolTip("Перезапустить солвер");
+
+//    m_pZoomInButton = new QPushButton("+x", this);
+//    m_pZoomOutButton = new QPushButton("-x", this);
+
+
+//    // Радиокнопки для режима оптимизации
+//    m_pDurationRadioButton = new QRadioButton("Оптимизация длительности", this);
+//    m_pCostRadioButton = new QRadioButton("Оптимизация стоимости", this);
+//    m_pSetupsRadioButton = new QRadioButton("Оптимизация переналадок", this);
+//    m_pDurationRadioButton->setChecked(true);
+
+//    QButtonGroup *radioGroup = new QButtonGroup(this);
+//    radioGroup->addButton(m_pDurationRadioButton);
+//    radioGroup->addButton(m_pCostRadioButton);
+//    radioGroup->addButton(m_pSetupsRadioButton);
+
+//    // отдельно блок для эвристик
+//    m_pHeuristicsButton1 = new QCheckBox("Эвристика 1", this);
+//    m_pHeuristicsButton1->setToolTip("Эвристика выбора ресурсов");  // Всплывающая подсказка
+//    m_pHeuristicsButton2 = new QCheckBox("Эвристика 2", this);
+//    m_pHeuristicsButton2->setToolTip("Эвристика выбора работ");  // Всплывающая подсказка
+
+//    // Подключаем сигналы радиокнопок к обработчикам
+//    connect(m_pDurationRadioButton, &QRadioButton::toggled, this, [this](bool checked) {
+//        if (checked) {
+//            g_currentState = DURATION;
+//            g_iSolverPower = 0;
+//            qDebug() << "Режим установлен: Длительность";
+//        }
+//    });
+
+//    // Подключаем сигналы радиокнопок к обработчикам
+//    connect(m_pCostRadioButton, &QRadioButton::toggled, this, [this](bool checked) {
+//        if (checked) {
+//            g_currentState = COST;
+//            g_iSolverPower = 0;
+//            qDebug() << "Режим установлен: Стоимость";
+//        }
+//    });
+
+//    connect(m_pSetupsRadioButton, &QRadioButton::toggled, this, [this](bool checked) {
+//        if (checked) {
+//            g_currentState = SETUPS;
+//            g_iSolverPower = 0;
+//            qDebug() << "Режим установлен: Переналадки";
+//        }
+//    });
+
+//    // Обработчики состояния чекбоксов
+//    connect(m_pHeuristicsButton1, &QCheckBox::stateChanged, this, [this](int state) {
+//        if ( state == Qt::Checked ) {
+//            g_iR1 = 1;
+//            g_iSolverPower = 0;
+//            //QMessageBox::information(this, "Эвристика 1", "Эвристика выбора ресурсов включена");
+//        } else if ( state == Qt::Unchecked ) {
+//            g_iR1 = 0;
+//            g_iSolverPower = 0;
+//            //QMessageBox::information(this, "Эвристика 1", "Эвристика выбора ресурсов выключена");
+//        }
+//    });
+
+//    connect(m_pHeuristicsButton2, &QCheckBox::stateChanged, this, [this](int state) {
+//        if ( state == Qt::Checked ) {
+//            g_iJ3 = 1;
+//            g_iSolverPower = 0;
+//            //QMessageBox::information(this, "Эвристика 2", "Эвристика выбора работ включена");
+//        } else if ( state == Qt::Unchecked ) {
+//            g_iJ3 = 0;
+//            g_iSolverPower = 0;
+//            //QMessageBox::information(this, "Эвристика 2", "Эвристика выбора работ выключена");
+//        }
+//    });
+
+
+
+//    // Создаём таймер
+//    m_pSolverCheckTimer = new QTimer(this);
+
+//    // Подключаем таймер к слоту проверки статуса
+//    connect(m_pSolverCheckTimer, &QTimer::timeout, this, [this]() {
+//        if (g_bSolverRunning) {
+//            m_pRestartSolverButton->setEnabled(false);
+//        } else {
+//            m_pRestartSolverButton->setEnabled(true);
+//        }
+//    });
+
+//    // Запускаем таймер с интервалом 100 мс
+//    m_pSolverCheckTimer->start(100);
+
+
+//    // Добавляем элементы на тулбар
+//    m_pToolBar->addWidget(m_pSolveButton);
+//    m_pToolBar->addWidget(m_pShowTimeButton);
+//    m_pToolBar->addWidget(m_pShowMetricsButton);
+//    m_pToolBar->addWidget(m_pRestartSolverButton);
+//    m_pToolBar->addWidget(m_pZoomOutButton);
+////    m_pToolBar->addWidget(m_pZoomLabel);
+//    m_pToolBar->addWidget(m_pZoomButton);
+//    m_pToolBar->addWidget(m_pZoomInButton);
+//    m_pToolBar->addWidget(m_pDurationRadioButton);
+//    m_pToolBar->addWidget(m_pCostRadioButton);
+//    m_pToolBar->addWidget(m_pSetupsRadioButton);
+
+//    m_pToolBar->addWidget(m_pHeuristicsButton1);
+//    m_pToolBar->addWidget(m_pHeuristicsButton2);
+
+//    // Размещаем тулбар и диаграмму в вертикальном layout
+//    QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
+//    // Устанавливаем отступы: снизу отступ равен высоте статусной строки,
+//    // чтобы график не заходил под неё.
+//    mainLayout->setContentsMargins(0, 0, 0, statusBar()->sizeHint().height());
+
+//    mainLayout->setSpacing(0);
+//    mainLayout->addWidget(m_pToolBar);
+////    mainLayout->addWidget(m_pScrollArea);
+//    mainLayout->addWidget(m_pToolBar);
+
+////    mainLayout->addWidget(m_pChartWidget);
+////    mainLayout->addWidget(m_pChartWidget, 1); // Важно — указать stretch = 1
+
+//    mainLayout->addWidget(m_pToolBar, 0); // тулбар без растягивания
+//    mainLayout->addWidget(m_pChartWidget); // не указываем вес (default = 0)
+
+
+
+
+//    // Подключаем сигналы к слотам
+//    connect(m_pSolveButton, &QPushButton::clicked, this, &MainWindow::onSolveButtonClicked);
+//    connect(m_pShowTimeButton, &QPushButton::clicked, this, &MainWindow::onShowTimeButtonClicked);
+//    connect(m_pShowMetricsButton, &QPushButton::clicked, this, &MainWindow::onShowMetricsButtonClicked);
+//    connect(m_pRestartSolverButton, &QPushButton::clicked, this, &MainWindow::onRestartSolverButtonClicked);
+//    connect(m_pZoomInButton, &QPushButton::clicked, this, &MainWindow::onZoomInButtonClicked);
+//    connect(m_pZoomOutButton, &QPushButton::clicked, this, &MainWindow::onZoomOutButtonClicked);
+//    connect(m_pZoomButton, &QPushButton::clicked, this, &MainWindow::onZoomResetClicked);
+
+
+//    connect(radioGroup, &QButtonGroup::idClicked, this, &MainWindow::onOptimizationModeChanged);
+
+//    connect(m_pChartWidget, &GanttChartWidget::statusTextChanged,
+//            this, [this](const QString &text){
+//                statusBar()->showMessage(text);
+//            });
+
+
+//}
+
 MainWindow::~MainWindow() {
     delete m_pChartWidget;  // Если указатель не управляется умным указателем
-    delete m_pScrollArea;
+//    delete m_pScrollArea;
 }
 
 

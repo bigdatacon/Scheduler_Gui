@@ -23,8 +23,12 @@ class GanttChartWidget : public QWidget {
     Q_OBJECT
 
 public:
+//    GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart,
+//                     QPushButton *m_pZoomButton, int m_toolbarHeight, QScrollArea *pScrollArea,
+//                     int statusBarHeight);
+
     GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart,
-                     QPushButton *m_pZoomButton, int m_toolbarHeight, QScrollArea *pScrollArea,
+                     QPushButton *m_pZoomButton, int m_toolbarHeight,
                      int statusBarHeight);
 
 
@@ -66,12 +70,12 @@ private slots:
 
     void OnZoomInClickedScroll(const QPointF &mousePos);
     void OnZoomOutClickedScroll(const QPointF &mousePos);
-    QScrollArea* findScrollArea() const;
+//    QScrollArea* findScrollArea() const;
 
     double scrollBarValueToDouble(QScrollBar *scrollBar, double zoom) const ;
 
     int doubleToScrollBarValue(double value, double zoom) const ;
-    void updateScrollBars();
+//    void updateScrollBars();
 
     // В секции signals:
 signals:
@@ -95,7 +99,7 @@ private:
 
 
     GanttChart* m_pGanttChart;
-    QScrollArea* m_pScrollArea; // Указатель на область прокрутки
+//    QScrollArea* m_pScrollArea; // Указатель на область прокрутки
 
     QImage m_oChartImage;
     QImage m_oWorkersImage;
