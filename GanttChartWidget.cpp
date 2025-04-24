@@ -890,7 +890,11 @@ void GanttChartWidget::mouseMoveEvent(QMouseEvent *event) {
         setPreciseOffset(QPointF(m_offset), __FUNCTION__);
 
 
+
+
         m_lastMousePos = currentMousePos;
+        m_pHScrollBar->setValue(-m_offset.x());
+        m_pVScrollBar->setValue(-m_offset.y());
         update();
         event->accept();
 //        updateScrollbars();
