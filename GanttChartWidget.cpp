@@ -92,7 +92,7 @@ void GanttChartWidget::updateZoomedImages() {
     DrawWorkersTimeChart();
     m_bManualResizeOnly = false;
 
-    updateScrollbars();
+//    updateScrollbars();
 
     update();  // Обновляем отображение
 }
@@ -819,22 +819,51 @@ void GanttChartWidget::setToolbarHeight(int height) {
 
 
 
+//void GanttChartWidget::wheelEvent(QWheelEvent *event) {
+//    if (event->modifiers() == Qt::ControlModifier) {
+//        // Координаты указателя мыши относительно виджета
+//        QPointF mousePosWidget = event->position();
+
+//        // Определяем направление прокрутки
+//        int delta = event->angleDelta().y();
+//        if (delta > 0) {
+//            OnZoomInClickedScroll(mousePosWidget);  // Передаем координаты мыши
+//        } else if (delta < 0) {
+//            OnZoomOutClickedScroll(mousePosWidget);  // Передаем координаты мыши
+//        }
+
+//        event->accept();
+//    } else {
+//        QWidget::wheelEvent(event);
+//    }
+//}
+
+
 void GanttChartWidget::wheelEvent(QWheelEvent *event) {
     if (event->modifiers() == Qt::ControlModifier) {
-        // Координаты указателя мыши относительно виджета
+        // Зум при Ctrl
         QPointF mousePosWidget = event->position();
-
-        // Определяем направление прокрутки
         int delta = event->angleDelta().y();
         if (delta > 0) {
-            OnZoomInClickedScroll(mousePosWidget);  // Передаем координаты мыши
+            OnZoomInClickedScroll(mousePosWidget);
         } else if (delta < 0) {
-            OnZoomOutClickedScroll(mousePosWidget);  // Передаем координаты мыши
+            OnZoomOutClickedScroll(mousePosWidget);
         }
-
         event->accept();
     } else {
-        QWidget::wheelEvent(event);
+        // 👉 Прокрутка по вертикали
+        int delta = event->angleDelta().y();
+
+        // 👇 Настроим скорость — шаг в пикселях
+        int scrollSpeed = 30;  // Можешь менять это значение
+
+        // 👇 Увеличиваем/уменьшаем значение скроллбара
+        int newValue = m_pVScrollBar->value() - (delta / 120) * scrollSpeed;
+
+        // 👇 Устанавливаем новое значение
+        m_pVScrollBar->setValue(newValue);
+
+        event->accept();
     }
 }
 
