@@ -1223,7 +1223,20 @@ MainWindow.o: ../MainWindow.cpp ../MainWindow.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QMessageBox \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qmessagebox.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStatusBar \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstatusbar.h
+		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstatusbar.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtGui/QGuiApplication \
+		/usr/include/x86_64-linux-gnu/qt5/QtGui/qguiapplication.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtCore/qeventloop.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtGui/qinputmethod.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtGui/QScreen \
+		/usr/include/x86_64-linux-gnu/qt5/QtGui/qscreen.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtCore/QList \
+		/usr/include/x86_64-linux-gnu/qt5/QtCore/QObject \
+		/usr/include/x86_64-linux-gnu/qt5/QtCore/QRect \
+		/usr/include/x86_64-linux-gnu/qt5/QtCore/QSize \
+		/usr/include/x86_64-linux-gnu/qt5/QtCore/QSizeF \
+		/usr/include/x86_64-linux-gnu/qt5/QtGui/QTransform
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainWindow.o ../MainWindow.cpp
 
 main.o: ../main.cpp /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication \

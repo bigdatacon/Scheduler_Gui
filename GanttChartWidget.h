@@ -75,7 +75,8 @@ private slots:
     double scrollBarValueToDouble(QScrollBar *scrollBar, double zoom) const ;
 
     int doubleToScrollBarValue(double value, double zoom) const ;
-//    void updateScrollBars();
+
+
 
     // В секции signals:
 signals:
@@ -91,10 +92,12 @@ private:
     void drawImageWithOffset(QPainter &oPainter, const QImage &sourceImage, const QRect &visibleRect);
     void printStackTrace(const QString &message);
     void setPreciseOffset(QPointF offset, const QString &context);
+    void updateScrollbars();
 
 
     QPoint clampOffsetToValidRange(const QPoint& offset) const;
     QSize getCurrentImageSize() const;
+
 
 
 
@@ -161,6 +164,9 @@ private:
     bool m_bManualResizeOnly = false;
 
     QPointF m_mouseImagePosBeforeScroll;
+
+    QScrollBar* m_pHScrollBar = nullptr;
+    QScrollBar* m_pVScrollBar = nullptr;
 
 
 

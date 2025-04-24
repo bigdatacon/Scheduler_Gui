@@ -14,6 +14,7 @@
 #include <cmath>
 #include <execinfo.h>  // Linux/macOS only
 
+
 GanttChartWidget::GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart,
                                      QPushButton *m_pZoomButton, int m_toolbarHeight,
                                      int statusBarHeight)
@@ -43,6 +44,20 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart,
     Initialize();
     QTimer::singleShot(900, this, SLOT(UpdateSize()));
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    m_pHScrollBar = new QScrollBar(Qt::Horizontal, this);
+    m_pVScrollBar = new QScrollBar(Qt::Vertical, this);
+
+    connect(m_pHScrollBar, &QScrollBar::valueChanged, this, [=](int value){
+        m_offset.setX(-value);
+        update();
+    });
+    connect(m_pVScrollBar, &QScrollBar::valueChanged, this, [=](int value){
+        m_offset.setY(-value);
+        update();
+    });
+
+
 
 }
 
@@ -76,6 +91,8 @@ void GanttChartWidget::updateZoomedImages() {
     DrawGanttChart();
     DrawWorkersTimeChart();
     m_bManualResizeOnly = false;
+
+//    updateScrollbars();
 
     update();  // Обновляем отображение
 }
@@ -222,7 +239,13 @@ void GanttChartWidget::drawImageWithOffset(QPainter &oPainter, const QImage &sou
 
 
 void GanttChartWidget::resizeEvent(QResizeEvent *event) {
+
+    int scrollbarSize = 16;
+    m_pHScrollBar->setGeometry(0, height() - scrollbarSize, width() - scrollbarSize, scrollbarSize);
+    m_pVScrollBar->setGeometry(width() - scrollbarSize, 0, scrollbarSize, height() - scrollbarSize);
+    updateScrollbars(); // ниже
     update();
+
     QWidget::resizeEvent(event);
 }
 
@@ -251,6 +274,8 @@ void GanttChartWidget::setZoom(double zoomLevel) {
     updateZoomedImages();
     UpdateSize();
     m_pZoomButton->setText("Zoom: 1.0");
+//    updateScrollbars();
+
     update();
 }
 
@@ -289,6 +314,7 @@ void GanttChartWidget::OnZoomInClicked() {
     // 👇 Сохраняем точное смещение
     setPreciseOffset(newScrollOffset, __FUNCTION__);
 
+//    updateScrollbars();
 
     update();
 }
@@ -328,6 +354,8 @@ void GanttChartWidget::OnZoomOutClicked() {
     QPointF newScrollOffset = mouseImagePosAfterZoom - mousePosWidget;
     setPreciseOffset(newScrollOffset, __FUNCTION__);
 
+//    updateScrollbars();
+
     update();
 }
 
@@ -359,6 +387,8 @@ void GanttChartWidget::OnZoomInClickedScroll(const QPointF &) {
 
 
     m_pZoomButton->setText("Zoom: " + QString::number(newZoom, 'f', 2));
+//    updateScrollbars();
+
     update();
 }
 
@@ -389,36 +419,12 @@ void GanttChartWidget::OnZoomOutClickedScroll(const QPointF &) {
     qDebug() << "After zoom-out precise offset =" << m_fPreciseScrollOffset << "raw offset =" << m_offset;
 
     m_pZoomButton->setText("Zoom: " + QString::number(newZoom, 'f', 2));
+
+//    updateScrollbars();
+
     update();
 }
 
-
-//void GanttChartWidget::OnZoomOutClickedScroll(const QPointF &) {
-//    double currentZoom = m_pGanttChart->get_zoom();
-//    if (currentZoom <= 1.0) {
-//        QMessageBox::warning(this, "Zoom Limit", "Zoom не может быть меньше 1.0");
-//        return;
-//    }
-
-//    QPointF mousePosWidget = mapFromGlobal(QCursor::pos());
-
-//    QPointF scrollOffset = m_fPreciseScrollOffset;
-
-//    QPointF mouseImagePosBeforeZoom = (scrollOffset + mousePosWidget) / currentZoom;
-//    double newZoom = std::max(currentZoom - 0.05, 1.0);
-
-//    m_pGanttChart->set_zoom(newZoom);
-//    updateZoomedImages();
-//    UpdateSize();
-
-//    QPointF mouseImagePosAfterZoom = mouseImagePosBeforeZoom * newZoom;
-//    QPointF newScrollOffset = mouseImagePosAfterZoom - mousePosWidget;
-
-//    m_fPreciseScrollOffset = newScrollOffset;
-
-//    m_pZoomButton->setText("Zoom: " + QString::number(newZoom, 'f', 2));
-//    update();
-//}
 
 
 double GanttChartWidget::scrollBarValueToDouble(QScrollBar *scrollBar, double zoom) const {
@@ -887,6 +893,8 @@ void GanttChartWidget::mouseMoveEvent(QMouseEvent *event) {
         m_lastMousePos = currentMousePos;
         update();
         event->accept();
+//        updateScrollbars();
+
 
     }
 
@@ -1040,6 +1048,7 @@ void GanttChartWidget::setPreciseOffset(QPointF offset, const QString &context) 
     }
 
     qDebug() << "🎯 Установлен m_offset:" << m_offset;
+//    updateScrollbars();
 
     update();
 }
@@ -1053,6 +1062,26 @@ QSize GanttChartWidget::getCurrentImageSize() const {
     int width = VIRTUAL_SCREEN_WIDTH * m_pGanttChart->get_zoom();
     int height = VIRTUAL_SCREEN_HEIGHT * m_pGanttChart->get_zoom();
     return QSize(width, height);
+}
+
+void GanttChartWidget::updateScrollbars() {
+    QSize imageSize = getCurrentImageSize();
+    QSize viewportSize = size();
+
+    int maxH = std::max(0, imageSize.width() - viewportSize.width());
+    int maxV = std::max(0, imageSize.height() - viewportSize.height());
+
+    m_pHScrollBar->setRange(0, maxH);
+    m_pVScrollBar->setRange(0, maxV);
+
+    m_pHScrollBar->setPageStep(viewportSize.width());
+    m_pVScrollBar->setPageStep(viewportSize.height());
+
+    m_pHScrollBar->setValue(-m_offset.x());
+    m_pVScrollBar->setValue(-m_offset.y());
+
+    m_pHScrollBar->setVisible(maxH > 0);
+    m_pVScrollBar->setVisible(maxV > 0);
 }
 
 
