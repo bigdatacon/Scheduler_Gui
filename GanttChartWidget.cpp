@@ -92,7 +92,7 @@ void GanttChartWidget::updateZoomedImages() {
     DrawWorkersTimeChart();
     m_bManualResizeOnly = false;
 
-//    updateScrollbars();
+    updateScrollbars();
 
     update();  // Обновляем отображение
 }
@@ -274,7 +274,7 @@ void GanttChartWidget::setZoom(double zoomLevel) {
     updateZoomedImages();
     UpdateSize();
     m_pZoomButton->setText("Zoom: 1.0");
-//    updateScrollbars();
+    updateScrollbars();
 
     update();
 }
@@ -314,7 +314,7 @@ void GanttChartWidget::OnZoomInClicked() {
     // 👇 Сохраняем точное смещение
     setPreciseOffset(newScrollOffset, __FUNCTION__);
 
-//    updateScrollbars();
+    updateScrollbars();
 
     update();
 }
@@ -354,7 +354,7 @@ void GanttChartWidget::OnZoomOutClicked() {
     QPointF newScrollOffset = mouseImagePosAfterZoom - mousePosWidget;
     setPreciseOffset(newScrollOffset, __FUNCTION__);
 
-//    updateScrollbars();
+    updateScrollbars();
 
     update();
 }
@@ -387,7 +387,7 @@ void GanttChartWidget::OnZoomInClickedScroll(const QPointF &) {
 
 
     m_pZoomButton->setText("Zoom: " + QString::number(newZoom, 'f', 2));
-//    updateScrollbars();
+    updateScrollbars();
 
     update();
 }
@@ -420,7 +420,7 @@ void GanttChartWidget::OnZoomOutClickedScroll(const QPointF &) {
 
     m_pZoomButton->setText("Zoom: " + QString::number(newZoom, 'f', 2));
 
-//    updateScrollbars();
+    updateScrollbars();
 
     update();
 }
@@ -889,15 +889,13 @@ void GanttChartWidget::mouseMoveEvent(QMouseEvent *event) {
         m_offset = clampOffsetToValidRange(proposedOffset);
         setPreciseOffset(QPointF(m_offset), __FUNCTION__);
 
-
-
-
         m_lastMousePos = currentMousePos;
+
         m_pHScrollBar->setValue(-m_offset.x());
         m_pVScrollBar->setValue(-m_offset.y());
         update();
         event->accept();
-//        updateScrollbars();
+        updateScrollbars();
 
 
     }
@@ -1052,7 +1050,7 @@ void GanttChartWidget::setPreciseOffset(QPointF offset, const QString &context) 
     }
 
     qDebug() << "🎯 Установлен m_offset:" << m_offset;
-//    updateScrollbars();
+    updateScrollbars();
 
     update();
 }
