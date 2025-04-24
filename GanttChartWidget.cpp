@@ -12,7 +12,7 @@
 #include <algorithm> // Для std::clamp
 #include <QCursor>
 #include <cmath>
-#include <execinfo.h>  // Linux/macOS only
+//#include <execinfo.h>  // Linux/macOS only
 
 
 
@@ -1197,19 +1197,19 @@ void GanttChartWidget::showEvent(QShowEvent *event) {
 }
 
 
-void GanttChartWidget::printStackTrace(const QString &message) {
-    constexpr int MAX_FRAMES = 20;
-    void* buffer[MAX_FRAMES];
-    int size = backtrace(buffer, MAX_FRAMES);
-    char** symbols = backtrace_symbols(buffer, size);
+//void GanttChartWidget::printStackTrace(const QString &message) {
+//    constexpr int MAX_FRAMES = 20;
+//    void* buffer[MAX_FRAMES];
+//    int size = backtrace(buffer, MAX_FRAMES);
+//    char** symbols = backtrace_symbols(buffer, size);
 
-    qDebug() << "\n\n=== Stack trace for:" << message << "===";
-    for (int i = 0; i < size; ++i) {
-        qDebug() << symbols[i];
-    }
-    free(symbols);
-    qDebug() << "====================";
-}
+//    qDebug() << "\n\n=== Stack trace for:" << message << "===";
+//    for (int i = 0; i < size; ++i) {
+//        qDebug() << symbols[i];
+//    }
+//    free(symbols);
+//    qDebug() << "====================";
+//}
 
 void GanttChartWidget::setPreciseOffset(QPointF offset, const QString &context) {
     if (context == "updateScrollBars" && offset == QPointF(0, 0) && m_fPreciseScrollOffset != QPointF(0, 0)) {
