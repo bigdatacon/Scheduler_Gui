@@ -12,7 +12,7 @@
 #include <algorithm> // Для std::clamp
 #include <QCursor>
 #include <cmath>
-//#include <execinfo.h>  // Linux/macOS only
+#include <execinfo.h>  // Linux/macOS only
 
 GanttChartWidget::GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart,
                                      QPushButton *m_pZoomButton, int m_toolbarHeight,
@@ -207,6 +207,7 @@ void GanttChartWidget::drawImageWithOffset(QPainter &oPainter, const QImage &sou
     QRect imageRect = sourceImage.rect();
 
     // Рассчитываем sourceRect — какую часть изображения надо показать
+
     QRect sourceRect = visibleRect.translated(-m_offset).intersected(imageRect);
 
     // Если нечего рисовать — выходим
@@ -214,7 +215,6 @@ void GanttChartWidget::drawImageWithOffset(QPainter &oPainter, const QImage &sou
 
     // Рассчитываем, куда рисовать — targetRect на экране
     QRect targetRect = sourceRect.translated(m_offset);
-
     // Рисуем только видимую часть изображения
     oPainter.drawImage(targetRect, sourceImage, sourceRect);
 
@@ -333,6 +333,7 @@ void GanttChartWidget::OnZoomOutClicked() {
 
 
 void GanttChartWidget::OnZoomInClickedScroll(const QPointF &) {
+        qDebug() << "in OnZoomInClickedScroll    imageSize :" << getCurrentImageSize() << "viewportSize:" << this->size();
     double currentZoom = m_pGanttChart->get_zoom();
     if (currentZoom >= 8.0) return;
     QPointF mousePosWidget = mapFromGlobal(QCursor::pos());
@@ -349,12 +350,21 @@ void GanttChartWidget::OnZoomInClickedScroll(const QPointF &) {
     QPointF mouseImagePosAfterZoom = mouseImagePosBeforeZoom * newZoom;
     QPointF newScrollOffset = mouseImagePosAfterZoom - mousePosWidget;
 
-    m_fPreciseScrollOffset = newScrollOffset;
+//    m_fPreciseScrollOffset = newScrollOffset;
+    setPreciseOffset(newScrollOffset, __FUNCTION__);
+    qDebug() << "After setPreciseOffset: raw offset =" << m_offset;
+
+    qDebug() << "After zoom-in precise offset =" << m_fPreciseScrollOffset << "raw offset =" << m_offset;
+
+
 
     m_pZoomButton->setText("Zoom: " + QString::number(newZoom, 'f', 2));
     update();
 }
+
 void GanttChartWidget::OnZoomOutClickedScroll(const QPointF &) {
+    qDebug() << "in OnZoomOutClickedScroll    imageSize :" << getCurrentImageSize() << "viewportSize:" << this->size();
+
     double currentZoom = m_pGanttChart->get_zoom();
     if (currentZoom <= 1.0) {
         QMessageBox::warning(this, "Zoom Limit", "Zoom не может быть меньше 1.0");
@@ -362,12 +372,10 @@ void GanttChartWidget::OnZoomOutClickedScroll(const QPointF &) {
     }
 
     QPointF mousePosWidget = mapFromGlobal(QCursor::pos());
-
     QPointF scrollOffset = m_fPreciseScrollOffset;
-
     QPointF mouseImagePosBeforeZoom = (scrollOffset + mousePosWidget) / currentZoom;
-    double newZoom = std::max(currentZoom - 0.05, 1.0);
 
+    double newZoom = std::max(currentZoom - 0.05, 1.0);
     m_pGanttChart->set_zoom(newZoom);
     updateZoomedImages();
     UpdateSize();
@@ -375,11 +383,42 @@ void GanttChartWidget::OnZoomOutClickedScroll(const QPointF &) {
     QPointF mouseImagePosAfterZoom = mouseImagePosBeforeZoom * newZoom;
     QPointF newScrollOffset = mouseImagePosAfterZoom - mousePosWidget;
 
-    m_fPreciseScrollOffset = newScrollOffset;
+    setPreciseOffset(newScrollOffset, __FUNCTION__);
+
+    qDebug() << "After setPreciseOffset: raw offset =" << m_offset;
+    qDebug() << "After zoom-out precise offset =" << m_fPreciseScrollOffset << "raw offset =" << m_offset;
 
     m_pZoomButton->setText("Zoom: " + QString::number(newZoom, 'f', 2));
     update();
 }
+
+
+//void GanttChartWidget::OnZoomOutClickedScroll(const QPointF &) {
+//    double currentZoom = m_pGanttChart->get_zoom();
+//    if (currentZoom <= 1.0) {
+//        QMessageBox::warning(this, "Zoom Limit", "Zoom не может быть меньше 1.0");
+//        return;
+//    }
+
+//    QPointF mousePosWidget = mapFromGlobal(QCursor::pos());
+
+//    QPointF scrollOffset = m_fPreciseScrollOffset;
+
+//    QPointF mouseImagePosBeforeZoom = (scrollOffset + mousePosWidget) / currentZoom;
+//    double newZoom = std::max(currentZoom - 0.05, 1.0);
+
+//    m_pGanttChart->set_zoom(newZoom);
+//    updateZoomedImages();
+//    UpdateSize();
+
+//    QPointF mouseImagePosAfterZoom = mouseImagePosBeforeZoom * newZoom;
+//    QPointF newScrollOffset = mouseImagePosAfterZoom - mousePosWidget;
+
+//    m_fPreciseScrollOffset = newScrollOffset;
+
+//    m_pZoomButton->setText("Zoom: " + QString::number(newZoom, 'f', 2));
+//    update();
+//}
 
 
 double GanttChartWidget::scrollBarValueToDouble(QScrollBar *scrollBar, double zoom) const {
@@ -764,7 +803,7 @@ void GanttChartWidget::UpdateSize() {
 //    int height = VIRTUAL_SCREEN_HEIGHT * m_pGanttChart->get_zoom()-m_istatusBarHeight*2 ;
 
 //    setMinimumSize(width, height);
-//    resize(width, height ); // Корректный расчет общей высоты
+//    resize(width, height ); // Корректный расчет общей высотыв
 }
 
 void GanttChartWidget::setToolbarHeight(int height) {
@@ -806,10 +845,10 @@ void GanttChartWidget::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 
+
 QPoint GanttChartWidget::clampOffsetToValidRange(const QPoint& offset) const {
     QSize imageSize = getCurrentImageSize();
-//    QSize viewportSize = size();
-    QSize viewportSize = parentWidget()->size() ;
+    QSize viewportSize = this->size();
 
     int minOffsetX = viewportSize.width() - imageSize.width();
     int minOffsetY = viewportSize.height() - imageSize.height();
@@ -820,6 +859,12 @@ QPoint GanttChartWidget::clampOffsetToValidRange(const QPoint& offset) const {
     int clampedX = std::clamp(offset.x(), minOffsetX, 0);
     int clampedY = std::clamp(offset.y(), minOffsetY, 0);
 
+    qDebug() << "[CLAMP] imageSize:" << imageSize
+             << "viewportSize:" << viewportSize
+             << "| before: offset =" << offset
+             << "| minOffsetX =" << minOffsetX << "minOffsetY =" << minOffsetY
+             << "| after: offset =" << QPoint(clampedX, clampedY);
+
     return QPoint(clampedX, clampedY);
 }
 
@@ -829,7 +874,7 @@ QPoint GanttChartWidget::clampOffsetToValidRange(const QPoint& offset) const {
 
 void GanttChartWidget::mouseMoveEvent(QMouseEvent *event) {
     // Если активен режим перетаскивания (hand tool), выполняем существующую логику
-    qDebug() << "offset in mouseMoveEvent: " << m_offset;
+//    qDebug() << "offset in mouseMoveEvent: " << m_offset;
     if (m_bHandToolActive) {
         QPoint currentMousePos = event->pos();
         QPoint offset = currentMousePos - m_lastMousePos;
@@ -924,53 +969,85 @@ void GanttChartWidget::showEvent(QShowEvent *event) {
 }
 
 
-//void GanttChartWidget::printStackTrace(const QString &message) {
-//    constexpr int MAX_FRAMES = 20;
-//    void* buffer[MAX_FRAMES];
-//    int size = backtrace(buffer, MAX_FRAMES);
-//    char** symbols = backtrace_symbols(buffer, size);
+void GanttChartWidget::printStackTrace(const QString &message) {
+    constexpr int MAX_FRAMES = 20;
+    void* buffer[MAX_FRAMES];
+    int size = backtrace(buffer, MAX_FRAMES);
+    char** symbols = backtrace_symbols(buffer, size);
 
-//    qDebug() << "\n\n=== Stack trace for:" << message << "===";
-//    for (int i = 0; i < size; ++i) {
-//        qDebug() << symbols[i];
-//    }
-//    free(symbols);
-//    qDebug() << "====================";
-//}
+    qDebug() << "\n\n=== Stack trace for:" << message << "===";
+    for (int i = 0; i < size; ++i) {
+        qDebug() << symbols[i];
+    }
+    free(symbols);
+    qDebug() << "====================";
+}
+
+#include <execinfo.h>
 
 void GanttChartWidget::setPreciseOffset(QPointF offset, const QString &context) {
-    if (context == "updateScrollBars" && offset == QPointF(0, 0) && m_fPreciseScrollOffset != QPointF(0, 0)) {
-        qDebug() << "[BLOCKED] Попытка сброса offset в (0,0) из updateScrollBars — отклонено";
-        return;
-    }
+    qDebug() << "➡ setPreciseOffset called. context =" << context << ", offset =" << offset;
 
     m_fPreciseScrollOffset = offset;
 
-    QSize imageSize(VIRTUAL_SCREEN_WIDTH * m_pGanttChart->get_zoom(),
-                    VIRTUAL_SCREEN_HEIGHT * m_pGanttChart->get_zoom());
-//    QSize viewportSize = m_pScrollArea ? m_pScrollArea->viewport()->size() : QSize(0, 0);
-//    QSize viewportSize = size();
-    QSize viewportSize = parentWidget()->size() ;
-    qDebug() << "viewportSize in setPreciseOffset =="<<viewportSize ;
+    QSize imageSize = getCurrentImageSize();
+    QSize viewportSize = parentWidget() ? parentWidget()->size() : size();
+
+    qDebug() << "📐 imageSize:" << imageSize << "viewportSize:" << viewportSize;
+
+    int proposedX = static_cast<int>(std::round(offset.x()));
+    int proposedY = static_cast<int>(std::round(offset.y()));
+
+    int maxOffsetX = std::max(0, viewportSize.width() - imageSize.width());
+    int maxOffsetY = std::max(0, viewportSize.height() - imageSize.height());
+    int minOffsetX = std::min(0, viewportSize.width() - imageSize.width());
+    int minOffsetY = std::min(0, viewportSize.height() - imageSize.height());
 
 
-    int minOffsetX = (imageSize.width() > viewportSize.width()) ? viewportSize.width() - imageSize.width() : 0;
-    int minOffsetY = (imageSize.height() > viewportSize.height()) ? viewportSize.height() - imageSize.height() : 0;
-    int maxOffsetX = 0;
-    int maxOffsetY = 0;
+//    int clampedX = std::clamp(proposedX, minOffsetX, maxOffsetX);
+//    int clampedY = std::clamp(proposedY, minOffsetY, maxOffsetY);
 
-    if (context != "mouseMoveEvent") {
-        m_offset.setX(std::clamp(static_cast<int>(std::round(offset.x())), minOffsetX, maxOffsetX));
-        m_offset.setY(std::clamp(static_cast<int>(std::round(offset.y())), minOffsetY, maxOffsetY));
-    } else {
-        // В ручном режиме не ограничиваем вправо/вниз
-        m_offset.setX(offset.x() > 0 ? offset.x() : std::clamp(static_cast<int>(std::round(offset.x())), minOffsetX, maxOffsetX));
-        m_offset.setY(offset.y() > 0 ? offset.y() : std::clamp(static_cast<int>(std::round(offset.y())), minOffsetY, maxOffsetY));
+    int clampedX;
+    int clampedY;
+    // clamp в обе стороны
+    if (proposedX>0 && minOffsetX < 0){
+        clampedX = std::clamp(-proposedX, minOffsetX, maxOffsetX);
+    }
+    else
+    {
+             clampedX = std::clamp(proposedX, minOffsetX, maxOffsetX);
+        }
+
+    if (proposedY>0 && minOffsetY < 0){
+        clampedY = std::clamp(-proposedY, minOffsetY, maxOffsetY);
+    }
+    else
+    {
+            clampedY = std::clamp(proposedY, minOffsetY, maxOffsetY);
+        }
+
+
+    m_offset = QPoint(clampedX, clampedY);
+
+
+    qDebug() << "🔢 Proposed offset: (" << proposedX << "," << proposedY << ")";
+    qDebug() << "📏 MinOffsetX:" << minOffsetX << "MinOffsetY:" << minOffsetY;
+    qDebug() << "✅ Clamped offset will be:" << m_offset;
+
+    if (m_offset == QPoint(0, 0) && offset != QPointF(0, 0)) {
+        qDebug() << "⚠️ m_offset обнулился несмотря на offset =" << offset;
+        printStackTrace("Offset reset to (0, 0)");
     }
 
+    qDebug() << "🎯 Установлен m_offset:" << m_offset;
 
-    update();  // перерисовка
+    update();
 }
+
+
+
+
+
 
 QSize GanttChartWidget::getCurrentImageSize() const {
     int width = VIRTUAL_SCREEN_WIDTH * m_pGanttChart->get_zoom();
