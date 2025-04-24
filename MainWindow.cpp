@@ -7,140 +7,8 @@
 #include <QMessageBox>
 #include "GanttChart.h"
 #include <QStatusBar>
-
-
-// === ОБНОВЛЕННЫЙ MainWindow.cpp с удалением QScrollArea, НО с полной функциональностью ===
-#include "MainWindow.h"
-#include "GanttChartWidget.h"
-#include "GanttChart.h"
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QToolBar>
-#include <QStatusBar>
-#include <QRadioButton>
-#include <QCheckBox>
-#include <QButtonGroup>
-#include <QTimer>
-#include <QDebug>
-
-//MainWindow::MainWindow(QWidget *parent)
-//    : QMainWindow(parent) {
-//    // Центральный виджет
-//    QWidget *centralWidget = new QWidget(this);
-//    setCentralWidget(centralWidget);
-
-//    setStatusBar(new QStatusBar(this));
-//    int statusBarHeight = statusBar()->sizeHint().height();
-
-//    // Создаем логический объект GanttChart
-//    GanttChart *pGanttChart = new GanttChart();
-
-//    // Кнопка Zoom
-//    m_pZoomButton = new QPushButton("Zoom: 1", this);
-//    m_pZoomButton->setMaximumWidth(90);
-
-//    // Тулбар
-//    m_pToolBar = new QToolBar(this);
-//    m_pToolBar->setMovable(false);
-//    int m_toolbarHeight = m_pToolBar->height();
-
-//    // Диаграмма
-//    m_pChartWidget = new GanttChartWidget(this, pGanttChart, m_pZoomButton, m_toolbarHeight, statusBarHeight);
-//    m_pChartWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-//    // Кнопки
-//    m_pSolveButton = new QPushButton(QIcon(":/resources/rocket-2.png"), "", this);
-//    m_pSolveButton->setToolTip("Запустить солвер из файла");
-//    m_pShowTimeButton = new QPushButton(QIcon(":/resources/metrics.png"), "", this);
-//    m_pShowTimeButton->setToolTip("Расписание / Утилизация ресурсов");
-//    m_pShowMetricsButton = new QPushButton(QIcon(":/resources/data.png"), "", this);
-//    m_pShowMetricsButton->setToolTip("Метрики расписания");
-//    m_pRestartSolverButton = new QPushButton(QIcon(":/resources/restart.png"), "", this);
-//    m_pRestartSolverButton->setToolTip("Перезапустить солвер");
-//    m_pZoomInButton = new QPushButton("+x", this);
-//    m_pZoomOutButton = new QPushButton("-x", this);
-
-//    m_pDurationRadioButton = new QRadioButton("Оптимизация длительности", this);
-//    m_pCostRadioButton = new QRadioButton("Оптимизация стоимости", this);
-//    m_pSetupsRadioButton = new QRadioButton("Оптимизация переналадок", this);
-//    m_pDurationRadioButton->setChecked(true);
-
-//    QButtonGroup *radioGroup = new QButtonGroup(this);
-//    radioGroup->addButton(m_pDurationRadioButton);
-//    radioGroup->addButton(m_pCostRadioButton);
-//    radioGroup->addButton(m_pSetupsRadioButton);
-
-//    m_pHeuristicsButton1 = new QCheckBox("Эвристика 1", this);
-//    m_pHeuristicsButton1->setToolTip("Эвристика выбора ресурсов");
-//    m_pHeuristicsButton2 = new QCheckBox("Эвристика 2", this);
-//    m_pHeuristicsButton2->setToolTip("Эвристика выбора работ");
-
-//    // Подключения сигналов
-//    connect(m_pDurationRadioButton, &QRadioButton::toggled, this, [this](bool checked) {
-//        if (checked) { g_currentState = DURATION; g_iSolverPower = 0; }
-//    });
-//    connect(m_pCostRadioButton, &QRadioButton::toggled, this, [this](bool checked) {
-//        if (checked) { g_currentState = COST; g_iSolverPower = 0; }
-//    });
-//    connect(m_pSetupsRadioButton, &QRadioButton::toggled, this, [this](bool checked) {
-//        if (checked) { g_currentState = SETUPS; g_iSolverPower = 0; }
-//    });
-//    connect(m_pHeuristicsButton1, &QCheckBox::stateChanged, this, [this](int state) {
-//        g_iR1 = (state == Qt::Checked) ? 1 : 0;
-//        g_iSolverPower = 0;
-//    });
-//    connect(m_pHeuristicsButton2, &QCheckBox::stateChanged, this, [this](int state) {
-//        g_iJ3 = (state == Qt::Checked) ? 1 : 0;
-//        g_iSolverPower = 0;
-//    });
-
-//    m_pSolverCheckTimer = new QTimer(this);
-//    connect(m_pSolverCheckTimer, &QTimer::timeout, this, [this]() {
-//        m_pRestartSolverButton->setEnabled(!g_bSolverRunning);
-//    });
-//    m_pSolverCheckTimer->start(100);
-
-//    // Добавление кнопок на тулбар
-//    m_pToolBar->addWidget(m_pSolveButton);
-//    m_pToolBar->addWidget(m_pShowTimeButton);
-//    m_pToolBar->addWidget(m_pShowMetricsButton);
-//    m_pToolBar->addWidget(m_pRestartSolverButton);
-//    m_pToolBar->addWidget(m_pZoomOutButton);
-//    m_pToolBar->addWidget(m_pZoomButton);
-//    m_pToolBar->addWidget(m_pZoomInButton);
-//    m_pToolBar->addWidget(m_pDurationRadioButton);
-//    m_pToolBar->addWidget(m_pCostRadioButton);
-//    m_pToolBar->addWidget(m_pSetupsRadioButton);
-//    m_pToolBar->addWidget(m_pHeuristicsButton1);
-//    m_pToolBar->addWidget(m_pHeuristicsButton2);
-
-//    // Layout без QScrollArea
-//    QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
-//    mainLayout->setContentsMargins(0, 0, 0, statusBarHeight);
-//    mainLayout->setSpacing(0);
-//    mainLayout->addWidget(m_pToolBar, 0);
-//    mainLayout->addWidget(m_pChartWidget, 1);
-
-//    // Обработка сигналов
-//    connect(m_pSolveButton, &QPushButton::clicked, this, &MainWindow::onSolveButtonClicked);
-//    connect(m_pShowTimeButton, &QPushButton::clicked, this, &MainWindow::onShowTimeButtonClicked);
-//    connect(m_pShowMetricsButton, &QPushButton::clicked, this, &MainWindow::onShowMetricsButtonClicked);
-//    connect(m_pRestartSolverButton, &QPushButton::clicked, this, &MainWindow::onRestartSolverButtonClicked);
-//    connect(m_pZoomInButton, &QPushButton::clicked, this, &MainWindow::onZoomInButtonClicked);
-//    connect(m_pZoomOutButton, &QPushButton::clicked, this, &MainWindow::onZoomOutButtonClicked);
-//    connect(m_pZoomButton, &QPushButton::clicked, this, &MainWindow::onZoomResetClicked);
-//    connect(radioGroup, &QButtonGroup::idClicked, this, &MainWindow::onOptimizationModeChanged);
-//    connect(m_pChartWidget, &GanttChartWidget::statusTextChanged, this, [this](const QString &text) {
-//        statusBar()->showMessage(text);
-//    });
-
-//    setMinimumSize(640, 480);   // минимальный размер
-//    resize(1280, 800);          // стартовый размер
-//    setWindowFlags(Qt::Window); // убедиться, что обычное окно
-
-//}
-
-
+#include <QGuiApplication>
+#include <QScreen>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent) {
@@ -328,10 +196,15 @@ MainWindow::MainWindow(QWidget *parent)
                 statusBar()->showMessage(text);
             });
 
-
     setMinimumSize(640, 480);   // минимальный размер
-    resize(1280, 800);          // стартовый размер
+//    resize(1280, 800);          // стартовый размер
+    resize(QGuiApplication::primaryScreen()->availableGeometry().size());
+
     setWindowFlags(Qt::Window); // убедиться, что обычное окно
+
+//    setMinimumSize(1920, 1080);   // минимальный размер
+//    resize(VIRTUAL_SCREEN_WIDTH, VIRTUAL_SCREEN_HEIGHT);          // стартовый размер
+//    setWindowFlags(Qt::Window); // убедиться, что обычное окно
 
 
 }
