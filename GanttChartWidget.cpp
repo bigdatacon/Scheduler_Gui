@@ -261,23 +261,57 @@ void GanttChartWidget::updateChart() {
 }
 
 
+//void GanttChartWidget::setZoom(double zoomLevel) {
+//    if (!m_pGanttChart) {
+//        qDebug() << "Ошибка: m_pGanttChart не инициализирован.";
+//        return;
+//    }
+
+//    m_pGanttChart->set_zoom(1.0);
+////    m_fPreciseScrollOffset = QPointF(0, 0); // сбросить точный offset
+//    setPreciseOffset(QPointF(0, 0), __FUNCTION__);
+
+//    updateZoomedImages();
+//    UpdateSize();
+//    m_pZoomButton->setText("Zoom: 1.0");
+//    updateScrollbars();
+
+//    update();
+//}
+
+
+
 void GanttChartWidget::setZoom(double zoomLevel) {
     if (!m_pGanttChart) {
         qDebug() << "Ошибка: m_pGanttChart не инициализирован.";
         return;
     }
 
-    m_pGanttChart->set_zoom(1.0);
-//    m_fPreciseScrollOffset = QPointF(0, 0); // сбросить точный offset
-    setPreciseOffset(QPointF(0, 0), __FUNCTION__);
+    m_pGanttChart->set_zoom(zoomLevel);
+
+    QSize imageSize = getCurrentImageSize();
+    QSize viewportSize = this->size();
+
+    // 🔄 Центрируем картинку в виджете
+    QPoint centerOffset = QPoint(
+        std::max(0, (viewportSize.width()  - imageSize.width())  / 2),
+        std::max(0, (viewportSize.height() - imageSize.height()) / 2)
+    );
+
+    // Устанавливаем смещение (влево и вверх)
+    setPreciseOffset(QPointF(-centerOffset), "setZoom");
 
     updateZoomedImages();
     UpdateSize();
     m_pZoomButton->setText("Zoom: 1.0");
     updateScrollbars();
-
     update();
 }
+
+
+
+
+
 
 void GanttChartWidget::OnZoomInClicked() {
     if (!m_pGanttChart) {
@@ -880,6 +914,23 @@ void GanttChartWidget::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 
+//void GanttChartWidget::mouseReleaseEvent(QMouseEvent *event) {
+//    if (m_bHandToolActive && event->button() == Qt::LeftButton) {
+//        m_bHandToolActive = false;
+//        setCursor(Qt::ArrowCursor);
+
+//        // 🔄 Сохраняем текущий offset как точный!
+//        setPreciseOffset(QPointF(m_offset), "mouseReleaseEvent");
+
+//        event->accept();
+//    } else {
+//        QWidget::mouseReleaseEvent(event);
+//    }
+//}
+
+
+
+
 
 QPoint GanttChartWidget::clampOffsetToValidRange(const QPoint& offset) const {
     QSize imageSize = getCurrentImageSize();
@@ -1095,6 +1146,66 @@ QSize GanttChartWidget::getCurrentImageSize() const {
     return QSize(width, height);
 }
 
+//void GanttChartWidget::updateScrollbars() {
+//    QSize imageSize = getCurrentImageSize();
+//    QSize viewportSize = size();
+
+//    int maxH = std::max(0, imageSize.width() - viewportSize.width());
+//    int maxV = std::max(0, imageSize.height() - viewportSize.height());
+
+//    m_pHScrollBar->setRange(0, maxH);
+//    m_pVScrollBar->setRange(0, maxV);
+
+//    m_pHScrollBar->setPageStep(viewportSize.width());
+//    m_pVScrollBar->setPageStep(viewportSize.height());
+
+//    m_pHScrollBar->setValue(-m_offset.x());
+//    m_pVScrollBar->setValue(-m_offset.y());
+
+//    m_pHScrollBar->setVisible(maxH > 0);
+//    m_pVScrollBar->setVisible(maxV > 0);
+//}
+
+
+//void GanttChartWidget::updateScrollbars() {
+//    QSize imageSize = getCurrentImageSize();
+//    QSize viewportSize = size();
+//    double zoom = m_pGanttChart->get_zoom();
+
+//    // 🔍 ДО обновления
+//    qDebug() << "📦 [BEFORE] updateScrollbars():";
+//    qDebug() << "    Zoom: " << zoom;
+//    qDebug() << "    Image Size: " << imageSize << ", Viewport Size: " << viewportSize;
+//    qDebug() << "    HScroll: Range=" << m_pHScrollBar->minimum() << "-" << m_pHScrollBar->maximum()
+//             << ", PageStep=" << m_pHScrollBar->pageStep();
+//    qDebug() << "    VScroll: Range=" << m_pVScrollBar->minimum() << "-" << m_pVScrollBar->maximum()
+//             << ", PageStep=" << m_pVScrollBar->pageStep();
+
+//    int maxH = std::max(0, imageSize.width() - viewportSize.width());
+//    int maxV = std::max(0, imageSize.height() - viewportSize.height());
+
+//    m_pHScrollBar->setRange(0, maxH);
+//    m_pVScrollBar->setRange(0, maxV);
+
+//    m_pHScrollBar->setPageStep(viewportSize.width());
+//    m_pVScrollBar->setPageStep(viewportSize.height());
+
+//    m_pHScrollBar->setValue(-m_offset.x());
+//    m_pVScrollBar->setValue(-m_offset.y());
+
+//    // 👁️ Отображать полосы только если zoom > 1
+//    bool showScrollbars = (zoom > 1.0);
+//    m_pHScrollBar->setVisible(showScrollbars && maxH > 0);
+//    m_pVScrollBar->setVisible(showScrollbars && maxV > 0);
+
+//    // 🔍 ПОСЛЕ обновления
+//    qDebug() << "📦 [AFTER] updateScrollbars():";
+//    qDebug() << "    H range: 0 -" << maxH << ", pageStep=" << m_pHScrollBar->pageStep()
+//             << ", visible=" << m_pHScrollBar->isVisible();
+//    qDebug() << "    V range: 0 -" << maxV << ", pageStep=" << m_pVScrollBar->pageStep()
+//             << ", visible=" << m_pVScrollBar->isVisible();
+//}
+
 void GanttChartWidget::updateScrollbars() {
     QSize imageSize = getCurrentImageSize();
     QSize viewportSize = size();
@@ -1111,10 +1222,40 @@ void GanttChartWidget::updateScrollbars() {
     m_pHScrollBar->setValue(-m_offset.x());
     m_pVScrollBar->setValue(-m_offset.y());
 
-    m_pHScrollBar->setVisible(maxH > 0);
-    m_pVScrollBar->setVisible(maxV > 0);
-}
+    double zoom = m_pGanttChart->get_zoom();
+    int thickness = std::clamp(static_cast<int>(10 * zoom), 8, 40);
+//    int thickness = std::clamp(static_cast<int>(20 * zoom), 10, 60);
 
+
+    if (thickness != m_lastScrollThickness) {
+        qDebug() << "🔄 Толщина скроллбаров изменилась: было =" << m_lastScrollThickness << ", стало =" << thickness;
+        m_lastScrollThickness = thickness;
+
+        m_pHScrollBar->setFixedHeight(thickness);
+        m_pVScrollBar->setFixedWidth(thickness);
+
+
+        // 🧱 Принудительно задаём геометрию
+        m_pHScrollBar->setGeometry(0, height() - thickness, width() - thickness, thickness);
+        m_pVScrollBar->setGeometry(width() - thickness, 0, thickness, height() - thickness);
+
+//        QString styleSheet = QString(
+//            "QScrollBar:horizontal { height: %1px; background: red; }"
+//            "QScrollBar::handle:horizontal { min-width: 25px; background: #888; }"
+//            "QScrollBar:vertical { width: %1px; background: red; }"
+//            "QScrollBar::handle:vertical { min-height: 25px; background: #888; }"
+//        ).arg(thickness);
+
+//        m_pHScrollBar->setStyleSheet(styleSheet);
+//        m_pVScrollBar->setStyleSheet(styleSheet);
+    }
+
+    m_pHScrollBar->setVisible(zoom > 1.0 && maxH > 0);
+    m_pVScrollBar->setVisible(zoom > 1.0 && maxV > 0);
+
+    qDebug() << "📦 updateScrollbars: zoom=" << zoom << ", thickness=" << thickness;
+    qDebug() << "📐 imageSize=" << imageSize << ", viewport=" << viewportSize;
+}
 
 
 

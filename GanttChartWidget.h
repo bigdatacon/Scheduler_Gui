@@ -167,6 +167,7 @@ private:
 
     QScrollBar* m_pHScrollBar = nullptr;
     QScrollBar* m_pVScrollBar = nullptr;
+    int m_lastScrollThickness = -1;  // Для отслеживания изменения толщины
 
 
 
