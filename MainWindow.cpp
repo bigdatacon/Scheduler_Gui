@@ -168,7 +168,7 @@ MainWindow::MainWindow(QWidget *parent)
     mainLayout->setSpacing(0);
     mainLayout->addWidget(m_pToolBar);
 //    mainLayout->addWidget(m_pScrollArea);
-    mainLayout->addWidget(m_pToolBar);
+//    mainLayout->addWidget(m_pToolBar);
 
 //    mainLayout->addWidget(m_pChartWidget);
 //    mainLayout->addWidget(m_pChartWidget, 1); // Важно — указать stretch = 1

@@ -57,6 +57,10 @@ GanttChartWidget::GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart,
         update();
     });
 
+    connect(m_pVScrollBar, &QScrollBar::valueChanged, this, [=](int val){
+        qDebug() << "⚠ VScrollBar изменился вручную или автоматически:" << val;
+    });
+
 
 
 }
@@ -280,7 +284,6 @@ void GanttChartWidget::updateChart() {
 //}
 
 
-
 void GanttChartWidget::setZoom(double zoomLevel) {
     if (!m_pGanttChart) {
         qDebug() << "Ошибка: m_pGanttChart не инициализирован.";
@@ -304,9 +307,18 @@ void GanttChartWidget::setZoom(double zoomLevel) {
     updateZoomedImages();
     UpdateSize();
     m_pZoomButton->setText("Zoom: 1.0");
-    updateScrollbars();
+//    updateScrollbars();
+    if (m_pVScrollBar)
+        m_pVScrollBar->setValue(m_pVScrollBar->minimum());
+
+
     update();
 }
+
+
+
+
+
 
 
 
