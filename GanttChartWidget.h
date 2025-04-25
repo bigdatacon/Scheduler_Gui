@@ -163,7 +163,9 @@ private:
 //    QPointF m_mouseImagePosSavedBeforeZoom = QPointF(0, 0);
     bool m_bManualResizeOnly = false;
 
-    QPointF m_mouseImagePosBeforeScroll;
+
+
+
 
     QScrollBar* m_pHScrollBar = nullptr;
     QScrollBar* m_pVScrollBar = nullptr;

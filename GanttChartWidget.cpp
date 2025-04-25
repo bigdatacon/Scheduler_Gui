@@ -12,7 +12,7 @@
 #include <algorithm> // Для std::clamp
 #include <QCursor>
 #include <cmath>
-#include <execinfo.h>  // Linux/macOS only
+//#include <execinfo.h>  // Linux/macOS only
 
 
 GanttChartWidget::GanttChartWidget(QWidget *pParent, GanttChart *pGanttChart,
@@ -472,7 +472,6 @@ void GanttChartWidget::OnZoomOutClickedScroll(const QPointF &) {
 }
 
 
-
 double GanttChartWidget::scrollBarValueToDouble(QScrollBar *scrollBar, double zoom) const {
     return static_cast<double>(scrollBar->value()) / zoom;
 }
@@ -865,26 +864,6 @@ void GanttChartWidget::setToolbarHeight(int height) {
 
 
 
-//void GanttChartWidget::wheelEvent(QWheelEvent *event) {
-//    if (event->modifiers() == Qt::ControlModifier) {
-//        // Координаты указателя мыши относительно виджета
-//        QPointF mousePosWidget = event->position();
-
-//        // Определяем направление прокрутки
-//        int delta = event->angleDelta().y();
-//        if (delta > 0) {
-//            OnZoomInClickedScroll(mousePosWidget);  // Передаем координаты мыши
-//        } else if (delta < 0) {
-//            OnZoomOutClickedScroll(mousePosWidget);  // Передаем координаты мыши
-//        }
-
-//        event->accept();
-//    } else {
-//        QWidget::wheelEvent(event);
-//    }
-//}
-
-
 void GanttChartWidget::wheelEvent(QWheelEvent *event) {
     if (event->modifiers() == Qt::ControlModifier) {
         // Зум при Ctrl
@@ -926,24 +905,6 @@ void GanttChartWidget::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 
-//void GanttChartWidget::mouseReleaseEvent(QMouseEvent *event) {
-//    if (m_bHandToolActive && event->button() == Qt::LeftButton) {
-//        m_bHandToolActive = false;
-//        setCursor(Qt::ArrowCursor);
-
-//        // 🔄 Сохраняем текущий offset как точный!
-//        setPreciseOffset(QPointF(m_offset), "mouseReleaseEvent");
-
-//        event->accept();
-//    } else {
-//        QWidget::mouseReleaseEvent(event);
-//    }
-//}
-
-
-
-
-
 QPoint GanttChartWidget::clampOffsetToValidRange(const QPoint& offset) const {
     QSize imageSize = getCurrentImageSize();
     QSize viewportSize = this->size();
@@ -973,23 +934,49 @@ QPoint GanttChartWidget::clampOffsetToValidRange(const QPoint& offset) const {
 void GanttChartWidget::mouseMoveEvent(QMouseEvent *event) {
     // Если активен режим перетаскивания (hand tool), выполняем существующую логику
 //    qDebug() << "offset in mouseMoveEvent: " << m_offset;
+//    if (m_bHandToolActive) {
+//        QPoint currentMousePos = event->pos();
+//        QPoint offset = currentMousePos - m_lastMousePos;
+
+//        QPoint proposedOffset = m_offset + offset;
+//        m_offset = clampOffsetToValidRange(proposedOffset);
+
+//        setPreciseOffset(QPointF(m_offset), __FUNCTION__);
+
+//        m_lastMousePos = currentMousePos;
+
+//        m_pHScrollBar->setValue(-m_offset.x());
+//        m_pVScrollBar->setValue(-m_offset.y());
+//        update();
+//        event->accept();
+//        updateScrollbars();
+
+//    }
+
     if (m_bHandToolActive) {
         QPoint currentMousePos = event->pos();
-        QPoint offset = currentMousePos - m_lastMousePos;
+        QPoint offsetDelta = currentMousePos - m_lastMousePos;
 
-        QPoint proposedOffset = m_offset + offset;
-        m_offset = clampOffsetToValidRange(proposedOffset);
+        QPoint proposedOffset = m_offset + offsetDelta;
+        QPoint newOffset = clampOffsetToValidRange(proposedOffset);
+
+        // 🔍 Если offset не изменился — прекращаем перетаскивание
+        if (newOffset == m_offset) {
+            qDebug() << "🧱 Перемещение уперлось в край — прекращаем перетаскивание.";
+            m_bHandToolActive = false;
+            setCursor(Qt::ArrowCursor);
+            return;
+        }
+
+        m_offset = newOffset;
         setPreciseOffset(QPointF(m_offset), __FUNCTION__);
-
         m_lastMousePos = currentMousePos;
 
         m_pHScrollBar->setValue(-m_offset.x());
         m_pVScrollBar->setValue(-m_offset.y());
         update();
-        event->accept();
         updateScrollbars();
-
-
+        event->accept();
     }
 
     else {
@@ -1071,21 +1058,21 @@ void GanttChartWidget::showEvent(QShowEvent *event) {
 }
 
 
-void GanttChartWidget::printStackTrace(const QString &message) {
-    constexpr int MAX_FRAMES = 20;
-    void* buffer[MAX_FRAMES];
-    int size = backtrace(buffer, MAX_FRAMES);
-    char** symbols = backtrace_symbols(buffer, size);
+//void GanttChartWidget::printStackTrace(const QString &message) {
+//    constexpr int MAX_FRAMES = 20;
+//    void* buffer[MAX_FRAMES];
+//    int size = backtrace(buffer, MAX_FRAMES);
+//    char** symbols = backtrace_symbols(buffer, size);
 
-    qDebug() << "\n\n=== Stack trace for:" << message << "===";
-    for (int i = 0; i < size; ++i) {
-        qDebug() << symbols[i];
-    }
-    free(symbols);
-    qDebug() << "====================";
-}
+//    qDebug() << "\n\n=== Stack trace for:" << message << "===";
+//    for (int i = 0; i < size; ++i) {
+//        qDebug() << symbols[i];
+//    }
+//    free(symbols);
+//    qDebug() << "====================";
+//}
 
-#include <execinfo.h>
+//#include <execinfo.h>
 
 void GanttChartWidget::setPreciseOffset(QPointF offset, const QString &context) {
     qDebug() << "➡ setPreciseOffset called. context =" << context << ", offset =" << offset;
@@ -1138,7 +1125,7 @@ void GanttChartWidget::setPreciseOffset(QPointF offset, const QString &context) 
 
     if (m_offset == QPoint(0, 0) && offset != QPointF(0, 0)) {
         qDebug() << "⚠️ m_offset обнулился несмотря на offset =" << offset;
-        printStackTrace("Offset reset to (0, 0)");
+//        printStackTrace("Offset reset to (0, 0)");
     }
 
     qDebug() << "🎯 Установлен m_offset:" << m_offset;
@@ -1158,65 +1145,6 @@ QSize GanttChartWidget::getCurrentImageSize() const {
     return QSize(width, height);
 }
 
-//void GanttChartWidget::updateScrollbars() {
-//    QSize imageSize = getCurrentImageSize();
-//    QSize viewportSize = size();
-
-//    int maxH = std::max(0, imageSize.width() - viewportSize.width());
-//    int maxV = std::max(0, imageSize.height() - viewportSize.height());
-
-//    m_pHScrollBar->setRange(0, maxH);
-//    m_pVScrollBar->setRange(0, maxV);
-
-//    m_pHScrollBar->setPageStep(viewportSize.width());
-//    m_pVScrollBar->setPageStep(viewportSize.height());
-
-//    m_pHScrollBar->setValue(-m_offset.x());
-//    m_pVScrollBar->setValue(-m_offset.y());
-
-//    m_pHScrollBar->setVisible(maxH > 0);
-//    m_pVScrollBar->setVisible(maxV > 0);
-//}
-
-
-//void GanttChartWidget::updateScrollbars() {
-//    QSize imageSize = getCurrentImageSize();
-//    QSize viewportSize = size();
-//    double zoom = m_pGanttChart->get_zoom();
-
-//    // 🔍 ДО обновления
-//    qDebug() << "📦 [BEFORE] updateScrollbars():";
-//    qDebug() << "    Zoom: " << zoom;
-//    qDebug() << "    Image Size: " << imageSize << ", Viewport Size: " << viewportSize;
-//    qDebug() << "    HScroll: Range=" << m_pHScrollBar->minimum() << "-" << m_pHScrollBar->maximum()
-//             << ", PageStep=" << m_pHScrollBar->pageStep();
-//    qDebug() << "    VScroll: Range=" << m_pVScrollBar->minimum() << "-" << m_pVScrollBar->maximum()
-//             << ", PageStep=" << m_pVScrollBar->pageStep();
-
-//    int maxH = std::max(0, imageSize.width() - viewportSize.width());
-//    int maxV = std::max(0, imageSize.height() - viewportSize.height());
-
-//    m_pHScrollBar->setRange(0, maxH);
-//    m_pVScrollBar->setRange(0, maxV);
-
-//    m_pHScrollBar->setPageStep(viewportSize.width());
-//    m_pVScrollBar->setPageStep(viewportSize.height());
-
-//    m_pHScrollBar->setValue(-m_offset.x());
-//    m_pVScrollBar->setValue(-m_offset.y());
-
-//    // 👁️ Отображать полосы только если zoom > 1
-//    bool showScrollbars = (zoom > 1.0);
-//    m_pHScrollBar->setVisible(showScrollbars && maxH > 0);
-//    m_pVScrollBar->setVisible(showScrollbars && maxV > 0);
-
-//    // 🔍 ПОСЛЕ обновления
-//    qDebug() << "📦 [AFTER] updateScrollbars():";
-//    qDebug() << "    H range: 0 -" << maxH << ", pageStep=" << m_pHScrollBar->pageStep()
-//             << ", visible=" << m_pHScrollBar->isVisible();
-//    qDebug() << "    V range: 0 -" << maxV << ", pageStep=" << m_pVScrollBar->pageStep()
-//             << ", visible=" << m_pVScrollBar->isVisible();
-//}
 
 void GanttChartWidget::updateScrollbars() {
     QSize imageSize = getCurrentImageSize();
