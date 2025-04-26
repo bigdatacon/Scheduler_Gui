@@ -924,15 +924,7 @@ void GanttChartWidget::mouseReleaseEvent(QMouseEvent *event) {
 
 void GanttChartWidget::mouseMoveEvent(QMouseEvent *event) {
     // Если активен режим перетаскивания (hand tool), выполняем существующую логику
-//    if (m_bHandToolActive) {
-//        QPoint currentMousePos = event->pos();
-//        QPoint offset = currentMousePos - m_lastMousePos;
-//        m_offset += offset;
-//        // (Ваш существующий код для ограничения смещения и обновления полос прокрутки)
-//        m_lastMousePos = currentMousePos;
-//        update();
-//        event->accept();
-//    }
+
 
 //    if (m_bHandToolActive) {
 //        QPoint currentMousePos = event->pos();
@@ -961,6 +953,8 @@ void GanttChartWidget::mouseMoveEvent(QMouseEvent *event) {
         // 🔍 Если offset не изменился — прекращаем перетаскивание
         if (newOffset == m_offset) {
             qDebug() << "🧱 Перемещение уперлось в край — прекращаем перетаскивание.";
+
+
             m_bHandToolActive = false;
             setCursor(Qt::ArrowCursor);
             return;
@@ -973,8 +967,9 @@ void GanttChartWidget::mouseMoveEvent(QMouseEvent *event) {
         m_pHScrollBar->setValue(-m_offset.x());
         m_pVScrollBar->setValue(-m_offset.y());
         update();
-        updateScrollbars();
+
         event->accept();
+//        updateScrollbars();
     }
 
     else {
@@ -1155,6 +1150,9 @@ void GanttChartWidget::setPreciseOffset(QPointF offset, const QString &context) 
     {
             clampedY = std::clamp(proposedY, minOffsetY, maxOffsetY);
         }
+
+
+
 
 
     m_offset = QPoint(clampedX, clampedY);

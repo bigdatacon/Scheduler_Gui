@@ -1,164 +1,119 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'GanttChartWidget.h'
 **
-** Created by: The Qt Meta Object Compiler version 68 (Qt 6.7.0)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "GanttChartWidget.h"
-#include <QtGui/qtextcursor.h>
-#include <QtCore/qmetatype.h>
-
-#include <QtCore/qtmochelpers.h>
-
 #include <memory>
-
-
-#include <QtCore/qxptype_traits.h>
+#include "GanttChartWidget.h"
+#include <QtCore/qbytearray.h>
+#include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'GanttChartWidget.h' doesn't include <QObject>."
-#elif Q_MOC_OUTPUT_REVISION != 68
-#error "This file was generated using the moc from 6.7.0. It"
+#elif Q_MOC_OUTPUT_REVISION != 67
+#error "This file was generated using the moc from 5.15.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
-#ifndef Q_CONSTINIT
-#define Q_CONSTINIT
-#endif
-
+QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
-QT_WARNING_DISABLE_GCC("-Wuseless-cast")
-namespace {
+struct qt_meta_stringdata_GanttChartWidget_t {
+    QByteArrayData data[21];
+    char stringdata0[321];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_GanttChartWidget_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_GanttChartWidget_t qt_meta_stringdata_GanttChartWidget = {
+    {
+QT_MOC_LITERAL(0, 0, 16), // "GanttChartWidget"
+QT_MOC_LITERAL(1, 17, 17), // "statusTextChanged"
+QT_MOC_LITERAL(2, 35, 0), // ""
+QT_MOC_LITERAL(3, 36, 4), // "text"
+QT_MOC_LITERAL(4, 41, 10), // "UpdateSize"
+QT_MOC_LITERAL(5, 52, 7), // "setZoom"
+QT_MOC_LITERAL(6, 60, 9), // "zoomLevel"
+QT_MOC_LITERAL(7, 70, 20), // "OnSolveButtonClicked"
+QT_MOC_LITERAL(8, 91, 28), // "OnShowScheduleMetricsClicked"
+QT_MOC_LITERAL(9, 120, 34), // "OnSolveButtonClicked_SolverRe..."
+QT_MOC_LITERAL(10, 155, 16), // "OnZoomOutClicked"
+QT_MOC_LITERAL(11, 172, 15), // "OnZoomInClicked"
+QT_MOC_LITERAL(12, 188, 21), // "OnZoomInClickedScroll"
+QT_MOC_LITERAL(13, 210, 8), // "mousePos"
+QT_MOC_LITERAL(14, 219, 22), // "OnZoomOutClickedScroll"
+QT_MOC_LITERAL(15, 242, 22), // "scrollBarValueToDouble"
+QT_MOC_LITERAL(16, 265, 11), // "QScrollBar*"
+QT_MOC_LITERAL(17, 277, 9), // "scrollBar"
+QT_MOC_LITERAL(18, 287, 4), // "zoom"
+QT_MOC_LITERAL(19, 292, 22), // "doubleToScrollBarValue"
+QT_MOC_LITERAL(20, 315, 5) // "value"
 
-#ifdef QT_MOC_HAS_STRINGDATA
-struct qt_meta_stringdata_CLASSGanttChartWidgetENDCLASS_t {};
-constexpr auto qt_meta_stringdata_CLASSGanttChartWidgetENDCLASS = QtMocHelpers::stringData(
-    "GanttChartWidget",
-    "statusTextChanged",
-    "",
-    "text",
-    "UpdateSize",
-    "OnSolveButtonClicked",
-    "OnShowScheduleMetricsClicked",
-    "OnSolveButtonClicked_SolverRestart",
-    "OnZoomOutClicked",
-    "OnZoomInClicked",
-    "OnZoomInClickedScroll",
-    "mousePos",
-    "OnZoomOutClickedScroll",
-    "findScrollArea",
-    "QScrollArea*",
-    "scrollBarValueToDouble",
-    "QScrollBar*",
-    "scrollBar",
-    "zoom",
-    "doubleToScrollBarValue",
-    "value",
-    "updateScrollBars"
-);
-#else  // !QT_MOC_HAS_STRINGDATA
-#error "qtmochelpers.h not found or too old."
-#endif // !QT_MOC_HAS_STRINGDATA
-} // unnamed namespace
+    },
+    "GanttChartWidget\0statusTextChanged\0\0"
+    "text\0UpdateSize\0setZoom\0zoomLevel\0"
+    "OnSolveButtonClicked\0OnShowScheduleMetricsClicked\0"
+    "OnSolveButtonClicked_SolverRestart\0"
+    "OnZoomOutClicked\0OnZoomInClicked\0"
+    "OnZoomInClickedScroll\0mousePos\0"
+    "OnZoomOutClickedScroll\0scrollBarValueToDouble\0"
+    "QScrollBar*\0scrollBar\0zoom\0"
+    "doubleToScrollBarValue\0value"
+};
+#undef QT_MOC_LITERAL
 
-Q_CONSTINIT static const uint qt_meta_data_CLASSGanttChartWidgetENDCLASS[] = {
+static const uint qt_meta_data_GanttChartWidget[] = {
 
  // content:
-      12,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
-      13,   14, // methods
+      12,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
        1,       // signalCount
 
- // signals: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    1,   92,    2, 0x06,    1 /* Public */,
+ // signals: name, argc, parameters, tag, flags
+       1,    1,   74,    2, 0x06 /* Public */,
 
- // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       4,    0,   95,    2, 0x0a,    3 /* Public */,
-       5,    0,   96,    2, 0x08,    4 /* Private */,
-       6,    0,   97,    2, 0x08,    5 /* Private */,
-       7,    0,   98,    2, 0x08,    6 /* Private */,
-       8,    0,   99,    2, 0x08,    7 /* Private */,
-       9,    0,  100,    2, 0x08,    8 /* Private */,
-      10,    1,  101,    2, 0x08,    9 /* Private */,
-      12,    1,  104,    2, 0x08,   11 /* Private */,
-      13,    0,  107,    2, 0x108,   13 /* Private | MethodIsConst  */,
-      15,    2,  108,    2, 0x108,   14 /* Private | MethodIsConst  */,
-      19,    2,  113,    2, 0x108,   17 /* Private | MethodIsConst  */,
-      21,    0,  118,    2, 0x08,   20 /* Private */,
+ // slots: name, argc, parameters, tag, flags
+       4,    0,   77,    2, 0x0a /* Public */,
+       5,    1,   78,    2, 0x0a /* Public */,
+       7,    0,   81,    2, 0x08 /* Private */,
+       8,    0,   82,    2, 0x08 /* Private */,
+       9,    0,   83,    2, 0x08 /* Private */,
+      10,    0,   84,    2, 0x08 /* Private */,
+      11,    0,   85,    2, 0x08 /* Private */,
+      12,    1,   86,    2, 0x08 /* Private */,
+      14,    1,   89,    2, 0x08 /* Private */,
+      15,    2,   92,    2, 0x08 /* Private */,
+      19,    2,   97,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString,    3,
 
  // slots: parameters
     QMetaType::Void,
+    QMetaType::Void, QMetaType::Double,    6,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QPointF,   11,
-    QMetaType::Void, QMetaType::QPointF,   11,
-    0x80000000 | 14,
+    QMetaType::Void, QMetaType::QPointF,   13,
+    QMetaType::Void, QMetaType::QPointF,   13,
     QMetaType::Double, 0x80000000 | 16, QMetaType::Double,   17,   18,
     QMetaType::Int, QMetaType::Double, QMetaType::Double,   20,   18,
-    QMetaType::Void,
 
        0        // eod
 };
-
-Q_CONSTINIT const QMetaObject GanttChartWidget::staticMetaObject = { {
-    QMetaObject::SuperData::link<QWidget::staticMetaObject>(),
-    qt_meta_stringdata_CLASSGanttChartWidgetENDCLASS.offsetsAndSizes,
-    qt_meta_data_CLASSGanttChartWidgetENDCLASS,
-    qt_static_metacall,
-    nullptr,
-    qt_incomplete_metaTypeArray<qt_meta_stringdata_CLASSGanttChartWidgetENDCLASS_t,
-        // Q_OBJECT / Q_GADGET
-        QtPrivate::TypeAndForceComplete<GanttChartWidget, std::true_type>,
-        // method 'statusTextChanged'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
-        // method 'UpdateSize'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'OnSolveButtonClicked'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'OnShowScheduleMetricsClicked'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'OnSolveButtonClicked_SolverRestart'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'OnZoomOutClicked'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'OnZoomInClicked'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'OnZoomInClickedScroll'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<const QPointF &, std::false_type>,
-        // method 'OnZoomOutClickedScroll'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<const QPointF &, std::false_type>,
-        // method 'findScrollArea'
-        QtPrivate::TypeAndForceComplete<QScrollArea *, std::false_type>,
-        // method 'scrollBarValueToDouble'
-        QtPrivate::TypeAndForceComplete<double, std::false_type>,
-        QtPrivate::TypeAndForceComplete<QScrollBar *, std::false_type>,
-        QtPrivate::TypeAndForceComplete<double, std::false_type>,
-        // method 'doubleToScrollBarValue'
-        QtPrivate::TypeAndForceComplete<int, std::false_type>,
-        QtPrivate::TypeAndForceComplete<double, std::false_type>,
-        QtPrivate::TypeAndForceComplete<double, std::false_type>,
-        // method 'updateScrollBars'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>
-    >,
-    nullptr
-} };
 
 void GanttChartWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
@@ -166,35 +121,43 @@ void GanttChartWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int
         auto *_t = static_cast<GanttChartWidget *>(_o);
         (void)_t;
         switch (_id) {
-        case 0: _t->statusTextChanged((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
+        case 0: _t->statusTextChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 1: _t->UpdateSize(); break;
-        case 2: _t->OnSolveButtonClicked(); break;
-        case 3: _t->OnShowScheduleMetricsClicked(); break;
-        case 4: _t->OnSolveButtonClicked_SolverRestart(); break;
-        case 5: _t->OnZoomOutClicked(); break;
-        case 6: _t->OnZoomInClicked(); break;
-        case 7: _t->OnZoomInClickedScroll((*reinterpret_cast< std::add_pointer_t<QPointF>>(_a[1]))); break;
-        case 8: _t->OnZoomOutClickedScroll((*reinterpret_cast< std::add_pointer_t<QPointF>>(_a[1]))); break;
-        case 9: { QScrollArea* _r = _t->findScrollArea();
-            if (_a[0]) *reinterpret_cast< QScrollArea**>(_a[0]) = std::move(_r); }  break;
-        case 10: { double _r = _t->scrollBarValueToDouble((*reinterpret_cast< std::add_pointer_t<QScrollBar*>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[2])));
+        case 2: _t->setZoom((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 3: _t->OnSolveButtonClicked(); break;
+        case 4: _t->OnShowScheduleMetricsClicked(); break;
+        case 5: _t->OnSolveButtonClicked_SolverRestart(); break;
+        case 6: _t->OnZoomOutClicked(); break;
+        case 7: _t->OnZoomInClicked(); break;
+        case 8: _t->OnZoomInClickedScroll((*reinterpret_cast< const QPointF(*)>(_a[1]))); break;
+        case 9: _t->OnZoomOutClickedScroll((*reinterpret_cast< const QPointF(*)>(_a[1]))); break;
+        case 10: { double _r = _t->scrollBarValueToDouble((*reinterpret_cast< QScrollBar*(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< double*>(_a[0]) = std::move(_r); }  break;
-        case 11: { int _r = _t->doubleToScrollBarValue((*reinterpret_cast< std::add_pointer_t<double>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[2])));
+        case 11: { int _r = _t->doubleToScrollBarValue((*reinterpret_cast< double(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 12: _t->updateScrollBars(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
             using _t = void (GanttChartWidget::*)(const QString & );
-            if (_t _q_method = &GanttChartWidget::statusTextChanged; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&GanttChartWidget::statusTextChanged)) {
                 *result = 0;
                 return;
             }
         }
     }
 }
+
+QT_INIT_METAOBJECT const QMetaObject GanttChartWidget::staticMetaObject = { {
+    QMetaObject::SuperData::link<QWidget::staticMetaObject>(),
+    qt_meta_stringdata_GanttChartWidget.data,
+    qt_meta_data_GanttChartWidget,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
 
 const QMetaObject *GanttChartWidget::metaObject() const
 {
@@ -204,7 +167,7 @@ const QMetaObject *GanttChartWidget::metaObject() const
 void *GanttChartWidget::qt_metacast(const char *_clname)
 {
     if (!_clname) return nullptr;
-    if (!strcmp(_clname, qt_meta_stringdata_CLASSGanttChartWidgetENDCLASS.stringdata0))
+    if (!strcmp(_clname, qt_meta_stringdata_GanttChartWidget.stringdata0))
         return static_cast<void*>(this);
     return QWidget::qt_metacast(_clname);
 }
@@ -215,13 +178,13 @@ int GanttChartWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 13)
+        if (_id < 12)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 13;
+        _id -= 12;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 13)
-            *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 13;
+        if (_id < 12)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 12;
     }
     return _id;
 }
@@ -233,3 +196,4 @@ void GanttChartWidget::statusTextChanged(const QString & _t1)
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 QT_WARNING_POP
+QT_END_MOC_NAMESPACE

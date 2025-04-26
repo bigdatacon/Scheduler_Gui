@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "/home/user1/SchedulingSolverGUI-25-04-25/SchedulingSolverGUI-24-04-25/debug/gch_3",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "/home/user1/SchedulingSolverGUI-25-04-25/SchedulingSolverGUI-24-04-25",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "/usr/bin/gdb",  // Убедитесь, что путь к gdb правильный
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+      "preLaunchTask": "Build Project"  // Убедитесь, что у вас есть задача для сборки
+    }
+  ]
+}

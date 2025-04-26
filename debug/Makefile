@@ -68,6 +68,7 @@ OBJECTS       = GlobalState.o \
 		moc_GanttChartWidget.o \
 		moc_MainWindow.o
 DIST          = ../.gitignore \
+		../.gitignore \
 		../operation_data.json \
 		../operation_data_2.json \
 		../resources/icons8-ракета-64.png \
@@ -575,8 +576,6 @@ moc_GanttChartWidget.cpp: ../GanttChartWidget.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qcheckbox.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QLineEdit \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlineedit.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QScrollArea \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qscrollarea.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/user1/SchedulingSolverGUI-25-04-25/SchedulingSolverGUI-24-04-25/debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/user1/SchedulingSolverGUI-25-04-25/SchedulingSolverGUI-24-04-25 -I/home/user1/SchedulingSolverGUI-25-04-25/SchedulingSolverGUI-24-04-25/json/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/Library/Developer/CommandLineTools/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/16/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include ../GanttChartWidget.h -o moc_GanttChartWidget.cpp
@@ -1026,8 +1025,6 @@ GanttChartWidget.o: ../GanttChartWidget.cpp ../GanttChartWidget.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qcheckbox.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QLineEdit \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlineedit.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QScrollArea \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qscrollarea.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QVBoxLayout \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qboxlayout.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlayout.h \
@@ -1045,6 +1042,8 @@ GanttChartWidget.o: ../GanttChartWidget.cpp ../GanttChartWidget.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtCore/qthread.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtCore/qdeadlinetimer.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtCore/qelapsedtimer.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QScrollArea \
+		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qscrollarea.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QScrollBar \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qscrollbar.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qabstractslider.h \
@@ -1222,7 +1221,20 @@ MainWindow.o: ../MainWindow.cpp ../MainWindow.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QMessageBox \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qmessagebox.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStatusBar \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstatusbar.h
+		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstatusbar.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtGui/QGuiApplication \
+		/usr/include/x86_64-linux-gnu/qt5/QtGui/qguiapplication.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtCore/qeventloop.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtGui/qinputmethod.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtGui/QScreen \
+		/usr/include/x86_64-linux-gnu/qt5/QtGui/qscreen.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtCore/QList \
+		/usr/include/x86_64-linux-gnu/qt5/QtCore/QObject \
+		/usr/include/x86_64-linux-gnu/qt5/QtCore/QRect \
+		/usr/include/x86_64-linux-gnu/qt5/QtCore/QSize \
+		/usr/include/x86_64-linux-gnu/qt5/QtCore/QSizeF \
+		/usr/include/x86_64-linux-gnu/qt5/QtGui/QTransform
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainWindow.o ../MainWindow.cpp
 
 main.o: ../main.cpp /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication \
